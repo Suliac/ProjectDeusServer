@@ -1,5 +1,7 @@
-#include "stdafx.h"
 #include "TcpSocket.h"
+#include "DeusSocketException.h"
+
+#include <WS2tcpip.h>
 
 namespace DeusNetwork
 {
@@ -11,54 +13,56 @@ namespace DeusNetwork
 	{
 		SocketClose();
 	}
-	
-	int TcpSocket::TCPConnect(const SOCKET socket)
+
+	void TcpSocket::TCPConnect(const SOCKET socket)
 	{
 		m_handler = socket;
-		m_state = SOCKET_READY;
-		return 0;
+		m_state = SocketState::SOCKET_READY;
 	}
-	
-	int TcpSocket::TCPConnect(const char* ipAdress, const char* port)
+
+	void TcpSocket::TCPConnect(std::string ipAdress, std::string port)
 	{
-		if (SocketInit(AF_INET, SOCK_STREAM, IPPROTO_TCP, AI_PASSIVE, ipAdress, port) == SOCKET_ERROR)
-			return SOCKET_ERROR;
-		if (SocketCreate() == SOCKET_ERROR)
-			return SOCKET_ERROR;
+		try {
+			SocketInit(AF_INET, SOCK_STREAM, IPPROTO_TCP, AI_PASSIVE, ipAdress, port);
+			SocketCreate();
+		}
+		catch (DeusSocketException const e)
+		{
+			throw e;
+		}
 
 		if (m_distantInfos == nullptr)
-			return SOCKET_ERROR;
+			throw DeusSocketException("Impossible to retrieve connection informations");
 
 		// Connect with the infos we got during the init of the socket
 		int result = connect(m_handler, m_distantInfos->ai_addr, (int)m_distantInfos->ai_addrlen);
 		if (result == SOCKET_ERROR) {
 			closesocket(m_handler);
 			m_handler = INVALID_SOCKET;
-			return SOCKET_ERROR;
+			throw DeusSocketException("TCP Connection for [" + ipAdress + "@" + port + "] failed");
 		}
 
 		// we don't need those informations anymore
 		freeaddrinfo(m_distantInfos);
 
 		if (m_handler == INVALID_SOCKET) {
-			printf("Unable to connect to server!\n");
 			WSACleanup();
-			return SOCKET_ERROR;
+			throw DeusSocketException("Unable to connect to server!");
 		}
 
-		m_state = SOCKET_READY;
-		return 0;
+		m_state = SocketState::SOCKET_READY;
 	}
 
 	int TcpSocket::TCPSend(const char* sendbuf, unsigned int datasSize)
 	{
-		if (m_state != SOCKET_READY)
+		if (m_state != SocketState::SOCKET_READY)
 			return SOCKET_ERROR;
 
 		int result = send(m_handler, sendbuf, datasSize, 0);
 		if (result == SOCKET_ERROR) {
-			printf("send failed with error: %d\n", GetLastError());
-			closesocket(m_handler);
+			std::string message = "send failed with error: "+ std::to_string(SocketGetLastError());
+			closesocket(m_handler); 
+			throw DeusSocketException(message);
 		}
 
 		return result;
@@ -69,9 +73,9 @@ namespace DeusNetwork
 		int result = recv(m_handler, datas, datasSize, 0); // récupérer les données réçue sur cette socket
 		if (result < 0) // données reçues
 		{
-			printf("recv failed: %d\n", GetLastError());
+			std::string message = "recv failed with error: " + std::to_string(SocketGetLastError());
 			closesocket(m_handler);
-			return SOCKET_ERROR;
+			throw DeusSocketException(message);
 		}
 
 		return result;

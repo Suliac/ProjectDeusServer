@@ -1,28 +1,29 @@
-#include "stdafx.h"
 #include "Socket.h"
+#include "DeusSocketException.h"
+
+#include <sstream>
+#include <WS2tcpip.h>
+
 
 namespace DeusNetwork
 {
 	Socket::Socket()
 	{
-		m_state = SOCKET_NOT_INITIALIZED;
+		m_state = SocketState::SOCKET_NOT_INITIALIZED;
 	}
 
 	Socket::~Socket()
 	{
-		if (m_distantInfos != nullptr)
-			freeaddrinfo(m_distantInfos);
 	}
 
-	int Socket::SocketInit(short family, short type, IPPROTO protocol, short flags, const char* ipAdress, const char* port)
+	void Socket::SocketInit(short family, short type, IPPROTO protocol, short flags, std::string ipAdress, std::string port)
 	{
 		m_distantInfos = nullptr;
 
 		// Initialize Winsock api
 		int iResult = WSAStartup(MAKEWORD(2, 2), &m_wsaData);
 		if (iResult != 0) {
-			printf("WSAStartup failed: %d\n", iResult);
-			return SOCKET_ERROR;
+			throw DeusSocketException("WSAStartup failed: " + std::to_string(iResult));
 		}
 
 		// Get/init addr infos
@@ -33,37 +34,33 @@ namespace DeusNetwork
 		m_hints.ai_flags = flags;
 
 		// Resolve the local address and port to be used by the peer
-		iResult = getaddrinfo(ipAdress, port, &m_hints, &m_distantInfos);
+		iResult = getaddrinfo(ipAdress.c_str(), port.c_str(), &m_hints, &m_distantInfos);
 		if (iResult != 0) {
-			printf("getaddrinfo failed: %d\n", iResult);
 			WSACleanup();
-			return SOCKET_ERROR;
+			throw DeusSocketException("Error when retreiving informations for [" + ipAdress + "@" + port + "]. Error " + std::to_string(iResult));
 		}
 
-		m_state = SOCKET_INITIALIZED;
-		return 0;
+		m_state = SocketState::SOCKET_INITIALIZED;
 	}
 
-	int Socket::SocketCreate()
+	void Socket::SocketCreate()
 	{
 		// Socket creation : to listen client connections
 		m_handler = socket(m_distantInfos->ai_family, m_distantInfos->ai_socktype, m_distantInfos->ai_protocol);
 		if (m_handler == INVALID_SOCKET)
 		{
-			printf("Error at socket(): %ld\n", SocketGetLastError());
+			int errorNumber = SocketGetLastError();
 			freeaddrinfo(m_distantInfos);
-			return SOCKET_ERROR;
+			throw DeusSocketException("Error during the socket creation : "+ std::to_string(errorNumber));
 		}
-		m_state = SOCKET_READY;
-
-		return 0;
+		m_state = SocketState::SOCKET_READY;
 	}
 
 	void Socket::SocketClose()
 	{
 		closesocket(m_handler);
 		WSACleanup(); 
-		m_state = SOCKET_CLOSED;
+		m_state = SocketState::SOCKET_CLOSED;
 	}
 
 	int Socket::SocketShutdown()

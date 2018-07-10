@@ -12,16 +12,17 @@ namespace DeusNetwork
 		~TcpSocket();
 
 		// Methods
-		/// Init TCP communication from an ip adress & a port
-		int TCPConnect(const char* ipAdress, const char* port);
 
-		/// Init TCP communication from an existing SOCKET
-		int TCPConnect(const SOCKET socket);
+		// Init TCP communication from an ip adress & a port
+		void TCPConnect(std::string ipAdress, std::string port);
 
-		/// Send buffer to the connected socket
+		// Init TCP communication from an existing SOCKET
+		void TCPConnect(const SOCKET socket);
+
+		// Send buffer to the connected socket
 		int TCPSend(const char* sendbuf, unsigned int datasSize);
 
-		/// Receive informations from the connected socket
+		// Receive informations from the connected socket
 		int TCPRecv(char* datas, unsigned int datasSize);
 	};
 }

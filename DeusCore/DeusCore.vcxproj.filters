@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Fichiers de ressources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Network">
+      <UniqueIdentifier>{1f34273f-6808-4d83-bbff-11b02fb07a3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Sockets">
+      <UniqueIdentifier>{97ded97a-e26a-4488-8b3e-74eb91a00a8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Sockets\Sources">
+      <UniqueIdentifier>{d25d3519-7511-41b2-be5f-fadd9c05dc5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Sockets\Headers">
+      <UniqueIdentifier>{bf1eb49f-8d84-427b-9460-52273885fae5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Exceptions">
+      <UniqueIdentifier>{3625f0c0-fea6-4311-937a-96f92a80733a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Exceptions\Headers">
+      <UniqueIdentifier>{09052e09-1dd4-4e5d-8a18-67b24137f6e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Exceptions\Sources">
+      <UniqueIdentifier>{89ca66ca-bb8b-4f70-850f-eed8be91469c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Socket.cpp">
+      <Filter>Network\Sockets\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpListener.cpp">
+      <Filter>Network\Sockets\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="TcpSocket.cpp">
+      <Filter>Network\Sockets\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="DeusSocketException.cpp">
+      <Filter>Network\Exceptions\Sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Socket.h">
+      <Filter>Network\Sockets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpListener.h">
+      <Filter>Network\Sockets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpSocket.h">
+      <Filter>Network\Sockets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="DeusSocketException.h">
+      <Filter>Network\Exceptions\Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
