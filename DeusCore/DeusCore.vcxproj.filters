@@ -26,6 +26,15 @@
     <Filter Include="Network\Exceptions\Sources">
       <UniqueIdentifier>{89ca66ca-bb8b-4f70-850f-eed8be91469c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Messages">
+      <UniqueIdentifier>{ab7dee00-0cee-4da0-8d3d-677aad1d407a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Messages\Headers">
+      <UniqueIdentifier>{0a0cd43c-f8aa-4dea-992b-8b33ba61f04d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Messages\Sources">
+      <UniqueIdentifier>{888b70d2-98ce-4e6b-8acd-544fa4d82b99}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Socket.cpp">
@@ -40,6 +49,12 @@
     <ClCompile Include="DeusSocketException.cpp">
       <Filter>Network\Exceptions\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Message.cpp">
+      <Filter>Network\Messages\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageText.cpp">
+      <Filter>Network\Messages\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -53,6 +68,15 @@
     </ClInclude>
     <ClInclude Include="DeusSocketException.h">
       <Filter>Network\Exceptions\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Message.h">
+      <Filter>Network\Messages\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>Network\Messages\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageText.h">
+      <Filter>Network\Messages\Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

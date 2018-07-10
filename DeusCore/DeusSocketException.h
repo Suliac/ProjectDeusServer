@@ -10,7 +10,7 @@ namespace DeusNetwork
 		DeusSocketException(std::string message);
 		~DeusSocketException();
 
-		std::string GetErrorMessage();
+		 std::string GetErrorMessage() const;
 
 	private:
 		std::string m_message;

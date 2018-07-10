@@ -12,7 +12,7 @@ namespace DeusNetwork
 	{
 	}
 
-	std::string DeusSocketException::GetErrorMessage()
+	 std::string DeusSocketException::GetErrorMessage() const
 	{
 		return m_message;
 	}

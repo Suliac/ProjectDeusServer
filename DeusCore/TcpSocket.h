@@ -2,6 +2,7 @@
 #define _TCPSOCKET
 
 #include "Socket.h"
+#include "Buffer.h"
 
 namespace DeusNetwork
 {
@@ -20,10 +21,10 @@ namespace DeusNetwork
 		void TCPConnect(const SOCKET socket);
 
 		// Send buffer to the connected socket
-		int TCPSend(const char* sendbuf, unsigned int datasSize);
+		int TCPSend(const Buffer& buffer);
 
 		// Receive informations from the connected socket
-		int TCPRecv(char* datas, unsigned int datasSize);
+		int TCPRecv(Buffer& buffer);
 	};
 }
 #endif // _TCPSOCKET

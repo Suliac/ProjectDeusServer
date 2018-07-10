@@ -53,12 +53,12 @@ namespace DeusNetwork
 		m_state = SocketState::SOCKET_READY;
 	}
 
-	int TcpSocket::TCPSend(const char* sendbuf, unsigned int datasSize)
+	int TcpSocket::TCPSend(const Buffer& buffer)
 	{
 		if (m_state != SocketState::SOCKET_READY)
 			return SOCKET_ERROR;
 
-		int result = send(m_handler, sendbuf, datasSize, 0);
+		int result = send(m_handler, reinterpret_cast<const char*>(buffer.data), buffer.size, 0);
 		if (result == SOCKET_ERROR) {
 			std::string message = "send failed with error: "+ std::to_string(SocketGetLastError());
 			closesocket(m_handler); 
@@ -68,9 +68,9 @@ namespace DeusNetwork
 		return result;
 	}
 
-	int TcpSocket::TCPRecv(char* datas, unsigned int datasSize)
+	int TcpSocket::TCPRecv(Buffer& buffer)
 	{
-		int result = recv(m_handler, datas, datasSize, 0); // récupérer les données réçue sur cette socket
+		int result = recv(m_handler, (char*)buffer.data, buffer.size, 0); // récupérer les données réçue sur cette socket
 		if (result < 0) // données reçues
 		{
 			std::string message = "recv failed with error: " + std::to_string(SocketGetLastError());
@@ -78,6 +78,7 @@ namespace DeusNetwork
 			throw DeusSocketException(message);
 		}
 
+		buffer.size = result;
 		return result;
 	}
 }
