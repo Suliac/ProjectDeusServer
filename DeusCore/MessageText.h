@@ -10,11 +10,11 @@ namespace DeusNetwork
 		MessageText();
 		~MessageText();
 
-		void Write(Buffer &buffer) override;
-		void Read(Buffer &buffer) override;
+		void Write(Buffer512 &buffer) const override;
+		void Read(const Buffer512 &buffer) override;
 	
-		void SetMessage(std::string message) { m_message = message; }
-		std::string GetMessage() { return m_message; };
+		void SetMessage(const std::string& message) { m_message = message; }
+		const std::string& GetMessage() { return m_message; };
 	private:
 		std::string m_message;
 	};

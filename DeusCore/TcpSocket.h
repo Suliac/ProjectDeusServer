@@ -21,10 +21,10 @@ namespace DeusNetwork
 		void TCPConnect(const SOCKET socket);
 
 		// Send buffer to the connected socket
-		int TCPSend(const Buffer& buffer);
+		int TCPSend(const Buffer512& buffer)const ;
 
 		// Receive informations from the connected socket
-		int TCPRecv(Buffer& buffer);
+		int TCPRecv(Buffer512& buffer) const;
 	};
 }
 #endif // _TCPSOCKET

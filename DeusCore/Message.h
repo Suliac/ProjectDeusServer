@@ -6,17 +6,17 @@ namespace DeusNetwork
 	class Message
 	{
 	public:
-		virtual void Write(Buffer &buffer) = 0;
-		virtual void Read(Buffer &buffer) = 0;
+		virtual void Write(Buffer512 &buffer) const = 0;
+		virtual void Read(const Buffer512 &buffer) = 0;
 
 	protected:
-		
-		template<typename T> 
-		void SerializeData(Buffer& buffer, const T& value);
+
+		template<typename T>
+		void SerializeData(Buffer512& buffer, const T& value) const;
 
 
 		template<typename T>
-		T DeserializeData(Buffer& buffer);
+		T DeserializeData(const Buffer512& buffer) const;
 	};
 
 }

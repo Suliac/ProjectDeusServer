@@ -16,7 +16,7 @@ namespace DeusNetwork
 	{
 	}
 
-	void Socket::SocketInit(short family, short type, IPPROTO protocol, short flags, std::string ipAdress, std::string port)
+	void Socket::SocketInit(short family, short type, IPPROTO protocol, short flags, const std::string& ipAdress, const std::string& port)
 	{
 		m_distantInfos = nullptr;
 
@@ -63,12 +63,12 @@ namespace DeusNetwork
 		m_state = SocketState::SOCKET_CLOSED;
 	}
 
-	int Socket::SocketShutdown()
+	int Socket::SocketShutdown() const
 	{
 		return shutdown(m_handler, SD_SEND);
 	}
 
-	int Socket::SocketGetLastError()
+	int Socket::SocketGetLastError() const
 	{
 		int result = WSAGetLastError();
 		WSACleanup();

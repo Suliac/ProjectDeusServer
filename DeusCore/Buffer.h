@@ -1,12 +1,16 @@
 #pragma once
 namespace DeusNetwork
 {
-#define DEFAULT_BUFFER_SIZE 512
+	static const int SIZE_BUFFER = 512;
+
+	template<int N>
 	struct Buffer
 	{
-		unsigned char* data[DEFAULT_BUFFER_SIZE];	// pointer to buffer data
-		int size;				// size of the buffer data (in bytes)
-		int index;				// index of next byte to be read
+		unsigned char data[N];	// pointer to buffer data
+		int size;									// size of the buffer data (in bytes)
+		int index;									// index of next byte to be read
 	};
+
+	using Buffer512 = Buffer<SIZE_BUFFER>;
 }
 

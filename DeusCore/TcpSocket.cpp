@@ -53,7 +53,7 @@ namespace DeusNetwork
 		m_state = SocketState::SOCKET_READY;
 	}
 
-	int TcpSocket::TCPSend(const Buffer& buffer)
+	int TcpSocket::TCPSend(const Buffer512& buffer) const
 	{
 		if (m_state != SocketState::SOCKET_READY)
 			return SOCKET_ERROR;
@@ -68,7 +68,7 @@ namespace DeusNetwork
 		return result;
 	}
 
-	int TcpSocket::TCPRecv(Buffer& buffer)
+	int TcpSocket::TCPRecv(Buffer512& buffer) const
 	{
 		int result = recv(m_handler, (char*)buffer.data, buffer.size, 0); // récupérer les données réçue sur cette socket
 		if (result < 0) // données reçues

@@ -8,7 +8,7 @@
 namespace DeusNetwork
 {
 	template<typename T>
-	void Message::SerializeData(Buffer& buffer, const T& value) {
+	void Message::SerializeData(Buffer512& buffer, const T& value) const {
 		assert(sizeof(T) <= 8); // only work for small types
 		assert(buffer.index + sizeof(T) <= buffer.size);
 
@@ -22,17 +22,17 @@ namespace DeusNetwork
 	}
 
 	template<>
-	void Message::SerializeData<std::string>(Buffer& buffer, const std::string& value) {
+	void Message::SerializeData<std::string>(Buffer512& buffer, const std::string& value) const{
 		const char* charValue = value.c_str();
 		for (int i = 0; i < value.length(); i++)
 		{
-			SerializeData<char>(buffer, *charValue);
+			SerializeData(buffer, *charValue);
 			charValue++;
 		}
 	}
 
 	template<typename T>
-	T Message::DeserializeData(Buffer& buffer)
+	T Message::DeserializeData(const Buffer512& buffer) const
 	{
 		assert(sizeof(T) <= 8); // only work for small types
 		assert(buffer.index + sizeof(T) <= buffer.size); // can we read the nextbytes ?

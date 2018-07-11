@@ -21,24 +21,26 @@ namespace DeusNetwork
 		void SocketClose();
 
 		// Close socket (Soft)
-		int SocketShutdown();
+		int SocketShutdown() const;
 
 	protected:
 		Socket();
 		~Socket();
 
+		///////////////
 		//Methods
 
 		// Init the informations needed for socket creation
-		void SocketInit(short family, short type, IPPROTO protocol, short flags, std::string ipAdress, std::string port);
+		void SocketInit(short family, short type, IPPROTO protocol, short flags, const std::string& ipAdress, const std::string& port);
 
 		// Real Socket creation
 		void SocketCreate();
 
-		// Attributes
-
 		// Get last error from wsa datas
-		int SocketGetLastError();
+		int SocketGetLastError() const;
+
+		///////////////
+		// Attributes
 
 		// Socket which permit communication
 		SOCKET m_handler;

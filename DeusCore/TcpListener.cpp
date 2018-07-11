@@ -14,7 +14,7 @@ namespace DeusNetwork
 	{
 	}
 
-	void TcpListener::Init(std::string ipAdress, std::string port)
+	void TcpListener::Init(const std::string& ipAdress, const std::string& port) 
 	{
 		try {
 			SocketInit(AF_INET, SOCK_STREAM, IPPROTO_TCP, AI_PASSIVE, ipAdress, port);
@@ -52,7 +52,7 @@ namespace DeusNetwork
 		m_state = SocketState::SOCKET_READY;
 	}
 
-	void TcpListener::Accept(TcpSocket& socket)
+	void TcpListener::Accept(TcpSocket& socket) const
 	{
 		SOCKET clientSocket = accept(m_handler, NULL, NULL);
 		if (clientSocket == INVALID_SOCKET) {
