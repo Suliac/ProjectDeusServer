@@ -6,9 +6,9 @@ namespace DeusNetwork
 	template<int N>
 	struct Buffer
 	{
+		const int size = N;		// size of the buffer data (in bytes)
 		unsigned char data[N];	// pointer to buffer data
-		int size;									// size of the buffer data (in bytes)
-		int index;									// index of next byte to be read
+		int index = 0;			// index of next byte to be read
 	};
 
 	using Buffer512 = Buffer<SIZE_BUFFER>;

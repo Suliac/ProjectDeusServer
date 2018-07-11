@@ -10,13 +10,13 @@ namespace DeusNetwork
 	{
 	}
 
-	void MessageText::Write(Buffer512 &buffer) const
+	void MessageText::Serialize(Buffer512 &buffer) const
 	{
-		SerializeData<std::string>(buffer, m_message);
+		SerializeData<ISerializable>(buffer, m_message);
 	}
 
-	void MessageText::Read(const Buffer512 &buffer)
-	{
-		m_message = DeserializeData<std::string>(buffer);
+	void MessageText::Deserialize(Buffer512& buffer)
+	{		
+		DeserializeData<ISerializable>(buffer, m_message);
 	}
 }

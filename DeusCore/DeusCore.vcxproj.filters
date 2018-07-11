@@ -35,6 +35,15 @@
     <Filter Include="Network\Messages\Sources">
       <UniqueIdentifier>{888b70d2-98ce-4e6b-8acd-544fa4d82b99}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Serialization">
+      <UniqueIdentifier>{851f35b2-fd5b-4eed-b67d-ea24d158c303}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Serialization\Headers">
+      <UniqueIdentifier>{d0d1a53f-7601-42d7-bbbc-aa5fb5ff3c1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Serialization\Sources">
+      <UniqueIdentifier>{887eb740-a54b-4a27-af66-cd5a97c92132}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Socket.cpp">
@@ -49,11 +58,11 @@
     <ClCompile Include="DeusSocketException.cpp">
       <Filter>Network\Exceptions\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="Message.cpp">
-      <Filter>Network\Messages\Sources</Filter>
-    </ClCompile>
     <ClCompile Include="MessageText.cpp">
       <Filter>Network\Messages\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="StringSerializable.cpp">
+      <Filter>Network\Serialization\Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +86,12 @@
     </ClInclude>
     <ClInclude Include="MessageText.h">
       <Filter>Network\Messages\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializable.h">
+      <Filter>Network\Serialization\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="StringSerializable.h">
+      <Filter>Network\Serialization\Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -15,7 +15,7 @@ namespace DeusNetwork
 		// Methods
 
 		// Init TCP communication from an ip adress & a port
-		void TCPConnect(std::string ipAdress, std::string port);
+		void TCPConnect(const std::string& ipAdress, const std::string& port);
 
 		// Init TCP communication from an existing SOCKET
 		void TCPConnect(const SOCKET socket);

@@ -1,22 +1,26 @@
 #pragma once
 #include "Message.h"
+#include "StringSerializable.h"
 #include <string>
 
 namespace DeusNetwork
 {
-	class MessageText : public Message
+	class MessageText : public IMessage
 	{
 	public:
 		MessageText();
 		~MessageText();
 
-		void Write(Buffer512 &buffer) const override;
-		void Read(const Buffer512 &buffer) override;
+		// Write message information into the buffer
+		void Serialize(Buffer512 &buffer) const override;
+
+		// Put information from the buffer into the message
+		void Deserialize(Buffer512 &buffer) override;
 	
-		void SetMessage(const std::string& message) { m_message = message; }
-		const std::string& GetMessage() { return m_message; };
+		void SetMessage(const std::string& message) { m_message.assign(message); }
+		const std::string& GetTextMessage() { return m_message; };
 	private:
-		std::string m_message;
+		StringSerializable m_message;
 	};
 }
 

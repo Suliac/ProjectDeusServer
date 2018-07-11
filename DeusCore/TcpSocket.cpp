@@ -20,7 +20,7 @@ namespace DeusNetwork
 		m_state = SocketState::SOCKET_READY;
 	}
 
-	void TcpSocket::TCPConnect(std::string ipAdress, std::string port)
+	void TcpSocket::TCPConnect(const std::string& ipAdress, const std::string& port)
 	{
 		try {
 			SocketInit(AF_INET, SOCK_STREAM, IPPROTO_TCP, AI_PASSIVE, ipAdress, port);
@@ -58,28 +58,28 @@ namespace DeusNetwork
 		if (m_state != SocketState::SOCKET_READY)
 			return SOCKET_ERROR;
 
-		int result = send(m_handler, reinterpret_cast<const char*>(buffer.data), buffer.size, 0);
-		if (result == SOCKET_ERROR) {
+		int nbrBytesSent = send(m_handler, reinterpret_cast<const char*>(buffer.data), buffer.index, 0);
+		if (nbrBytesSent == SOCKET_ERROR) {
 			std::string message = "send failed with error: "+ std::to_string(SocketGetLastError());
 			closesocket(m_handler); 
 			throw DeusSocketException(message);
 		}
 
-		return result;
+		return nbrBytesSent;
 	}
 
 	int TcpSocket::TCPRecv(Buffer512& buffer) const
 	{
-		int result = recv(m_handler, (char*)buffer.data, buffer.size, 0); // récupérer les données réçue sur cette socket
-		if (result < 0) // données reçues
+		int recvSize = recv(m_handler, (char*)buffer.data, buffer.size, 0); // récupérer les données réçue sur cette socket
+		if (recvSize < 0) // données reçues
 		{
 			std::string message = "recv failed with error: " + std::to_string(SocketGetLastError());
 			closesocket(m_handler);
 			throw DeusSocketException(message);
 		}
 
-		buffer.size = result;
-		return result;
+		buffer.index = 0;
+		return recvSize;
 	}
 }
 
