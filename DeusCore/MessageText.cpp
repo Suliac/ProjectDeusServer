@@ -10,12 +10,12 @@ namespace DeusNetwork
 	{
 	}
 
-	void MessageText::Serialize(Buffer512 &buffer) const
+	void MessageText::OnSerialize(Buffer512 &buffer) const
 	{
 		SerializeData<ISerializable>(buffer, m_message);
 	}
 
-	void MessageText::Deserialize(Buffer512& buffer)
+	void MessageText::OnDeserialize(Buffer512& buffer)
 	{		
 		DeserializeData<ISerializable>(buffer, m_message);
 	}

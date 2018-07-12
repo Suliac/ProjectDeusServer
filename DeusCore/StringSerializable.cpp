@@ -11,18 +11,26 @@ namespace DeusNetwork
 	{
 	}
 
-	void StringSerializable::Serialize(Buffer512 & buffer) const
+	void StringSerializable::OnSerialize(Buffer512 & buffer) const
 	{
 		// we first serialize the length of the string
-		size_t dataSize = length();
-		SerializeData(buffer, dataSize);
+		size_t dataSize = length() + 1; // +1 to add the \0 of string
+		SerializeData(buffer, dataSize); // SerializeData only for primitive
 
 		//  then we add the string 
-		memcpy(buffer.data + buffer.index, c_str(), dataSize + 1);
-		buffer.index += dataSize + 1; // +1 to add the \0
+		const char* myCurrentText = c_str();
+		for (size_t i = 0; i < dataSize; i++)
+		{
+			SerializeData(buffer, *myCurrentText);
+			myCurrentText++;
+		}
+
+		//buffer.Insert((const unsigned char*)c_str(), dataSize);
+		//memcpy(buffer.data + buffer.index, c_str(), dataSize + 1);
+		//buffer.index += dataSize + 1; // +1 to add the \0
 	}
 
-	void StringSerializable::Deserialize(Buffer512 & buffer)
+	void StringSerializable::OnDeserialize(Buffer512 & buffer)
 	{
 		// get the size of the string
 		size_t dataSize;
@@ -30,9 +38,8 @@ namespace DeusNetwork
 
 		// get the string
 		clear();
-
-		assign((const char*)(buffer.data + buffer.index));
-
-		buffer.index += dataSize;
+		std::vector<unsigned char> tmp = buffer.Select(dataSize);
+		assign((char *)tmp.data());
+		//buffer.index += dataSize;
 	}
 }

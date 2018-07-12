@@ -53,33 +53,95 @@ namespace DeusNetwork
 		m_state = SocketState::SOCKET_READY;
 	}
 
-	int TcpSocket::TCPSend(const Buffer512& buffer) const
+	void TcpSocket::TCPSend(const IMessage& message, size_t& byteSent) const
 	{
-		if (m_state != SocketState::SOCKET_READY)
-			return SOCKET_ERROR;
+		Buffer512 buffer;
+		message.Serialize(buffer);
 
-		int nbrBytesSent = send(m_handler, reinterpret_cast<const char*>(buffer.data), buffer.index, 0);
-		if (nbrBytesSent == SOCKET_ERROR) {
-			std::string message = "send failed with error: "+ std::to_string(SocketGetLastError());
-			closesocket(m_handler); 
-			throw DeusSocketException(message);
+		try
+		{
+			TCPSend(buffer, byteSent);
+			std::cout << "Bytes sent: " << byteSent << std::endl;
 		}
-
-		return nbrBytesSent;
+		catch (const DeusSocketException& ex)
+		{
+			throw ex;
+		}
 	}
 
-	int TcpSocket::TCPRecv(Buffer512& buffer) const
+	void TcpSocket::TCPSend(const Buffer512& buffer, size_t& byteSent) const
 	{
-		int recvSize = recv(m_handler, (char*)buffer.data, buffer.size, 0); // récupérer les données réçue sur cette socket
-		if (recvSize < 0) // données reçues
+		try
+		{
+			TCPSend((const char*)buffer.Data(), buffer.GetIndex(), byteSent);
+		}
+		catch (const DeusSocketException& ex)
+		{
+			throw ex;
+		}
+	}
+
+	void TcpSocket::TCPSend(const char * data, std::size_t size, std::size_t & byteSent) const
+	{
+		if (m_state != SocketState::SOCKET_READY)
+			throw DeusSocketException("Socket wasn't ready to send");
+
+		byteSent = send(m_handler, data, size, 0);
+		if (byteSent == SOCKET_ERROR) {
+			std::string message = "send failed with error: " + std::to_string(SocketGetLastError());
+			closesocket(m_handler);
+			WSACleanup();
+			throw DeusSocketException(message);
+		}
+	}
+
+	void TcpSocket::TCPRecv(Buffer512& buffer, size_t& byteRecv) const
+	{
+		char tmpBuffer[SIZE_BUFFER];
+
+		try
+		{
+			TCPRecv(tmpBuffer, SIZE_BUFFER, byteRecv);
+		}
+		catch (const DeusSocketException& ex)
+		{
+			throw ex;
+		}
+
+		buffer.Set((const unsigned char*)tmpBuffer, byteRecv);
+	}
+
+	void TcpSocket::TCPRecv(IMessage & message, size_t & byteRecv) const
+	{
+		Buffer512 buffer;
+
+		try
+		{
+			TCPRecv(buffer, byteRecv);
+
+			if (byteRecv > 0)
+			{
+				std::cout << "Bytes received: " << byteRecv << std::endl;
+				message.Deserialize(buffer);
+				std::cout << "Deserialized size: " << buffer.GetIndex() << std::endl;
+			}
+		}
+		catch (const DeusSocketException& ex)
+		{
+			throw ex;
+		}
+	}
+
+	void TcpSocket::TCPRecv(char * data, size_t size, size_t & byteRecv) const
+	{
+		byteRecv = recv(m_handler, data, size, 0); // récupérer les données réçue sur cette socket
+		if (byteRecv < 0) // données reçues
 		{
 			std::string message = "recv failed with error: " + std::to_string(SocketGetLastError());
 			closesocket(m_handler);
+			WSACleanup();
 			throw DeusSocketException(message);
 		}
-
-		buffer.index = 0;
-		return recvSize;
 	}
 }
 

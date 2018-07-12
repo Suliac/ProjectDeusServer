@@ -7,11 +7,18 @@ namespace DeusNetwork
 	class ISerializable
 	{
 	public:
-
-		virtual void Serialize(Buffer512 &buffer) const = 0;
-		virtual void Deserialize(Buffer512 &buffer) = 0;
+		// Update buffer index to 'offset' param then call OnSerialize method
+		void Serialize(Buffer512 &buffer, size_t offset = 0) const;
+		
+		// Update buffer index to 'offset' param then call OnDeserialize method
+		void Deserialize(Buffer512 &buffer, size_t offset = 0);
 
 	protected:
+		// Define specific serialization method for each children
+		virtual void OnSerialize(Buffer512 &buffer) const = 0;
+
+		// Define specific deserialization method for each children
+		virtual void OnDeserialize(Buffer512 &buffer) = 0;
 
 		template<typename T>
 		void SerializeData(Buffer512& buffer, const T& value) const;
@@ -25,15 +32,14 @@ namespace DeusNetwork
 	inline void ISerializable::DeserializeData(Buffer512& buffer, T& value) const
 	{
 		static_assert(sizeof(T) <= 8, "Size higher than 8 bytes"); // only work for small types
-		assert(buffer.index + sizeof(T) <= buffer.size); // can we read the nextbytes ?
-		
-#ifdef BIG_ENDIAN
-		value = bswap(*((unsigned char*)(buffer.data + buffer.index)));
-#else // #ifdef BIG_ENDIAN
-		value = *((unsigned char*)(buffer.data + buffer.index));
-#endif // #ifdef BIG_ENDIAN
+		unsigned char tmp[sizeof(T)];
+		buffer.Select(tmp, sizeof(T));
 
-		buffer.index += sizeof(T);
+#ifdef BIG_ENDIAN
+		value = bswap(*(tmp));
+#else // #ifdef BIG_ENDIAN
+		value = *(tmp);
+#endif // #ifdef BIG_ENDIAN
 	}
 
 	template<>
@@ -48,15 +54,15 @@ namespace DeusNetwork
 	template<typename T>
 	inline void ISerializable::SerializeData(Buffer512& buffer, const T& value) const {
 		static_assert(sizeof(T) <= 8, "Size higher than 8 bytes"); // only work for small types
-		assert(buffer.index + sizeof(T) <= buffer.size);
+		unsigned char datas[sizeof(T)];
 
 #ifdef BIG_ENDIAN
-		*((unsigned char*)(buffer.data + buffer.index)) = bswap(value);
+		*(datas) = bswap(value);
 #else // #ifdef BIG_ENDIAN
-		*((unsigned char*)(buffer.data + buffer.index)) = value;
+		*(datas) = value;
 #endif // #ifdef BIG_ENDIAN
 
-		buffer.index += sizeof(T);
+		buffer.Insert(datas, sizeof(T));
 	}
 
 	template<>

@@ -9,10 +9,8 @@ namespace DeusNetwork
 		StringSerializable();
 		~StringSerializable();
 
-		// Hérité via ISerializable
-		virtual void Serialize(Buffer512 & buffer) const override;
-		virtual void Deserialize(Buffer512 & buffer) override;
-
+		virtual void OnSerialize(Buffer512 & buffer) const override;
+		virtual void OnDeserialize(Buffer512 & buffer) override;
 	};
 }
 

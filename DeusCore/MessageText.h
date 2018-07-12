@@ -12,10 +12,10 @@ namespace DeusNetwork
 		~MessageText();
 
 		// Write message information into the buffer
-		void Serialize(Buffer512 &buffer) const override;
+		void OnSerialize(Buffer512 &buffer) const override;
 
 		// Put information from the buffer into the message
-		void Deserialize(Buffer512 &buffer) override;
+		void OnDeserialize(Buffer512 &buffer) override;
 	
 		void SetMessage(const std::string& message) { m_message.assign(message); }
 		const std::string& GetTextMessage() { return m_message; };

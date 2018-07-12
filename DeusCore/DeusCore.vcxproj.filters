@@ -64,6 +64,12 @@
     <ClCompile Include="StringSerializable.cpp">
       <Filter>Network\Serialization\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Buffer.cpp">
+      <Filter>Network\Messages\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="ISerializable.cpp">
+      <Filter>Network\Serialization\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -81,9 +87,6 @@
     <ClInclude Include="Message.h">
       <Filter>Network\Messages\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Buffer.h">
-      <Filter>Network\Messages\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="MessageText.h">
       <Filter>Network\Messages\Headers</Filter>
     </ClInclude>
@@ -92,6 +95,9 @@
     </ClInclude>
     <ClInclude Include="StringSerializable.h">
       <Filter>Network\Serialization\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>Network\Messages\Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

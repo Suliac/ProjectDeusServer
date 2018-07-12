@@ -20,6 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DeusSocketException.cpp" />
+    <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="ISerializable.cpp" />
     <ClCompile Include="MessageText.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="StringSerializable.cpp" />
@@ -27,10 +29,10 @@
     <ClCompile Include="TcpSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Buffer.h" />
     <ClInclude Include="DeusSocketException.h" />
     <ClInclude Include="ISerializable.h" />
     <ClInclude Include="Message.h" />
+    <ClInclude Include="Buffer.h" />
     <ClInclude Include="MessageText.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="StringSerializable.h" />
