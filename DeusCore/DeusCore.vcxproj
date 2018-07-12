@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DeusSocketException.cpp" />
-    <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="ISerializable.cpp" />
     <ClCompile Include="MessageText.cpp" />
     <ClCompile Include="Socket.cpp" />
