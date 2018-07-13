@@ -22,6 +22,8 @@
     <ClCompile Include="DeusSocketException.cpp" />
     <ClCompile Include="ISerializable.cpp" />
     <ClCompile Include="MessageText.cpp" />
+    <ClCompile Include="Packet.cpp" />
+    <ClCompile Include="PacketTest.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="StringSerializable.cpp" />
     <ClCompile Include="TcpListener.cpp" />
@@ -33,6 +35,8 @@
     <ClInclude Include="Message.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="MessageText.h" />
+    <ClInclude Include="Packet.h" />
+    <ClInclude Include="PacketTest.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="StringSerializable.h" />
     <ClInclude Include="TcpListener.h" />

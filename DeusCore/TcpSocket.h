@@ -3,7 +3,7 @@
 
 #include "Socket.h"
 #include "Buffer.h"
-#include "Message.h"
+#include "Packet.h"
 
 namespace DeusNetwork
 {
@@ -22,7 +22,7 @@ namespace DeusNetwork
 		void TCPConnect(const SOCKET socket);
 		
 		// Send buffer to the connected socket
-		void TCPSend(const IMessage& message, size_t& byteSent)const;
+		void TCPSend(const Packet& packet, size_t& byteSent)const;
 
 		// Send buffer to the connected socket
 		void TCPSend(const Buffer512& buffer, size_t& byteSent)const;
@@ -31,7 +31,7 @@ namespace DeusNetwork
 		void TCPSend(const char *data, size_t size, size_t &byteSent)const;
 
 		// Receive informations from the connected socket
-		void TCPRecv(IMessage& message, size_t& byteRecv) const;
+		Packet * TCPRecv(size_t& byteRecv) const;
 
 		// Receive informations from the connected socket
 		void TCPRecv(Buffer512& buffer, size_t& byteRecv) const;
