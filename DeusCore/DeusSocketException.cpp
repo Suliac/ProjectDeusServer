@@ -2,18 +2,12 @@
 
 namespace DeusNetwork
 {
-	DeusSocketException::DeusSocketException(std::string message)
+	DeusSocketException::DeusSocketException(std::string message) : DeusException(message)
 	{
-		m_message = message;
 	}
-
 
 	DeusSocketException::~DeusSocketException()
 	{
 	}
 
-	 std::string DeusSocketException::GetErrorMessage() const
-	{
-		return m_message;
-	}
 }

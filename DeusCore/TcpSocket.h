@@ -31,7 +31,7 @@ namespace DeusNetwork
 		void TCPSend(const char *data, size_t size, size_t &byteSent)const;
 
 		// Receive informations from the connected socket
-		Packet * TCPRecv(size_t& byteRecv) const;
+		std::unique_ptr<Packet> TCPRecv(size_t& byteRecv) const;
 
 		// Receive informations from the connected socket
 		void TCPRecv(Buffer512& buffer, size_t& byteRecv) const;

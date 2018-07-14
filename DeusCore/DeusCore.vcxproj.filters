@@ -35,23 +35,8 @@
     <Filter Include="Network\Packets\Headers">
       <UniqueIdentifier>{5d7734aa-19b7-458c-b583-3df34604236c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Network\ZOld_Serialization">
-      <UniqueIdentifier>{851f35b2-fd5b-4eed-b67d-ea24d158c303}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Network\ZOld_Serialization\Headers">
-      <UniqueIdentifier>{d0d1a53f-7601-42d7-bbbc-aa5fb5ff3c1b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Network\ZOld_Serialization\Sources">
-      <UniqueIdentifier>{887eb740-a54b-4a27-af66-cd5a97c92132}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Network\ZOld_Messages">
-      <UniqueIdentifier>{ab7dee00-0cee-4da0-8d3d-677aad1d407a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Network\ZOld_Messages\Headers">
-      <UniqueIdentifier>{0a0cd43c-f8aa-4dea-992b-8b33ba61f04d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Network\ZOld_Messages\Sources">
-      <UniqueIdentifier>{888b70d2-98ce-4e6b-8acd-544fa4d82b99}</UniqueIdentifier>
+    <Filter Include="Legacy">
+      <UniqueIdentifier>{068ce0f1-97e3-4766-ad27-a74817b70f7c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -67,21 +52,25 @@
     <ClCompile Include="DeusSocketException.cpp">
       <Filter>Network\Exceptions\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="MessageText.cpp">
-      <Filter>Network\ZOld_Messages\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="StringSerializable.cpp">
-      <Filter>Network\ZOld_Serialization\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="ISerializable.cpp">
-      <Filter>Network\ZOld_Serialization\Sources</Filter>
-    </ClCompile>
     <ClCompile Include="PacketTest.cpp">
       <Filter>Network\Packets\Sources</Filter>
     </ClCompile>
     <ClCompile Include="Packet.cpp">
       <Filter>Network\Packets\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="StringSerializable.cpp">
+      <Filter>Legacy</Filter>
+    </ClCompile>
+    <ClCompile Include="ISerializable.cpp">
+      <Filter>Legacy</Filter>
+    </ClCompile>
+    <ClCompile Include="MessageText.cpp">
+      <Filter>Legacy</Filter>
+    </ClCompile>
+    <ClCompile Include="DeusSerializationException.cpp">
+      <Filter>Network\Exceptions\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="DeusException.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -96,26 +85,30 @@
     <ClInclude Include="DeusSocketException.h">
       <Filter>Network\Exceptions\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Message.h">
-      <Filter>Network\ZOld_Messages\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="MessageText.h">
-      <Filter>Network\ZOld_Messages\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="ISerializable.h">
-      <Filter>Network\ZOld_Serialization\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="StringSerializable.h">
-      <Filter>Network\ZOld_Serialization\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Buffer.h">
-      <Filter>Network\ZOld_Messages\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Packet.h">
       <Filter>Network\Packets\Headers</Filter>
     </ClInclude>
     <ClInclude Include="PacketTest.h">
       <Filter>Network\Packets\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="StringSerializable.h">
+      <Filter>Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializable.h">
+      <Filter>Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageText.h">
+      <Filter>Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="Message.h">
+      <Filter>Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>Legacy</Filter>
+    </ClInclude>
+    <ClInclude Include="DeusSerializationException.h">
+      <Filter>Network\Exceptions\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="DeusException.h" />
   </ItemGroup>
 </Project>

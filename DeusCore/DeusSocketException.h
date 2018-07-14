@@ -1,19 +1,13 @@
 #pragma once
-#include <exception>
-#include <iostream>
+#include "DeusException.h"
 
 namespace DeusNetwork
 {
-	class DeusSocketException : public std::exception
+	class DeusSocketException : public DeusException
 	{
 	public:
 		DeusSocketException(std::string message);
 		~DeusSocketException();
-
-		 std::string GetErrorMessage() const;
-
-	private:
-		std::string m_message;
 	};
 }
 

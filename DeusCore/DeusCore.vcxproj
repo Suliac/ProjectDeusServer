@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DeusException.cpp" />
+    <ClCompile Include="DeusSerializationException.cpp" />
     <ClCompile Include="DeusSocketException.cpp" />
     <ClCompile Include="ISerializable.cpp" />
     <ClCompile Include="MessageText.cpp" />
@@ -30,6 +32,8 @@
     <ClCompile Include="TcpSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DeusException.h" />
+    <ClInclude Include="DeusSerializationException.h" />
     <ClInclude Include="DeusSocketException.h" />
     <ClInclude Include="ISerializable.h" />
     <ClInclude Include="Message.h" />

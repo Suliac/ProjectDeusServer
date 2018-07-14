@@ -111,9 +111,9 @@ namespace DeusNetwork
 		buffer.Set((const unsigned char*)tmpBuffer, byteRecv);
 	}
 
-	Packet * TcpSocket::TCPRecv(size_t & byteRecv) const
+	std::unique_ptr<Packet> TcpSocket::TCPRecv(size_t & byteRecv) const
 	{
-		Packet * p_monPacket = nullptr;
+		std::unique_ptr<Packet> p_packetReceived = nullptr;
 		Buffer512 buffer;
 
 		try
@@ -123,7 +123,7 @@ namespace DeusNetwork
 			if (byteRecv > 0)
 			{
 				std::cout << "Bytes received: " << byteRecv << std::endl;
-				p_monPacket = Packet::Deserialize(buffer);
+				p_packetReceived = Packet::Deserialize(buffer);
 				std::cout << "Deserialized size: " << buffer.GetIndex() << std::endl;
 			}
 		}
@@ -132,7 +132,7 @@ namespace DeusNetwork
 			throw ex;
 		}
 
-		return p_monPacket;
+		return p_packetReceived;
 	}
 
 	void TcpSocket::TCPRecv(char * data, size_t size, size_t & byteRecv) const

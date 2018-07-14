@@ -1,5 +1,6 @@
 #pragma once
 #include "Buffer.h"
+#include <memory>
 namespace DeusNetwork
 {
 	class Packet
@@ -14,15 +15,27 @@ namespace DeusNetwork
 		Packet();
 		~Packet();
 
-		static Packet* Deserialize(Buffer512 &buffer);
-		static void Serialize(Buffer512 &buffer, const Packet &paquet);
+		// Entry point to deserialize packets :
+		// - Set buffer's index to 'bufferIndexOffset' param (0 by default)
+		// - Deserialize custom headers (message id type)
+		// - Call specific deserialization method for right message type with OnDeserialize which has to be override by the childrens packets
+		static std::unique_ptr<Packet> Deserialize(Buffer512 &buffer, const size_t bufferIndexOffset = 0);
+		
+		// Entry point to serialize packets :
+		// - Set buffer's index to 'bufferIndexOffset' param (0 by default)
+		// - Serialize custom headers (message id type)
+		// - Call specific deserialization method with OnDeserialize which has to be override by the childrens packets
+		static void Serialize(Buffer512 &buffer, const Packet &paquet, const size_t bufferIndexOffset = 0);
 
 		uint8_t GetID() const { return m_id; }
 		Packet(EMessageType messageType) { m_id = messageType; }
 
 	protected:
-		virtual void OnDeserialize(Buffer512 &buffer) {};
-		virtual void OnSerialize(Buffer512 &buffer) const {};
+		// Specific method to deserialize specific packets
+		virtual void OnDeserialize(Buffer512 &buffer) = 0;
+
+		// Specific method to serialize specific packets
+		virtual void OnSerialize(Buffer512 &buffer) const = 0;
 
 		template<typename T>
 		static void SerializeData(Buffer512& buffer, const T& value);

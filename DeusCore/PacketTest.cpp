@@ -2,7 +2,7 @@
 
 namespace DeusNetwork
 {
-	PacketTest::PacketTest()
+	PacketTest::PacketTest() : Packet(Packet::EMessageType::MessageTest)
 	{
 	}
 
