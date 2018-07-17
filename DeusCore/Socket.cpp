@@ -9,7 +9,7 @@ namespace DeusNetwork
 {
 	Socket::Socket()
 	{
-		m_state = SocketState::SOCKET_NOT_INITIALIZED;
+		//m_state = SocketState::SOCKET_NOT_INITIALIZED;
 	}
 
 	Socket::~Socket()
@@ -40,7 +40,7 @@ namespace DeusNetwork
 			throw DeusSocketException("Error when retreiving informations for [" + ipAdress + "@" + port + "]. Error " + std::to_string(iResult));
 		}
 
-		m_state = SocketState::SOCKET_INITIALIZED;
+		//m_state = SocketState::SOCKET_INITIALIZED;
 	}
 
 	void Socket::SocketCreate()
@@ -51,16 +51,104 @@ namespace DeusNetwork
 		{
 			int errorNumber = SocketGetLastError();
 			freeaddrinfo(m_distantInfos);
-			throw DeusSocketException("Error during the socket creation : "+ std::to_string(errorNumber));
+			throw DeusSocketException("Error during the socket creation : " + std::to_string(errorNumber));
 		}
-		m_state = SocketState::SOCKET_READY;
+		//m_state = SocketState::SOCKET_READY;
 	}
 
-	void Socket::SocketClose()
+	void Socket::SetNonBlocking(bool value)
+	{
+		m_isNonBlocking = value;
+		u_long blockingMode = m_isNonBlocking;
+
+		int iResult = ioctlsocket(m_handler, FIONBIO, &blockingMode);
+		if (iResult != NO_ERROR)
+			throw DeusSocketException("Cannot set socket to blocking mode. ioctlsocket failed with error: " + std::to_string(iResult));
+
+	}
+
+	SocketStateFlag Socket::CheckSocketStates(unsigned int timeoutSecond, unsigned int timeoutMicroseconds) const
+	{
+		SocketStateFlag state = SocketStateFlag::SOCKET_READY;
+		fd_set readFlags, writeFlags, exceptFlags;							// the flag sets to be used
+		struct timeval waitTime = { timeoutSecond, timeoutMicroseconds };	// the max wait time for an event
+		int selectResult;													// holds return value for select();
+
+		// Init flags
+		FD_ZERO(&readFlags);
+		FD_ZERO(&writeFlags);
+		FD_ZERO(&exceptFlags);
+		FD_SET(m_handler, &readFlags);
+		FD_SET(m_handler, &writeFlags);
+		FD_SET(m_handler, &exceptFlags);
+
+		selectResult = select(m_handler + 1, &readFlags, &writeFlags, &exceptFlags, &waitTime);
+		if (selectResult < 0)
+			throw DeusSocketException("Error during select : " + std::to_string(SocketGetLastError()));
+
+		if (selectResult == 0) // timed out
+		{
+			state = state | SocketStateFlag::SOCKET_TIMEOUT;
+		}
+		else
+		{
+			// The socket is ready to read ?
+			if (!FD_ISSET(m_handler, &readFlags)) // If FD_ISSET -> Can read
+				state = state | SocketStateFlag::SOCKET_READ_NOT_READY;
+			
+			// The socket is ready to write ?
+			if (!FD_ISSET(m_handler, &writeFlags)) // If FD_ISSET -> Can write
+				state = state | SocketStateFlag::SOCKET_WRITE_NOT_READY;
+			
+			// Other blocking errors ?
+			if (FD_ISSET(m_handler, &exceptFlags)) // /!\ If FD_ISSET -> error ! 
+				state = state | SocketStateFlag::SOCKET_NOT_READY;
+		}
+
+		//clear sets
+		FD_CLR(m_handler, &readFlags);
+		FD_CLR(m_handler, &writeFlags);
+		FD_CLR(m_handler, &exceptFlags);
+
+		return state;
+	}
+
+	bool Socket::CheckSocketStates(bool isWritable, bool isReadable, unsigned int timeoutSecond, unsigned int timeoutMicroseconds) const
+	{
+		SocketStateFlag states;
+		bool canUseSocket = true;
+
+		if (!m_isNonBlocking)
+			return true;
+
+		states = CheckSocketStates(DEFAULT_SOCKETSTATE_TIMEOUT);
+
+		if (states & SocketStateFlag::SOCKET_WRITE_NOT_READY && isWritable)
+			canUseSocket = false;
+		if (states & SocketStateFlag::SOCKET_READ_NOT_READY && isReadable)
+			canUseSocket = false;
+
+		if (states & SocketStateFlag::SOCKET_NOT_READY)
+			canUseSocket = false;
+
+		if (states & SocketStateFlag::SOCKET_TIMEOUT)
+			canUseSocket = false;
+
+		/*system("cls");
+		std::cout << "writable : " << ((states & SocketStateFlag::SOCKET_WRITE_NOT_READY && isWritable	)?"oui":"non") << std::endl;
+		std::cout << "readable : " << ((states & SocketStateFlag::SOCKET_READ_NOT_READY && isReadable	)?"oui":"non") << std::endl;
+		std::cout << "error    : " << ((states & SocketStateFlag::SOCKET_NOT_READY						)?"oui":"non") << std::endl;
+		std::cout << "timeout  : " << ((states & SocketStateFlag::SOCKET_TIMEOUT						)?"oui":"non") << std::endl;*/
+
+
+		return canUseSocket;
+	}
+
+	void Socket::SocketClose() const
 	{
 		closesocket(m_handler);
-		WSACleanup(); 
-		m_state = SocketState::SOCKET_CLOSED;
+		WSACleanup();
+		//m_state = SocketState::SOCKET_CLOSED;
 	}
 
 	int Socket::SocketShutdown() const

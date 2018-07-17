@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeusCore", "DeusCore\DeusCo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeusServerLogin", "DeusServerLogin\DeusServerLogin.vcxproj", "{B1F93742-E84E-4EEF-B988-69638F0D5A43}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeusTests", "DeusTests\DeusTests.vcxproj", "{470F5258-CC06-41A6-AE1B-9FDA5673720D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -41,6 +43,14 @@ Global
 		{B1F93742-E84E-4EEF-B988-69638F0D5A43}.Release|x64.Build.0 = Release|x64
 		{B1F93742-E84E-4EEF-B988-69638F0D5A43}.Release|x86.ActiveCfg = Release|Win32
 		{B1F93742-E84E-4EEF-B988-69638F0D5A43}.Release|x86.Build.0 = Release|Win32
+		{470F5258-CC06-41A6-AE1B-9FDA5673720D}.Debug|x64.ActiveCfg = Debug|x64
+		{470F5258-CC06-41A6-AE1B-9FDA5673720D}.Debug|x64.Build.0 = Debug|x64
+		{470F5258-CC06-41A6-AE1B-9FDA5673720D}.Debug|x86.ActiveCfg = Debug|Win32
+		{470F5258-CC06-41A6-AE1B-9FDA5673720D}.Debug|x86.Build.0 = Debug|Win32
+		{470F5258-CC06-41A6-AE1B-9FDA5673720D}.Release|x64.ActiveCfg = Release|x64
+		{470F5258-CC06-41A6-AE1B-9FDA5673720D}.Release|x64.Build.0 = Release|x64
+		{470F5258-CC06-41A6-AE1B-9FDA5673720D}.Release|x86.ActiveCfg = Release|Win32
+		{470F5258-CC06-41A6-AE1B-9FDA5673720D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

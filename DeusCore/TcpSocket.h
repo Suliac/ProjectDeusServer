@@ -16,28 +16,29 @@ namespace DeusNetwork
 		// Methods
 
 		// Init TCP communication from an ip adress & a port
-		void TCPConnect(const std::string& ipAdress, const std::string& port);
+		// return true if connection succeded otherwise return false
+		bool TCPConnect(const std::string& ipAdress, const std::string& port, const bool setNonBlocking = false);
 
 		// Init TCP communication from an existing SOCKET
-		void TCPConnect(const SOCKET socket);
+		void TCPConnect(const SOCKET socket, const bool setNonBlocking = false);
 		
 		// Send buffer to the connected socket
-		void TCPSend(const Packet& packet, size_t& byteSent)const;
+		bool TCPSend(const Packet& packet, size_t& byteSent)const;
 
 		// Send buffer to the connected socket
-		void TCPSend(const Buffer512& buffer, size_t& byteSent)const;
+		bool TCPSend(const Buffer512& buffer, size_t& byteSent)const;
 
 		// Send buffer to the connected socket
-		void TCPSend(const char *data, size_t size, size_t &byteSent)const;
+		bool TCPSend(const char *data, size_t size, size_t &byteSent)const;
 
 		// Receive informations from the connected socket
-		std::unique_ptr<Packet> TCPRecv(size_t& byteRecv) const;
+		bool TCPRecv(std::unique_ptr<Packet>& p_packetReceived, size_t& byteRecv) const;
 
 		// Receive informations from the connected socket
-		void TCPRecv(Buffer512& buffer, size_t& byteRecv) const;
+		bool TCPRecv(Buffer512& buffer, size_t& byteRecv) const;
 
 		// Receive informations from the connected socket
-		void TCPRecv(char *data, size_t size, size_t &byteRecv) const;
+		bool TCPRecv(char *data, size_t size, size_t &byteRecv) const;
 	};
 }
 #endif // _TCPSOCKET

@@ -7,6 +7,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DeusServer.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="DeusClient.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DeusClient.h" />
   </ItemGroup>
 </Project>

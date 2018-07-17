@@ -38,6 +38,9 @@
     <Filter Include="Legacy">
       <UniqueIdentifier>{068ce0f1-97e3-4766-ad27-a74817b70f7c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Deleguate">
+      <UniqueIdentifier>{aa14d465-a033-49d6-9978-734a4a561d18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Socket.cpp">
@@ -110,5 +113,8 @@
       <Filter>Network\Exceptions\Headers</Filter>
     </ClInclude>
     <ClInclude Include="DeusException.h" />
+    <ClInclude Include="FastDeleguate.h">
+      <Filter>Deleguate</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

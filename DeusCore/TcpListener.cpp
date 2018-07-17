@@ -14,16 +14,13 @@ namespace DeusNetwork
 	{
 	}
 
-	void TcpListener::Init(const std::string& ipAdress, const std::string& port) 
+	void TcpListener::Init(const std::string& ipAdress, const std::string& port, const bool setNonBlocking)
 	{
-		try {
-			SocketInit(AF_INET, SOCK_STREAM, IPPROTO_TCP, AI_PASSIVE, ipAdress, port);
-			SocketCreate();
-		}
-		catch (DeusSocketException const e)
-		{
-			throw e;
-		}
+		SocketInit(AF_INET, SOCK_STREAM, IPPROTO_TCP, AI_PASSIVE, ipAdress, port);
+		SocketCreate();
+
+		if (setNonBlocking)
+			SetNonBlocking();
 
 		if (m_distantInfos == nullptr)
 			throw DeusSocketException("Impossible to retrieve connection informations");
@@ -49,19 +46,29 @@ namespace DeusNetwork
 			throw DeusSocketException(message);
 		}
 
-		m_state = SocketState::SOCKET_READY;
+		//m_state = SocketState::SOCKET_READY;
 	}
 
-	void TcpListener::Accept(TcpSocket& socket) const
+	bool TcpListener::Accept(TcpSocket& socket) const
 	{
+		if (!CheckSocketStates(false, true))
+			return false;
+
 		SOCKET clientSocket = accept(m_handler, NULL, NULL);
-		if (clientSocket == INVALID_SOCKET) {
-			std::string message = "Accept connection failed with error: " + std::to_string(SocketGetLastError());
-			closesocket(m_handler);
-			throw DeusSocketException(message);
+		if (clientSocket < 0)
+		{
+			int error =  WSAGetLastError(); 
+			if (error != WSAEWOULDBLOCK) { // EWOULDBLOCK isn't a 'real' error
+				std::string message = "Accept connection failed with error: " + std::to_string(error);
+				closesocket(m_handler);
+				throw DeusSocketException(message);
+			}
+
+			return false;
 		}
 
-		socket.TCPConnect(clientSocket);
+		socket.TCPConnect(clientSocket, m_isNonBlocking);
+		return true;
 	}
 
 
