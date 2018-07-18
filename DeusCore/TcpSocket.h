@@ -31,10 +31,10 @@ namespace DeusNetwork
 		// Send buffer to the connected socket
 		bool TCPSend(const char *data, size_t size, size_t &byteSent)const;
 
-		// Receive informations from the connected socket
+		// Receive ONLY the first packet (and delete other datas) from the connected socket
 		bool TCPRecv(std::unique_ptr<Packet>& p_packetReceived, size_t& byteRecv) const;
 
-		// Receive informations from the connected socket
+		// Receive buffer from the connected socket
 		bool TCPRecv(Buffer512& buffer, size_t& byteRecv) const;
 
 		// Receive informations from the connected socket

@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{470F5258-CC06-41A6-AE1B-9FDA5673720D}</ProjectGuid>
+    <ProjectGuid>{6954A008-6DA4-459F-A2C4-CB57714C82D4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>DeusTests</RootNamespace>
+    <RootNamespace>DeusTestServer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -151,7 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DeusTestsDeleguate.cpp" />
+    <ClCompile Include="DeusTestServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DeusCore\DeusCore.vcxproj">
