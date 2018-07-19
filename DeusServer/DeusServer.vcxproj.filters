@@ -9,8 +9,12 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="DeusClient.cpp" />
+    <ClCompile Include="DeusConnection.cpp" />
+    <ClCompile Include="DeusTcpConnection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeusClient.h" />
+    <ClInclude Include="DeusConnection.h" />
+    <ClInclude Include="DeusTcpConnection.h" />
   </ItemGroup>
 </Project>

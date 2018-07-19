@@ -32,17 +32,19 @@ namespace DeusNetwork
 	class Socket
 	{
 	public:
+		Socket(std::string name);
+		~Socket();
+		
 		void SetNonBlocking(bool value = true);
 
 		// Close socket (Hard)
-		void SocketClose() const;
+		void SocketClose();
 
 		// Close socket (Soft)
 		int SocketShutdown() const;
 
+		bool DataAvailable();
 	protected:
-		Socket();
-		~Socket();
 
 		///////////////
 		//Methods
@@ -53,16 +55,13 @@ namespace DeusNetwork
 		// Real Socket creation
 		void SocketCreate();
 		
-		// Get last error from wsa datas
-		int SocketGetLastError() const;
-
-		bool CheckSocketStates(bool isWritable, bool isReadable, unsigned int timeoutSecond = DEFAULT_SOCKETSTATE_TIMEOUT, unsigned int timeoutMicroseconds = 0) const;
+		bool CheckSocketStates(bool isWritable, bool isReadable, unsigned int timeoutSecond = DEFAULT_SOCKETSTATE_TIMEOUT, unsigned int timeoutMicroseconds = 0);
 		
 		///////////////
 		// Attributes
 
 		// Socket which permit communication
-		SOCKET m_handler;
+		SOCKET m_handler = INVALID_SOCKET;
 
 		// Pre-Informations to find informations 
 		addrinfo m_hints;
@@ -78,7 +77,11 @@ namespace DeusNetwork
 		// Data we need for winsocks
 		WSADATA m_wsaData;
 
-		SocketStateFlag CheckSocketStates(unsigned int timeoutSecond, unsigned int timeoutMicroseconds = 0) const;
+		bool m_isWsaAlive = false;
+
+		std::string m_name;
+
+		SocketStateFlag CheckSocketStates(unsigned int timeoutSecond, unsigned int timeoutMicroseconds = 0);
 	};
 }
 

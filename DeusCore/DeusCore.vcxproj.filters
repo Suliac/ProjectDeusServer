@@ -73,7 +73,9 @@
     <ClCompile Include="DeusSerializationException.cpp">
       <Filter>Network\Exceptions\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="DeusException.cpp" />
+    <ClCompile Include="DeusException.cpp">
+      <Filter>Network\Exceptions\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -106,15 +108,17 @@
     <ClInclude Include="Message.h">
       <Filter>Legacy</Filter>
     </ClInclude>
-    <ClInclude Include="Buffer.h">
-      <Filter>Legacy</Filter>
-    </ClInclude>
     <ClInclude Include="DeusSerializationException.h">
       <Filter>Network\Exceptions\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="DeusException.h" />
     <ClInclude Include="FastDeleguate.h">
       <Filter>Deleguate</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>Network\Packets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="DeusException.h">
+      <Filter>Network\Exceptions\Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

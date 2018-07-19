@@ -26,11 +26,11 @@ namespace DeusNetwork
 
 		// Get current buffer's index
 		const size_t GetIndex() const { return m_index; };
-		
+
 		// Set current buffer's index
 		void SetIndex(size_t value) { m_index = value; };
 
-		const size_t size = N;		// size of the buffer data (in bytes)
+		const size_t size = N;		// TOTAL size of the buffer data (in bytes) -> size=512 for Buffer<512> 
 	protected:
 		unsigned char m_data[N];	// pointer to buffer data
 		size_t m_index = 0;			// index of next byte to be write or read
@@ -49,6 +49,7 @@ namespace DeusNetwork
 	template<int N>
 	inline void Buffer<N>::Set(const unsigned char* datas, size_t dataSize, size_t offset)
 	{
+		assert(offset + dataSize <= size);
 		m_index = offset;
 		memcpy(m_data + m_index, datas, dataSize);
 		m_index += dataSize;

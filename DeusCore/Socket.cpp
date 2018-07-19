@@ -7,24 +7,34 @@
 
 namespace DeusNetwork
 {
-	Socket::Socket()
+	Socket::Socket(std::string name)
 	{
-		//m_state = SocketState::SOCKET_NOT_INITIALIZED;
+		m_name = "[" + name + " | " + std::to_string(std::rand()) + "]";
+		// Initialize WSA
+		int iResult = WSAStartup(MAKEWORD(2, 2), &m_wsaData);
+		if (iResult != 0) {
+			throw DeusSocketException("WSAStartup failed: " + std::to_string(iResult));
+		}
+
+		std::cout << m_name << "WSAStartup" << std::endl;
+		m_isWsaAlive = true;
 	}
 
 	Socket::~Socket()
 	{
+		/*if (m_handler != INVALID_SOCKET)
+			SocketClose();*/
+
+		if (m_isWsaAlive)
+		{
+			std::cout << m_name << "WSACleanup (destructor)" << std::endl;
+			WSACleanup();
+		}
 	}
 
 	void Socket::SocketInit(short family, short type, IPPROTO protocol, short flags, const std::string& ipAdress, const std::string& port)
 	{
 		m_distantInfos = nullptr;
-
-		// Initialize Winsock api
-		int iResult = WSAStartup(MAKEWORD(2, 2), &m_wsaData);
-		if (iResult != 0) {
-			throw DeusSocketException("WSAStartup failed: " + std::to_string(iResult));
-		}
 
 		// Get/init addr infos
 		ZeroMemory(&m_hints, sizeof(m_hints));
@@ -34,13 +44,12 @@ namespace DeusNetwork
 		m_hints.ai_flags = flags;
 
 		// Resolve the local address and port to be used by the peer
-		iResult = getaddrinfo(ipAdress.c_str(), port.c_str(), &m_hints, &m_distantInfos);
+		int iResult = getaddrinfo(ipAdress.c_str(), port.c_str(), &m_hints, &m_distantInfos);
 		if (iResult != 0) {
 			WSACleanup();
 			throw DeusSocketException("Error when retreiving informations for [" + ipAdress + "@" + port + "]. Error " + std::to_string(iResult));
 		}
 
-		//m_state = SocketState::SOCKET_INITIALIZED;
 	}
 
 	void Socket::SocketCreate()
@@ -49,8 +58,8 @@ namespace DeusNetwork
 		m_handler = socket(m_distantInfos->ai_family, m_distantInfos->ai_socktype, m_distantInfos->ai_protocol);
 		if (m_handler == INVALID_SOCKET)
 		{
-			int errorNumber = SocketGetLastError();
-			freeaddrinfo(m_distantInfos);
+			int errorNumber = WSAGetLastError();
+			SocketClose();
 			throw DeusSocketException("Error during the socket creation : " + std::to_string(errorNumber));
 		}
 		//m_state = SocketState::SOCKET_READY;
@@ -63,11 +72,14 @@ namespace DeusNetwork
 
 		int iResult = ioctlsocket(m_handler, FIONBIO, &blockingMode);
 		if (iResult != NO_ERROR)
+		{
+			SocketClose();
 			throw DeusSocketException("Cannot set socket to blocking mode. ioctlsocket failed with error: " + std::to_string(iResult));
+		}
 
 	}
 
-	SocketStateFlag Socket::CheckSocketStates(unsigned int timeoutSecond, unsigned int timeoutMicroseconds) const
+	SocketStateFlag Socket::CheckSocketStates(unsigned int timeoutSecond, unsigned int timeoutMicroseconds) 
 	{
 		SocketStateFlag state = SocketStateFlag::SOCKET_READY;
 		fd_set readFlags, writeFlags, exceptFlags;							// the flag sets to be used
@@ -84,7 +96,11 @@ namespace DeusNetwork
 
 		selectResult = select(m_handler + 1, &readFlags, &writeFlags, &exceptFlags, &waitTime);
 		if (selectResult < 0)
-			throw DeusSocketException("Error during select : " + std::to_string(SocketGetLastError()));
+		{
+			int error = WSAGetLastError();
+			SocketClose();
+			throw DeusSocketException("Error during select : " + std::to_string(error));
+		}
 
 		if (selectResult == 0) // timed out
 		{
@@ -95,11 +111,11 @@ namespace DeusNetwork
 			// The socket is ready to read ?
 			if (!FD_ISSET(m_handler, &readFlags)) // If FD_ISSET -> Can read
 				state = state | SocketStateFlag::SOCKET_READ_NOT_READY;
-			
+
 			// The socket is ready to write ?
 			if (!FD_ISSET(m_handler, &writeFlags)) // If FD_ISSET -> Can write
 				state = state | SocketStateFlag::SOCKET_WRITE_NOT_READY;
-			
+
 			// Other blocking errors ?
 			if (FD_ISSET(m_handler, &exceptFlags)) // /!\ If FD_ISSET -> error ! 
 				state = state | SocketStateFlag::SOCKET_NOT_READY;
@@ -113,7 +129,7 @@ namespace DeusNetwork
 		return state;
 	}
 
-	bool Socket::CheckSocketStates(bool isWritable, bool isReadable, unsigned int timeoutSecond, unsigned int timeoutMicroseconds) const
+	bool Socket::CheckSocketStates(bool isWritable, bool isReadable, unsigned int timeoutSecond, unsigned int timeoutMicroseconds)
 	{
 		SocketStateFlag states;
 		bool canUseSocket = true;
@@ -144,11 +160,14 @@ namespace DeusNetwork
 		return canUseSocket;
 	}
 
-	void Socket::SocketClose() const
+	void Socket::SocketClose()
 	{
 		closesocket(m_handler);
-		WSACleanup();
-		//m_state = SocketState::SOCKET_CLOSED;
+		WSACleanup(); 
+		m_isWsaAlive = false;
+		std::cout << m_name << "WSACleanup (SocketClose())" << std::endl;
+
+		m_handler = INVALID_SOCKET;
 	}
 
 	int Socket::SocketShutdown() const
@@ -156,11 +175,7 @@ namespace DeusNetwork
 		return shutdown(m_handler, SD_SEND);
 	}
 
-	int Socket::SocketGetLastError() const
-	{
-		int result = WSAGetLastError();
-		WSACleanup();
-
-		return result;
+	bool Socket::DataAvailable() {
+		return CheckSocketStates(false, true);
 	}
 }

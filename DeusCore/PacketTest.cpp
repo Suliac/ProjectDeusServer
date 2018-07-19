@@ -13,6 +13,8 @@ namespace DeusNetwork
 
 	void PacketTest::OnDeserialize(Buffer512 & buffer)
 	{
+		size_t serializedSize = 0;
+
 		// get the size of the string
 		size_t dataSize;
 		DeserializeData(buffer, dataSize);
@@ -20,7 +22,9 @@ namespace DeusNetwork
 		// get the string
 		m_message.clear();
 		std::vector<unsigned char> tmp = buffer.Select(dataSize);
+
 		m_message.assign((char *)tmp.data());
+
 	}
 
 	void PacketTest::OnSerialize(Buffer512 & buffer) const
@@ -35,5 +39,13 @@ namespace DeusNetwork
 			SerializeData(buffer, *myCurrentText);
 			myCurrentText++;
 		}
+	}
+
+	int16_t PacketTest::EstimateCurrentSerializedSize() const
+	{
+		// 1 PacketTest packet uses :
+		// - 1 byte						: to save an unsigned int for the length of the next string
+		// - m_message.size()+1 bytes	: to save the string message ('+1' is for the \0)
+		return sizeof(size_t) + (m_message.size() + 1);
 	}
 }

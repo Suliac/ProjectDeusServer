@@ -18,7 +18,7 @@ namespace DeusNetwork
 		void Start();
 
 		// Accept next connection and fill the TcpSocket object
-		bool Accept(TcpSocket& socket) const;
+		bool Accept(TcpSocket& socket);
 
 		// TODO : Pending() function which return true or false if there is any pending connection
 	};

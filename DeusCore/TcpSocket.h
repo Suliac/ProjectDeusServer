@@ -23,22 +23,24 @@ namespace DeusNetwork
 		void TCPConnect(const SOCKET socket, const bool setNonBlocking = false);
 		
 		// Send buffer to the connected socket
-		bool TCPSend(const Packet& packet, size_t& byteSent)const;
+		bool TCPSend(const Packet& packet, size_t& byteSent);
 
 		// Send buffer to the connected socket
-		bool TCPSend(const Buffer512& buffer, size_t& byteSent)const;
+		bool TCPSend(const Buffer512& buffer, size_t& byteSent);
 
 		// Send buffer to the connected socket
-		bool TCPSend(const char *data, size_t size, size_t &byteSent)const;
+		bool TCPSend(const char *data, size_t size, size_t &byteSent);
 
 		// Receive ONLY the first packet (and delete other datas) from the connected socket
-		bool TCPRecv(std::unique_ptr<Packet>& p_packetReceived, size_t& byteRecv) const;
+		bool TCPRecv(std::unique_ptr<Packet>& p_packetReceived, size_t& byteRecv) ;
 
 		// Receive buffer from the connected socket
-		bool TCPRecv(Buffer512& buffer, size_t& byteRecv) const;
+		bool TCPRecv(Buffer512& buffer, size_t& byteRecv) ;
 
 		// Receive informations from the connected socket
-		bool TCPRecv(char *data, size_t size, size_t &byteRecv) const;
+		bool TCPRecv(char *data, size_t size, size_t &byteRecv) ;
+	
+		
 	};
 }
 #endif // _TCPSOCKET
