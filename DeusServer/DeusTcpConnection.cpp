@@ -1,4 +1,5 @@
 #include "DeusTcpConnection.h"
+#include "DeusCore/PacketTest.h"
 #define NOMINMAX
 
 namespace DeusServer
@@ -12,7 +13,7 @@ namespace DeusServer
 	{
 		m_cancellationRequested = true;
 		m_communicationThread.join();
-		std::cout << "end thread" << std::endl;
+		std::cout << "delete connection" << std::endl;
 	}
 
 	void DeusTcpConnection::Init(std::unique_ptr<DeusNetwork::TcpSocket> communicationSocket)
@@ -20,8 +21,7 @@ namespace DeusServer
 		m_clientTCPSocket = std::move(communicationSocket); // transfert ownership
 
 		// init thread only here
-		//m_communicationThread = std::thread([this] { ThreadSendAndReceive(); });
-		//std::cout << "end thread init" << std::endl;
+		m_communicationThread = std::thread([this] { ThreadSendAndReceive(); });
 	}
 
 	void DeusTcpConnection::ThreadSendAndReceive()
@@ -38,7 +38,7 @@ namespace DeusServer
 			{
 				// reset buffer & counter
 				sentByteCount = 0;
-				writeBuffer.SetIndex(0); 
+				writeBuffer.SetIndex(0);
 
 				// NB : we send packet per packet
 				if (p_toSendPacket)
@@ -61,13 +61,23 @@ namespace DeusServer
 				do {
 					// reset buffer & counter
 					readedByteCount = 0;
-					readBuffer.SetIndex(0); 
+					readBuffer.SetIndex(0);
 
 					// Receive information in the readBuffer
-					m_clientTCPSocket->TCPRecv(readBuffer, readedByteCount);
+					if (m_clientTCPSocket->TCPRecv(readBuffer, readedByteCount))
+					{
+						if (readedByteCount == 0)
+						{
+							std::cout << "Want to stop communication" << std::endl;
+							m_cancellationRequested = true;
+						}
+						else {
+							// insert data we get in our general buffer
+							allByteReceivedBuffer.insert(allByteReceivedBuffer.end(), readBuffer.Data(), readBuffer.Data() + readedByteCount);
+						}
 
-					// insert data we get in our general buffer
-					allByteReceivedBuffer.insert(allByteReceivedBuffer.end(), readBuffer.Data(), readBuffer.Data() + readedByteCount);
+
+					}
 
 					// we continue to read while there is data left and we already fill our previous buffer
 				} while (m_clientTCPSocket->DataAvailable() && readedByteCount == readBuffer.size);
@@ -78,10 +88,10 @@ namespace DeusServer
 				{
 					// buffer max size should not be higher than max network buffer (= deserializeBuffer.size)
 					int maxBufferSize = (int)(allByteReceivedBuffer.size()) > deserializeBuffer.size ? deserializeBuffer.size : ((int)(allByteReceivedBuffer.size()));
-					
+
 					deserializeBuffer.SetIndex(0);
 					deserializeBuffer.Set(((unsigned char*)allByteReceivedBuffer.data()), maxBufferSize);
-					
+
 					assert(allByteReceivedBuffer.size() > 3); // headers need at least 3 bytes
 
 					DeusNetwork::PacketUPtr p_packetDeserialized = DeusNetwork::Packet::Deserialize(deserializeBuffer);
@@ -89,14 +99,19 @@ namespace DeusServer
 					{
 						// we can now delete the byte in our buffer corresponding to our packet serializedSize
 						allByteReceivedBuffer.erase(allByteReceivedBuffer.begin(), allByteReceivedBuffer.begin() + p_packetDeserialized->GetSerializedSize());
-					
+
+						//std::cout << "Message : " << (*((DeusNetwork::PacketTest*)p_packetDeserialized.get())).GetTextMessage() << std::endl;
+
 						// TODO : raise event "OnMessageReceived"
 					}
-					else 
+					else
 						break; // we cannot deserialize data for now, just continue
-					
+
 				}
 			}
 		}
+
+		// TODO : raise event "Disconnected"
+		std::cout << "end thread" << std::endl;
 	}
 }

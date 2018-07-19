@@ -16,7 +16,7 @@ namespace DeusNetwork
 			throw DeusSocketException("WSAStartup failed: " + std::to_string(iResult));
 		}
 
-		std::cout << m_name << "WSAStartup" << std::endl;
+		//std::cout << m_name << "WSAStartup" << std::endl;
 		m_isWsaAlive = true;
 	}
 
@@ -27,7 +27,7 @@ namespace DeusNetwork
 
 		if (m_isWsaAlive)
 		{
-			std::cout << m_name << "WSACleanup (destructor)" << std::endl;
+			//std::cout << m_name << "WSACleanup (destructor)" << std::endl;
 			WSACleanup();
 		}
 	}

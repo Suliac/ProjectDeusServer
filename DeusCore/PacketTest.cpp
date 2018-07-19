@@ -41,7 +41,7 @@ namespace DeusNetwork
 		}
 	}
 
-	int16_t PacketTest::EstimateCurrentSerializedSize() const
+	uint16_t PacketTest::EstimateCurrentSerializedSize() const
 	{
 		// 1 PacketTest packet uses :
 		// - 1 byte						: to save an unsigned int for the length of the next string

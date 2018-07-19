@@ -16,7 +16,7 @@ namespace DeusNetwork
 
 		virtual void OnDeserialize(Buffer512 & buffer) override;
 		virtual void OnSerialize(Buffer512 & buffer) const override;
-		virtual int16_t EstimateCurrentSerializedSize() const override;
+		virtual uint16_t EstimateCurrentSerializedSize() const override;
 
 	private:
 		std::string m_message;

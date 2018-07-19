@@ -3,6 +3,7 @@
 #include <memory>
 namespace DeusNetwork
 {
+
 	class Packet
 	{
 	public:
@@ -29,12 +30,12 @@ namespace DeusNetwork
 		// - Call specific deserialization method with OnDeserialize which has to be override by the childrens packets
 		static void Serialize(Buffer512 &buffer, const Packet &paquet, const size_t bufferIndexOffset = 0);
 
-		
 		uint8_t GetID() const { return m_id; }
 
 		uint16_t GetSerializedSize() const { return m_serializedSize; }
 		void SetSerializedSize(uint16_t serializedSize) { m_serializedSize = serializedSize; }
 		
+		const uint16_t HEADER_SIZE = 3;
 	protected:
 		template<typename T>
 		static void SerializeData(Buffer512& buffer, const T& value);
@@ -47,10 +48,9 @@ namespace DeusNetwork
 
 		// Specific method to serialize specific packets
 		virtual void OnSerialize(Buffer512 &buffer) const = 0;
-		
-		
+				
 		// Specific method to get the serialize size of packets
-		virtual int16_t EstimateCurrentSerializedSize() const = 0;
+		virtual uint16_t EstimateCurrentSerializedSize() const = 0;
 
 	private:
 		
