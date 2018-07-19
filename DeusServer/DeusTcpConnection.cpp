@@ -1,10 +1,11 @@
 #include "DeusTcpConnection.h"
 #include "DeusCore/PacketTest.h"
+#include <iomanip>
 #define NOMINMAX
 
 namespace DeusServer
 {
-	DeusTcpConnection::DeusTcpConnection()
+	DeusTcpConnection::DeusTcpConnection(int id) : DeusConnection(id)
 	{
 		allByteReceivedBuffer.reserve(DEFAULT_DEUSCLIENT_BUFFER_SIZE);
 	}
@@ -13,7 +14,7 @@ namespace DeusServer
 	{
 		m_cancellationRequested = true;
 		m_communicationThread.join();
-		std::cout << "delete connection" << std::endl;
+		std::cout << "[Client " << std::setw(3) << m_id << "] Delete connection" << std::endl;
 	}
 
 	void DeusTcpConnection::Init(std::unique_ptr<DeusNetwork::TcpSocket> communicationSocket)
@@ -26,7 +27,7 @@ namespace DeusServer
 
 	void DeusTcpConnection::ThreadSendAndReceive()
 	{
-		std::cout << "start thread" << std::endl;
+		std::cout << "[Client " << std::setw(3) << m_id << "] Start thread" << std::endl;
 		while (!m_cancellationRequested)
 		{
 			///////////////////////////////////////////////////
@@ -68,7 +69,7 @@ namespace DeusServer
 					{
 						if (readedByteCount == 0)
 						{
-							std::cout << "Want to stop communication" << std::endl;
+							std::cout << "[Client " << std::setw(3) << m_id << "] Want to stop communication" << std::endl;
 							m_cancellationRequested = true;
 						}
 						else {
@@ -92,7 +93,7 @@ namespace DeusServer
 					deserializeBuffer.SetIndex(0);
 					deserializeBuffer.Set(((unsigned char*)allByteReceivedBuffer.data()), maxBufferSize);
 
-					assert(allByteReceivedBuffer.size() > 3); // headers need at least 3 bytes
+					assert(allByteReceivedBuffer.size() >= 3); // headers need at least 3 bytes
 
 					DeusNetwork::PacketUPtr p_packetDeserialized = DeusNetwork::Packet::Deserialize(deserializeBuffer);
 					if (p_packetDeserialized)
@@ -102,7 +103,8 @@ namespace DeusServer
 
 						//std::cout << "Message : " << (*((DeusNetwork::PacketTest*)p_packetDeserialized.get())).GetTextMessage() << std::endl;
 
-						// TODO : raise event "OnMessageReceived"
+						// Trigger event "OnMessageReceived"
+						TriggerEvent(std::move(p_packetDeserialized), DeusConnectionEventsType::OnMessageReceived);
 					}
 					else
 						break; // we cannot deserialize data for now, just continue
@@ -111,7 +113,7 @@ namespace DeusServer
 			}
 		}
 
-		// TODO : raise event "Disconnected"
-		std::cout << "end thread" << std::endl;
+		// Trigger event "Disconnected"
+		TriggerEvent(nullptr, DeusConnectionEventsType::Disconnected);
 	}
 }

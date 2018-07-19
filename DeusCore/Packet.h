@@ -95,5 +95,6 @@ namespace DeusNetwork
 #pragma endregion
 
 	using PacketUPtr = std::unique_ptr<Packet>;
+	using PacketSPtr = std::shared_ptr<Packet>;
 }
 

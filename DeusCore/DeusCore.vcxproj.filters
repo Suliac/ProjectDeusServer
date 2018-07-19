@@ -38,7 +38,7 @@
     <Filter Include="Legacy">
       <UniqueIdentifier>{068ce0f1-97e3-4766-ad27-a74817b70f7c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Deleguate">
+    <Filter Include="Delegate">
       <UniqueIdentifier>{aa14d465-a033-49d6-9978-734a4a561d18}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -111,14 +111,14 @@
     <ClInclude Include="DeusSerializationException.h">
       <Filter>Network\Exceptions\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="FastDeleguate.h">
-      <Filter>Deleguate</Filter>
-    </ClInclude>
     <ClInclude Include="Buffer.h">
       <Filter>Network\Packets\Headers</Filter>
     </ClInclude>
     <ClInclude Include="DeusException.h">
       <Filter>Network\Exceptions\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="FastDelegate.h">
+      <Filter>Delegate</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -11,16 +11,31 @@ namespace DeusServer
 	class DeusClient
 	{
 	public:
-		DeusClient(std::unique_ptr<DeusNetwork::TcpSocket> communicationSocket);
+		enum class DeusClientEventsType {
+			OnTCPMessageReceived = 0x0,
+			OnTCPDisconnect = 0x1,
+			OnUDPMessageReceived = 0x2,
+			OnUDPDisconnect = 0x3
+		};
+		using DeusClientEventDeleguateMap = std::map<DeusClientEventsType, DeusEventDeleguateVector>;
+
+		DeusClient(int id, std::unique_ptr<DeusNetwork::TcpSocket> communicationSocket);
 		~DeusClient();
+		
+		// Just access to specific connection events
+		bool AddListener(const DeusEventDeleguate& eventDeleguate, const DeusClientEventsType type);
 
+		// Just access to specific connection events
+		bool RemoveListener(const DeusEventDeleguate& eventDeleguate, const DeusClientEventsType type);
 	private:
-		// Do we want to stop the communication with the client
-		bool m_cancellationRequested = false;
-
+		// TCP communication interface
 		DeusTcpConnection m_tcpConnection;
 
+		// ID of the connection
 		int m_id;
+
+		void ManageTcpMessageReceivedEvent(int id, DeusNetwork::PacketSPtr p_packet);
+		void ManageTcpDisconnectedEvent(int id, DeusNetwork::PacketSPtr p_packet);
 	};
 }
 

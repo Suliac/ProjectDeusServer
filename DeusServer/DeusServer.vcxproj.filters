@@ -5,16 +5,37 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="ClientCommunication">
+      <UniqueIdentifier>{7bf62c0d-19a2-4b0c-9f2b-053fa597b395}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ClientCommunication\Headers">
+      <UniqueIdentifier>{839ec242-ddd3-43b2-aa46-5cbb0a2c6c37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ClientCommunication\Sources">
+      <UniqueIdentifier>{8d7b4ec3-f32c-4293-90b4-decabe153762}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="DeusClient.cpp" />
-    <ClCompile Include="DeusConnection.cpp" />
-    <ClCompile Include="DeusTcpConnection.cpp" />
+    <ClCompile Include="DeusClient.cpp">
+      <Filter>ClientCommunication\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="DeusConnection.cpp">
+      <Filter>ClientCommunication\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="DeusTcpConnection.cpp">
+      <Filter>ClientCommunication\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DeusClient.h" />
-    <ClInclude Include="DeusConnection.h" />
-    <ClInclude Include="DeusTcpConnection.h" />
+    <ClInclude Include="DeusClient.h">
+      <Filter>ClientCommunication\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="DeusConnection.h">
+      <Filter>ClientCommunication\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="DeusTcpConnection.h">
+      <Filter>ClientCommunication\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

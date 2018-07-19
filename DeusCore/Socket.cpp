@@ -165,7 +165,7 @@ namespace DeusNetwork
 		closesocket(m_handler);
 		WSACleanup(); 
 		m_isWsaAlive = false;
-		std::cout << m_name << "WSACleanup (SocketClose())" << std::endl;
+		//std::cout << m_name << "WSACleanup (SocketClose())" << std::endl;
 
 		m_handler = INVALID_SOCKET;
 	}
