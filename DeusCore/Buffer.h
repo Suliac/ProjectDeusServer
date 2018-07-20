@@ -1,7 +1,7 @@
 #pragma once
 #include <assert.h>
 #include <vector>
-namespace DeusNetwork
+namespace DeusCore
 {
 	static const int SIZE_BUFFER = 512;
 

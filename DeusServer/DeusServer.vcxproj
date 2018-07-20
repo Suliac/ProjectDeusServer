@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClCompile Include="DeusClient.cpp" />
     <ClCompile Include="DeusConnection.cpp" />
+    <ClCompile Include="WorldServer.cpp" />
     <ClCompile Include="DeusTcpConnection.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="DeusClient.h" />
     <ClInclude Include="DeusConnection.h" />
+    <ClInclude Include="WorldServer.h" />
     <ClInclude Include="DeusTcpConnection.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

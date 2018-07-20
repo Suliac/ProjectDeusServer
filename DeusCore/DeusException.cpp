@@ -2,7 +2,7 @@
 
 
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	DeusException::DeusException(std::string message)
 	{

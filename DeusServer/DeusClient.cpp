@@ -1,11 +1,14 @@
 #include "DeusClient.h"
+
+#include "DeusCore/Logger.h"
+
 #include <string>
 #include <iostream>
 #include <iomanip>
 
 namespace DeusServer
 {
-	DeusClient::DeusClient(int id, std::unique_ptr<DeusNetwork::TcpSocket> communicationSocket)
+	DeusClient::DeusClient(int id, std::unique_ptr<DeusCore::TcpSocket> communicationSocket)
 		: m_tcpConnection(id)
 	{
 		m_id = id;
@@ -86,14 +89,16 @@ namespace DeusServer
 		return false;
 	}
 
-	void DeusClient::ManageTcpMessageReceivedEvent(int id, DeusNetwork::PacketSPtr p_packet)
+	void DeusClient::ManageTcpMessageReceivedEvent(int id, DeusCore::PacketSPtr p_packet)
 	{
-		std::cout << "[Client " << std::setw(3)<< id << "] Received TCP message of type : " << p_packet->GetID() << std::endl;
+		DeusCore::Logger::Instance()->Log("Client " + std::to_string(id), "Received TCP message of type : " + std::to_string(p_packet->GetID()));
+		//std::cout << "[Client " << std::setw(3)<< id << "] Received TCP message of type : " << p_packet->GetID() << std::endl;
 	}
 
-	void DeusClient::ManageTcpDisconnectedEvent(int id, DeusNetwork::PacketSPtr p_packet)
+	void DeusClient::ManageTcpDisconnectedEvent(int id, DeusCore::PacketSPtr p_packet)
 	{
-		std::cout << "[Client " << std::setw(3) << id << "] TCP Disconnected" << std::endl;
+		DeusCore::Logger::Instance()->Log("Client " + std::to_string(id), "TCP Disconnected");
+		//std::cout << "[Client " << std::setw(3) << id << "] TCP Disconnected" << std::endl;
 	}
 
 }

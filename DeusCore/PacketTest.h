@@ -1,7 +1,7 @@
 #pragma once
 #include "Packet.h"
 #include <string>
-namespace DeusNetwork
+namespace DeusCore
 {
 	class PacketTest : public Packet
 	{

@@ -1,7 +1,7 @@
 #pragma once
 #include "DeusException.h"
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	class DeusSocketException : public DeusException
 	{

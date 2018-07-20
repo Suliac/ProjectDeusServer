@@ -1,7 +1,7 @@
 #pragma once
 #include "Buffer.h"
 #include <memory>
-namespace DeusNetwork
+namespace DeusCore
 {
 
 	class Packet

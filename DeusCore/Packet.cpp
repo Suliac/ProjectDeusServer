@@ -1,7 +1,7 @@
 #include "Packet.h"
 #include "PacketTest.h"
 #include "DeusSerializationException.h"
-namespace DeusNetwork
+namespace DeusCore
 {
 	Packet::Packet() : Packet(Packet::EMessageType::MessageTest)
 	{
@@ -13,7 +13,7 @@ namespace DeusNetwork
 
 	std::unique_ptr<Packet> Packet::Deserialize(Buffer512 &buffer, const size_t bufferIndexOffset)
 	{
-		DeusNetwork::PacketUPtr p_packetDeserialized = nullptr;
+		PacketUPtr p_packetDeserialized = nullptr;
 		buffer.SetIndex(bufferIndexOffset);
 
 		// Deserialize Header

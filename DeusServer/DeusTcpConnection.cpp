@@ -1,6 +1,7 @@
 #include "DeusTcpConnection.h"
 #include "DeusCore/PacketTest.h"
-#include <iomanip>
+#include "DeusCore/Logger.h"
+
 #define NOMINMAX
 
 namespace DeusServer
@@ -14,10 +15,11 @@ namespace DeusServer
 	{
 		m_cancellationRequested = true;
 		m_communicationThread.join();
-		std::cout << "[Client " << std::setw(3) << m_id << "] Delete connection" << std::endl;
+		DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Delete connection");
+		//std::cout << "[Client " << std::setw(3) << m_id << "] Delete connection" << std::endl;
 	}
 
-	void DeusTcpConnection::Init(std::unique_ptr<DeusNetwork::TcpSocket> communicationSocket)
+	void DeusTcpConnection::Init(std::unique_ptr<DeusCore::TcpSocket> communicationSocket)
 	{
 		m_clientTCPSocket = std::move(communicationSocket); // transfert ownership
 
@@ -27,14 +29,16 @@ namespace DeusServer
 
 	void DeusTcpConnection::ThreadSendAndReceive()
 	{
-		std::cout << "[Client " << std::setw(3) << m_id << "] Start thread" << std::endl;
+		DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Start thread");
+
+		//std::cout << "[Client " << std::setw(3) << m_id << "] Start thread" << std::endl;
 		while (!m_cancellationRequested)
 		{
 			///////////////////////////////////////////////////
 			//       1- We first try to send our message     //
 			///////////////////////////////////////////////////
 
-			std::unique_ptr<DeusNetwork::Packet> p_toSendPacket = nullptr;
+			std::unique_ptr<DeusCore::Packet> p_toSendPacket = nullptr;
 			while (TryTakePacket(p_toSendPacket))
 			{
 				// reset buffer & counter
@@ -45,7 +49,7 @@ namespace DeusServer
 				if (p_toSendPacket)
 				{
 					// Serialize our packet
-					DeusNetwork::Packet::Serialize(writeBuffer, *(p_toSendPacket.get()));
+					DeusCore::Packet::Serialize(writeBuffer, *(p_toSendPacket.get()));
 
 					// Send our serialized packet
 					m_clientTCPSocket->TCPSend(*(p_toSendPacket), sentByteCount);
@@ -69,7 +73,9 @@ namespace DeusServer
 					{
 						if (readedByteCount == 0)
 						{
-							std::cout << "[Client " << std::setw(3) << m_id << "] Want to stop communication" << std::endl;
+							DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Want to stop communication");
+							//std::cout << "[Client " << std::setw(3) << m_id << "] " << std::endl;
+
 							m_cancellationRequested = true;
 						}
 						else {
@@ -95,13 +101,13 @@ namespace DeusServer
 
 					assert(allByteReceivedBuffer.size() >= 3); // headers need at least 3 bytes
 
-					DeusNetwork::PacketUPtr p_packetDeserialized = DeusNetwork::Packet::Deserialize(deserializeBuffer);
+					DeusCore::PacketUPtr p_packetDeserialized = DeusCore::Packet::Deserialize(deserializeBuffer);
 					if (p_packetDeserialized)
 					{
 						// we can now delete the byte in our buffer corresponding to our packet serializedSize
 						allByteReceivedBuffer.erase(allByteReceivedBuffer.begin(), allByteReceivedBuffer.begin() + p_packetDeserialized->GetSerializedSize());
 
-						//std::cout << "Message : " << (*((DeusNetwork::PacketTest*)p_packetDeserialized.get())).GetTextMessage() << std::endl;
+						//std::cout << "Message : " << (*((DeusCore::PacketTest*)p_packetDeserialized.get())).GetTextMessage() << std::endl;
 
 						// Trigger event "OnMessageReceived"
 						TriggerEvent(std::move(p_packetDeserialized), DeusConnectionEventsType::OnMessageReceived);

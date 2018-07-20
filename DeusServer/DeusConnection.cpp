@@ -3,7 +3,7 @@
 
 namespace DeusServer
 {
-	void DeusConnection::AddPacketToQueue(DeusNetwork::PacketUPtr & p_packet)
+	void DeusConnection::AddPacketToQueue(DeusCore::PacketUPtr & p_packet)
 	{
 		if (!p_packet)
 			return;
@@ -54,7 +54,7 @@ namespace DeusServer
 	}
 
 
-	bool DeusConnection::TriggerEvent(const DeusNetwork::PacketSPtr& p_packet, const DeusConnectionEventsType type)
+	bool DeusConnection::TriggerEvent(const DeusCore::PacketSPtr& p_packet, const DeusConnectionEventsType type)
 	{
 		bool processed = false;
 
@@ -78,7 +78,7 @@ namespace DeusServer
 		return processed;
 	}
 
-	bool DeusConnection::TryTakePacket(DeusNetwork::PacketUPtr & p_packet)
+	bool DeusConnection::TryTakePacket(DeusCore::PacketUPtr & p_packet)
 	{
 		bool popedElement = false;
 

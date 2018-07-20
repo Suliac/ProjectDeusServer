@@ -5,7 +5,7 @@
 #include "Buffer.h"
 #include "Packet.h"
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	class TcpSocket : public Socket
 	{

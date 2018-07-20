@@ -26,6 +26,7 @@
     <ClCompile Include="DeusTcpConnection.cpp">
       <Filter>ClientCommunication\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="WorldServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeusClient.h">
@@ -37,5 +38,6 @@
     <ClInclude Include="DeusTcpConnection.h">
       <Filter>ClientCommunication\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="WorldServer.h" />
   </ItemGroup>
 </Project>

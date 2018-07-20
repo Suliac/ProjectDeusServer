@@ -22,12 +22,10 @@
     <ClCompile Include="DeusException.cpp" />
     <ClCompile Include="DeusSerializationException.cpp" />
     <ClCompile Include="DeusSocketException.cpp" />
-    <ClCompile Include="ISerializable.cpp" />
-    <ClCompile Include="MessageText.cpp" />
+    <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="PacketTest.cpp" />
     <ClCompile Include="Socket.cpp" />
-    <ClCompile Include="StringSerializable.cpp" />
     <ClCompile Include="TcpListener.cpp" />
     <ClCompile Include="TcpSocket.cpp" />
   </ItemGroup>
@@ -36,14 +34,11 @@
     <ClInclude Include="DeusSerializationException.h" />
     <ClInclude Include="DeusSocketException.h" />
     <ClInclude Include="FastDelegate.h" />
-    <ClInclude Include="ISerializable.h" />
-    <ClInclude Include="Message.h" />
+    <ClInclude Include="Logger.h" />
     <ClInclude Include="Buffer.h" />
-    <ClInclude Include="MessageText.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="PacketTest.h" />
     <ClInclude Include="Socket.h" />
-    <ClInclude Include="StringSerializable.h" />
     <ClInclude Include="TcpListener.h" />
     <ClInclude Include="TcpSocket.h" />
   </ItemGroup>

@@ -1,6 +1,6 @@
 #include "DeusSerializationException.h"
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	DeusSerializationException::DeusSerializationException(std::string message) : DeusException(message)
 	{

@@ -1,6 +1,6 @@
 #include "PacketTest.h"
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	PacketTest::PacketTest() : Packet(Packet::EMessageType::MessageTest)
 	{

@@ -3,7 +3,7 @@
 
 #include <WS2tcpip.h>
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	TcpSocket::TcpSocket() : Socket("TcpSocket")
 	{

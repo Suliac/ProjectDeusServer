@@ -1,6 +1,6 @@
 #include "DeusSocketException.h"
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	DeusSocketException::DeusSocketException(std::string message) : DeusException(message)
 	{

@@ -1,7 +1,7 @@
 #pragma once
 #include <exception>
 #include <string>
-namespace DeusNetwork
+namespace DeusCore
 {
 	class DeusException : public std::exception
 	{

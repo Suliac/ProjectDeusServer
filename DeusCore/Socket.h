@@ -1,10 +1,13 @@
 #pragma once
 
+// Need to link with Ws2_32.lib
+#pragma comment (lib, "Ws2_32.lib")
+
 #include <WinSock2.h>
 #include <iostream>
 #include <string>
 
-namespace DeusNetwork
+namespace DeusCore
 {
 #define DEFAULT_SOCKETSTATE_TIMEOUT 3
 	/////////////////////
@@ -35,6 +38,7 @@ namespace DeusNetwork
 		Socket(std::string name);
 		~Socket();
 		
+		// Set our socket asynchronous 
 		void SetNonBlocking(bool value = true);
 
 		// Close socket (Hard)
@@ -43,6 +47,7 @@ namespace DeusNetwork
 		// Close socket (Soft)
 		int SocketShutdown() const;
 
+		// Is there any pending data on the socket?
 		bool DataAvailable();
 	protected:
 
@@ -77,10 +82,13 @@ namespace DeusNetwork
 		// Data we need for winsocks
 		WSADATA m_wsaData;
 
+		// Manage Wsa lifetime
 		bool m_isWsaAlive = false;
 
+		// Debug name
 		std::string m_name;
 
+		// Check if socket is writable, readable or blocked
 		SocketStateFlag CheckSocketStates(unsigned int timeoutSecond, unsigned int timeoutMicroseconds = 0);
 	};
 }

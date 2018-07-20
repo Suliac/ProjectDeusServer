@@ -3,7 +3,7 @@
 
 #include <WS2tcpip.h>
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	TcpListener::TcpListener() : Socket("TcpListener")
 	{

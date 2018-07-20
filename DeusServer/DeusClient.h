@@ -19,7 +19,7 @@ namespace DeusServer
 		};
 		using DeusClientEventDeleguateMap = std::map<DeusClientEventsType, DeusEventDeleguateVector>;
 
-		DeusClient(int id, std::unique_ptr<DeusNetwork::TcpSocket> communicationSocket);
+		DeusClient(int id, std::unique_ptr<DeusCore::TcpSocket> communicationSocket);
 		~DeusClient();
 		
 		// Just access to specific connection events
@@ -34,8 +34,8 @@ namespace DeusServer
 		// ID of the connection
 		int m_id;
 
-		void ManageTcpMessageReceivedEvent(int id, DeusNetwork::PacketSPtr p_packet);
-		void ManageTcpDisconnectedEvent(int id, DeusNetwork::PacketSPtr p_packet);
+		void ManageTcpMessageReceivedEvent(int id, DeusCore::PacketSPtr p_packet);
+		void ManageTcpDisconnectedEvent(int id, DeusCore::PacketSPtr p_packet);
 	};
 }
 

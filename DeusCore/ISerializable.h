@@ -2,7 +2,7 @@
 #include "Buffer.h"
 #include <assert.h>
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	class ISerializable
 	{

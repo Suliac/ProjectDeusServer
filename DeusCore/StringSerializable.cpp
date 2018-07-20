@@ -1,7 +1,7 @@
 #include "StringSerializable.h"
 #include <iterator>
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	StringSerializable::StringSerializable()
 	{

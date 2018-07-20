@@ -7,7 +7,7 @@
 #include <type_traits>
 #include <iostream>
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	class IMessage : public ISerializable
 	{

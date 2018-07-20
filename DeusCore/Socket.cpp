@@ -5,7 +5,7 @@
 #include <WS2tcpip.h>
 
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	Socket::Socket(std::string name)
 	{

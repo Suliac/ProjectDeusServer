@@ -1,6 +1,6 @@
 #pragma once
 #include "DeusException.h"
-namespace DeusNetwork
+namespace DeusCore
 {
 	class DeusSerializationException : public DeusException
 	{

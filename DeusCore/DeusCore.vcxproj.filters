@@ -35,9 +35,6 @@
     <Filter Include="Network\Packets\Headers">
       <UniqueIdentifier>{5d7734aa-19b7-458c-b583-3df34604236c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Legacy">
-      <UniqueIdentifier>{068ce0f1-97e3-4766-ad27-a74817b70f7c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Delegate">
       <UniqueIdentifier>{aa14d465-a033-49d6-9978-734a4a561d18}</UniqueIdentifier>
     </Filter>
@@ -61,21 +58,13 @@
     <ClCompile Include="Packet.cpp">
       <Filter>Network\Packets\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="StringSerializable.cpp">
-      <Filter>Legacy</Filter>
-    </ClCompile>
-    <ClCompile Include="ISerializable.cpp">
-      <Filter>Legacy</Filter>
-    </ClCompile>
-    <ClCompile Include="MessageText.cpp">
-      <Filter>Legacy</Filter>
-    </ClCompile>
     <ClCompile Include="DeusSerializationException.cpp">
       <Filter>Network\Exceptions\Sources</Filter>
     </ClCompile>
     <ClCompile Include="DeusException.cpp">
       <Filter>Network\Exceptions\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Logger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -96,18 +85,6 @@
     <ClInclude Include="PacketTest.h">
       <Filter>Network\Packets\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="StringSerializable.h">
-      <Filter>Legacy</Filter>
-    </ClInclude>
-    <ClInclude Include="ISerializable.h">
-      <Filter>Legacy</Filter>
-    </ClInclude>
-    <ClInclude Include="MessageText.h">
-      <Filter>Legacy</Filter>
-    </ClInclude>
-    <ClInclude Include="Message.h">
-      <Filter>Legacy</Filter>
-    </ClInclude>
     <ClInclude Include="DeusSerializationException.h">
       <Filter>Network\Exceptions\Headers</Filter>
     </ClInclude>
@@ -120,5 +97,6 @@
     <ClInclude Include="FastDelegate.h">
       <Filter>Delegate</Filter>
     </ClInclude>
+    <ClInclude Include="Logger.h" />
   </ItemGroup>
 </Project>

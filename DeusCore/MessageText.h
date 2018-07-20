@@ -3,7 +3,7 @@
 #include "StringSerializable.h"
 #include <string>
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	class MessageText : public IMessage
 	{

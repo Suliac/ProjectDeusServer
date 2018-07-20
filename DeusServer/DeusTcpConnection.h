@@ -10,7 +10,7 @@ namespace DeusServer
 		DeusTcpConnection(int id);
 		~DeusTcpConnection();
 
-		void Init(std::unique_ptr<DeusNetwork::TcpSocket> communicationSocket);
+		void Init(std::unique_ptr<DeusCore::TcpSocket> communicationSocket);
 		void Stop() { m_cancellationRequested = true; }
 
 	protected:
@@ -21,7 +21,7 @@ namespace DeusServer
 
 	private:
 		// TCP connection handler
-		std::unique_ptr<DeusNetwork::TcpSocket> m_clientTCPSocket;
+		std::unique_ptr<DeusCore::TcpSocket> m_clientTCPSocket;
 
 	};
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "ISerializable.h"
 #include <string>
-namespace DeusNetwork
+namespace DeusCore
 {
 	class StringSerializable : public std::string, public ISerializable
 	{

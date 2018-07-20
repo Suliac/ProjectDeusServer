@@ -3,7 +3,7 @@
 #include "TcpSocket.h"
 
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	class TcpListener : public Socket
 	{
@@ -20,7 +20,6 @@ namespace DeusNetwork
 		// Accept next connection and fill the TcpSocket object
 		bool Accept(TcpSocket& socket);
 
-		// TODO : Pending() function which return true or false if there is any pending connection
 	};
 }
 

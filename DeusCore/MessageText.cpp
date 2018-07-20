@@ -1,6 +1,6 @@
 #include "MessageText.h"
 
-namespace DeusNetwork
+namespace DeusCore
 {
 	MessageText::MessageText()
 	{
