@@ -37,5 +37,7 @@ namespace DeusServer
 		void ManageTcpMessageReceivedEvent(int id, DeusCore::PacketSPtr p_packet);
 		void ManageTcpDisconnectedEvent(int id, DeusCore::PacketSPtr p_packet);
 	};
+
+	using DeusClientUPtr = std::unique_ptr<DeusServer::DeusClient>;
 }
 

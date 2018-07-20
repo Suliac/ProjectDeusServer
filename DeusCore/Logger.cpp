@@ -4,7 +4,7 @@
 
 namespace DeusCore
 {
-	Logger* volatile Logger::p_instance = nullptr;
+	Logger* Logger::p_instance = nullptr;
 	std::mutex Logger::m_instanceLock;
 
 
@@ -13,7 +13,7 @@ namespace DeusCore
 		if(p_instance == nullptr) {
 			m_instanceLock.lock();
 			if (p_instance == nullptr) {
-				Logger* volatile temp = new Logger; // volatile added
+				Logger* temp = new Logger; // volatile added
 				p_instance = temp;
 			}
 			m_instanceLock.unlock();
@@ -25,7 +25,7 @@ namespace DeusCore
 	void Logger::Log(std::string name, std::string message)
 	{
 		m_cliLock.lock();
-		std::cout << "[" << std::left <<std::setw(15) << name << "]" << message << std::endl;
+		std::cout << "[" << std::left <<std::setw(15) << name << "] " << message << std::endl;
 		m_cliLock.unlock();
 	}
 

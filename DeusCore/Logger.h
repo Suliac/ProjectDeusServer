@@ -11,7 +11,7 @@ namespace DeusCore
 		void Log(std::string name, std::string message);
 	private:
 
-		static Logger* volatile p_instance;
+		static Logger* p_instance;
 		static std::mutex m_instanceLock;
 
 		std::mutex m_cliLock;
