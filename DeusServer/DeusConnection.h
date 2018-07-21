@@ -69,7 +69,7 @@ namespace DeusServer
 		std::vector<char> allByteReceivedBuffer;
 
 		// Counter 
-		size_t sentByteCount, readedByteCount;
+		int sentByteCount, readedByteCount;
 
 		///////////////////////////////////////
 		//               Events              //

@@ -1,4 +1,5 @@
 #include "TcpSocket.h"
+#include "Logger.h"
 #include "DeusSocketException.h"
 
 #include <WS2tcpip.h>
@@ -63,22 +64,23 @@ namespace DeusCore
 	/*                SEND               */
 	/*************************************/
 
-	bool TcpSocket::TCPSend(const Packet& paquet, size_t& byteSent) 
+	bool TcpSocket::TCPSend(const Packet& paquet, int& byteSent)
 	{
 		Buffer512 buffer;
 		Packet::Serialize(buffer, paquet);
 
 		bool sendSuccess = TCPSend(buffer, byteSent);
-		std::cout << "Bytes sent: " << byteSent << std::endl;
+		DeusCore::Logger::Instance()->Log("Client", "Bytes sent: "+std::to_string(byteSent));
+		//std::cout << "Bytes sent: " << byteSent << std::endl;
 		return sendSuccess;
 	}
 
-	bool TcpSocket::TCPSend(const Buffer512& buffer, size_t& byteSent) 
+	bool TcpSocket::TCPSend(const Buffer512& buffer, int& byteSent)
 	{
 		return TCPSend((const char*)buffer.Data(), buffer.GetIndex(), byteSent);
 	}
 
-	bool TcpSocket::TCPSend(const char * data, std::size_t size, std::size_t & byteSent) 
+	bool TcpSocket::TCPSend(const char * data, size_t size, int& byteSent)
 	{
 		if (!CheckSocketStates(true, false)) // Check if socket is writable
 			return false;
@@ -97,7 +99,7 @@ namespace DeusCore
 	/*             RECEIVED              */
 	/*************************************/
 
-	bool TcpSocket::TCPRecv(std::unique_ptr<Packet>& p_packetReceived, size_t & byteRecv) 
+	bool TcpSocket::TCPRecv(std::unique_ptr<Packet>& p_packetReceived, int& byteRecv)
 	{
 		p_packetReceived.reset();
 		Buffer512 buffer;
@@ -107,15 +109,17 @@ namespace DeusCore
 
 		if (byteRecv > 0)
 		{
-			std::cout << "Bytes received: " << byteRecv << std::endl;
+			DeusCore::Logger::Instance()->Log("Client", "Bytes received: " + std::to_string(byteRecv));
+			//std::cout << "Bytes received: " << byteRecv << std::endl;
 			p_packetReceived = Packet::Deserialize(buffer);
-			std::cout << "Deserialized size: " << buffer.GetIndex() << std::endl;
+			DeusCore::Logger::Instance()->Log("Client", "Deserialized size: " + std::to_string(buffer.GetIndex()));
+			//std::cout << "Deserialized size: " << buffer.GetIndex() << std::endl;
 		}
 
 		return true;
 	}
 
-	bool TcpSocket::TCPRecv(Buffer512& buffer, size_t& byteRecv) 
+	bool TcpSocket::TCPRecv(Buffer512& buffer, int& byteRecv)
 	{
 		char tmpBuffer[SIZE_BUFFER];
 
@@ -126,7 +130,7 @@ namespace DeusCore
 		return true;
 	}
 
-	bool TcpSocket::TCPRecv(char * data, size_t size, size_t & byteRecv) 
+	bool TcpSocket::TCPRecv(char * data, size_t size, int & byteRecv)
 	{
 		if (!CheckSocketStates(false, true)) // Check if socket is readable
 			return false;

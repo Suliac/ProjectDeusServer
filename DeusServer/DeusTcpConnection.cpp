@@ -112,8 +112,7 @@ namespace DeusServer
 							// we can now delete the byte in our buffer corresponding to our packet serializedSize
 							allByteReceivedBuffer.erase(allByteReceivedBuffer.begin(), allByteReceivedBuffer.begin() + p_packetDeserialized->GetSerializedSize());
 
-							//std::cout << "Message : " << (*((DeusCore::PacketTest*)p_packetDeserialized.get())).GetTextMessage() << std::endl;
-
+							///////////////////////////////////////////////////////////
 							// Trigger event "OnMessageReceived"
 							TriggerEvent(std::move(p_packetDeserialized), DeusConnectionEventsType::OnMessageReceived);
 						}
