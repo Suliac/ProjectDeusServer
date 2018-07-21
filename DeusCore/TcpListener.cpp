@@ -51,9 +51,9 @@ namespace DeusCore
 
 	}
 
-	bool TcpListener::Accept(TcpSocket& socket)
+	bool TcpListener::Accept(TcpSocket& socket, unsigned int timeoutSeconds)
 	{
-		if (!CheckSocketStates(false, true))
+		if (!CheckSocketStates(false, true, timeoutSeconds))
 			return false;
 
 		SOCKET clientSocket = accept(m_handler, NULL, NULL);

@@ -9,7 +9,7 @@
 
 namespace DeusCore
 {
-#define DEFAULT_SOCKETSTATE_TIMEOUT 3
+#define DEFAULT_SOCKETSTATE_TIMEOUT 1
 	/////////////////////
 	// Socket States
 	enum class SocketStateFlag {

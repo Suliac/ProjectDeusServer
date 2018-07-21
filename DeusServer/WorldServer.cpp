@@ -1,9 +1,11 @@
 #include "DeusCore\DeusSocketException.h"
 #include "DeusCore\Logger.h"
+#include "DeusCore\PacketTest.h"
 
 #include "WorldServer.h"
 
 #include <stdio.h>
+
 
 
 namespace DeusServer
@@ -17,9 +19,14 @@ namespace DeusServer
 		StopConnections();
 	}
 
+	/////////////////////////// 
+	//         SERVER        // 
+	/////////////////////////// 
+
 	void WorldServer::Run(std::string ipAddr, std::string port)
 	{
-		std::thread m_inputHandlerThread = std::thread([this] { HandleInput(); });
+		std::thread inputHandlerThread = std::thread([this] { HandleInput(); });
+		std::thread processPacketThread = std::thread([this] { ProcessPackets(); });
 
 		m_ipAddr = ipAddr;
 		m_port = port;
@@ -42,9 +49,11 @@ namespace DeusServer
 		}
 
 		StopConnections();
-		m_inputHandlerThread.join();
+		inputHandlerThread.join();
+		processPacketThread.join();
 
 	}
+
 	void WorldServer::StopConnections()
 	{
 		m_listener.SocketShutdown();
@@ -68,14 +77,14 @@ namespace DeusServer
 		m_clientsConnections.clear();
 	}
 
-	bool WorldServer::AcceptConnection(const size_t& id)
+	bool WorldServer::AcceptConnection(const unsigned int id, const unsigned int timeoutSecond)
 	{
 		// create a pointer on empty tcp socket
 		std::unique_ptr<DeusCore::TcpSocket> p_client = std::make_unique<DeusCore::TcpSocket>();
 
 		// timeout is in the accept function
 		// block until timeout (3sec currently)
-		if (m_listener.Accept(*p_client))
+		if (m_listener.Accept(*p_client, timeoutSecond))
 		{
 
 			DeusCore::Logger::Instance()->Log(m_name, "Connection accepted !");
@@ -126,7 +135,7 @@ namespace DeusServer
 					// Can be weird but it works
 					DeusServer::DeusEventDeleguate messageTcpReceivedDeleguate = fastdelegate::MakeDelegate(this, &WorldServer::ManageOnReceivedPacketEvent);
 					DeusServer::DeusEventDeleguate disconnectTcpDeleguate = fastdelegate::MakeDelegate(this, &WorldServer::ManageDisconnectedEvent);
-					
+
 					// remove deleguates
 					matchingConnectionIt->second->RemoveListener(messageTcpReceivedDeleguate, DeusServer::DeusClient::DeusClientEventsType::OnTCPMessageReceived);
 					matchingConnectionIt->second->RemoveListener(messageTcpReceivedDeleguate, DeusServer::DeusClient::DeusClientEventsType::OnTCPDisconnect);
@@ -139,8 +148,6 @@ namespace DeusServer
 		}
 		m_lockClientsToDisconnect.unlock();
 	}
-
-
 
 	// Threaded function
 	void WorldServer::HandleInput()
@@ -160,18 +167,98 @@ namespace DeusServer
 		}
 	}
 
+	// Threaded function
+	void WorldServer::ProcessPackets()
+	{
+		while (!m_wantToStop)
+		{
+			std::pair<int, DeusCore::PacketSPtr> packetToProcess;
+			bool getPacket = false;
 
+			std::unique_lock<std::mutex> lk(m_lockPacketsToProcess);
+			// wait for a packet to be added to our queue 
+			// or if there already is packet to process, don't wait
+			m_newPacketBlocker.wait(lk, [this] {return m_thereIsPacket; }); 
+
+			// Get packet from queue
+			if (!m_packetsToProcess.empty())
+			{
+				getPacket = true;
+
+				// Pop the front packet to use it later without blocking 
+				// for too long the access on the queue
+				packetToProcess = m_packetsToProcess.front();
+				m_packetsToProcess.pop();
+
+				// update our thereIsPacket var for our condition_var
+				if (!m_packetsToProcess.empty())
+					m_thereIsPacket = true;
+				else
+					m_thereIsPacket = false;
+
+			}
+
+			lk.unlock();
+
+			// Process packet
+			if (getPacket)
+			{
+				switch (packetToProcess.second->GetID())
+				{
+				case DeusCore::Packet::EMessageType::MessageTest:
+					DeusCore::Logger::Instance()->Log(m_name, "Interpret packet id : " + std::to_string(packetToProcess.second->GetID()) + ". Sent by client :" + std::to_string(packetToProcess.first));
+					DeusCore::Logger::Instance()->Log(m_name, "Message : " + ((DeusCore::PacketTest*)packetToProcess.second.get())->GetTextMessage());
+
+					break;
+				default:
+					DeusCore::Logger::Instance()->Log(m_name, "Try to interpret packet failed. Unknown packet id : " + std::to_string(packetToProcess.second->GetID()) + ". Sent by client :" + std::to_string(packetToProcess.first));
+					break;
+				}
+
+			}
+		}
+	}
+
+	/////////////////////////// 
+	//          GAMES        // 
+	///////////////////////////
+
+	void WorldServer::GetGames()
+	{
+	}
+
+	void WorldServer::CreateGame()
+	{
+	}
+
+	void WorldServer::JoinGame()
+	{
+	}
+
+	/////////////////////////// 
+	//       DELEGUATES      // 
+	/////////////////////////// 
 	// Warning : on those deleguate your are on the same execution thread than the one 
 	// which raise the deleguates
 
-	void WorldServer::ManageOnReceivedPacketEvent(int id, DeusCore::PacketSPtr p_packet)
+	void WorldServer::ManageOnReceivedPacketEvent(int idSender, DeusCore::PacketSPtr p_packet)
 	{
 		DeusCore::Logger::Instance()->Log(m_name, "Received TCP message of type : " + std::to_string(p_packet->GetID()));
+		
+		m_lockPacketsToProcess.lock();
+
+		m_packetsToProcess.push(std::make_pair(idSender, p_packet));
+		m_thereIsPacket = true;
+
+		m_lockPacketsToProcess.unlock();
+		m_newPacketBlocker.notify_all();
+
+		DeusCore::Logger::Instance()->Log(m_name, "Message added to queue");
 	}
 
-	void WorldServer::ManageDisconnectedEvent(int id, DeusCore::PacketSPtr p_packet)
+	void WorldServer::ManageDisconnectedEvent(int idSender, DeusCore::PacketSPtr p_packet)
 	{
-		DeusClientConnections::iterator matchingConnectionIt = m_clientsConnections.find(id);
+		DeusClientConnections::iterator matchingConnectionIt = m_clientsConnections.find(idSender);
 
 		if (matchingConnectionIt != m_clientsConnections.end())
 		{
@@ -181,6 +268,6 @@ namespace DeusServer
 			m_lockClientsToDisconnect.unlock();
 		}
 
-		DeusCore::Logger::Instance()->Log("World Server", "Client " + std::to_string(id) + " disconnection handled in deleguate");
+		DeusCore::Logger::Instance()->Log("World Server", "Client " + std::to_string(idSender) + " disconnection handled in deleguate");
 	}
 }

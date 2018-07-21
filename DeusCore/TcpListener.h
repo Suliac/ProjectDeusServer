@@ -18,7 +18,7 @@ namespace DeusCore
 		void Start();
 
 		// Accept next connection and fill the TcpSocket object
-		bool Accept(TcpSocket& socket);
+		bool Accept(TcpSocket& socket, unsigned int timeoutSeconds = DEFAULT_SOCKETSTATE_TIMEOUT);
 
 	};
 }
