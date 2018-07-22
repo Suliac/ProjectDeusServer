@@ -27,6 +27,8 @@ namespace DeusServer
 
 		// Just access to specific connection events
 		bool RemoveListener(const DeusEventDeleguate& eventDeleguate, const DeusClientEventsType type);
+	
+		void SendPacket(DeusCore::PacketUPtr p_packet, bool isTcp);
 	private:
 		// TCP communication interface
 		DeusTcpConnection m_tcpConnection;
@@ -34,10 +36,9 @@ namespace DeusServer
 		// ID of the connection
 		int m_id;
 
-		void ManageTcpMessageReceivedEvent(int id, DeusCore::PacketSPtr p_packet);
-		void ManageTcpDisconnectedEvent(int id, DeusCore::PacketSPtr p_packet);
 	};
 
 	using DeusClientUPtr = std::unique_ptr<DeusServer::DeusClient>;
+	using DeusClientSPtr = std::shared_ptr<DeusServer::DeusClient>;
 }
 

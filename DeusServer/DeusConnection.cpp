@@ -3,7 +3,7 @@
 
 namespace DeusServer
 {
-	void DeusConnection::AddPacketToQueue(DeusCore::PacketUPtr & p_packet)
+	void DeusConnection::AddPacketToQueue(DeusCore::PacketUPtr p_packet)
 	{
 		if (!p_packet)
 			return;
@@ -64,7 +64,7 @@ namespace DeusServer
 		if (matchingType != m_eventListeners.end())
 		{
 			// Get the vector for the event type found
-			DeusEventDeleguateVector& listeners = matchingType->second;
+			DeusEventDeleguateVector listeners = matchingType->second;
 
 			// loop and all deleguate and call thems
 			for (auto it = listeners.begin(); it != listeners.end(); ++it)

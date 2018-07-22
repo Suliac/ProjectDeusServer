@@ -2,7 +2,7 @@
 
 namespace DeusCore
 {
-	PacketTest::PacketTest() : Packet(Packet::EMessageType::MessageTest)
+	PacketTest::PacketTest() : Packet(Packet::EMessageType::Test)
 	{
 	}
 
@@ -13,8 +13,6 @@ namespace DeusCore
 
 	void PacketTest::OnDeserialize(Buffer512 & buffer)
 	{
-		size_t serializedSize = 0;
-
 		// get the size of the string
 		size_t dataSize;
 		DeserializeData(buffer, dataSize);

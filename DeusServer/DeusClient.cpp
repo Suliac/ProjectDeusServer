@@ -67,5 +67,13 @@ namespace DeusServer
 		return false;
 	}
 
+	void DeusClient::SendPacket(DeusCore::PacketUPtr p_packet, bool isTcp)
+	{
+		if (isTcp)
+			m_tcpConnection.AddPacketToQueue(std::move(p_packet));
+		else
+			throw std::exception("UDP Not implemented");
+	}
+
 
 }

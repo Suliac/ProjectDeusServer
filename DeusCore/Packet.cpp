@@ -1,11 +1,14 @@
 #include "Packet.h"
 #include "PacketTest.h"
+#include "PacketCreateGameAnswer.h"
+#include "PacketCreateGameRequest.h"
+#include "PacketGetGamesAnswer.h"
+#include "PacketGetGamesRequest.h"
+#include "PacketJoinGameAnswer.h"
+#include "PacketJoinGameRequest.h"
 #include "DeusSerializationException.h"
 namespace DeusCore
 {
-	Packet::Packet() : Packet(Packet::EMessageType::MessageTest)
-	{
-	}
 
 	Packet::~Packet()
 	{
@@ -38,8 +41,26 @@ namespace DeusCore
 		// Specific packet deserialzation
 		switch (id)
 		{
-		case Packet::MessageTest:
+		case Packet::Test:
 			p_packetDeserialized = std::make_unique<PacketTest>();
+			break;
+		case Packet::CreateGameRequest:
+			p_packetDeserialized = std::make_unique<PacketCreateGameRequest>();
+			break;
+		case Packet::CreateGameAnswer:
+			p_packetDeserialized = std::make_unique<PacketCreateGameAnswer>();
+			break;
+		case Packet::JoinGameRequest:
+			p_packetDeserialized = std::make_unique<PacketJoinGameRequest>();
+			break;
+		case Packet::JoinGameAnswer:
+			p_packetDeserialized = std::make_unique<PacketJoinGameAnswer>();
+			break;
+		case Packet::GetGameRequest:
+			p_packetDeserialized = std::make_unique<PacketGetGamesRequest>();
+			break;
+		case Packet::GetGameAnswer:
+			p_packetDeserialized = std::make_unique<PacketGetGamesAnswer>();
 			break;
 		default:
 			throw DeusSerializationException("Impossible to deserialize object : unknown message type");

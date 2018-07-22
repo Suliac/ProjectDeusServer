@@ -1,5 +1,6 @@
 #pragma once
 #include "Buffer.h"
+
 #include <memory>
 namespace DeusCore
 {
@@ -9,11 +10,18 @@ namespace DeusCore
 	public:
 		enum EMessageType : uint8_t
 		{
-			MessageError = 0x0,
-			MessageTest = 0x1
+			Error = 0x0,
+			Test = 0x1,
+
+			// Game management
+			CreateGameRequest = 0x2,
+			CreateGameAnswer = 0x3,
+			JoinGameRequest = 0x4,
+			JoinGameAnswer = 0x5,
+			GetGameRequest = 0x6,
+			GetGameAnswer = 0x7,
 		};
 
-		Packet();
 		Packet(EMessageType messageType) { m_id = messageType; }
 
 		~Packet();

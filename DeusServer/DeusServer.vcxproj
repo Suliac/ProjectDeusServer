@@ -153,7 +153,10 @@
   <ItemGroup>
     <ClCompile Include="DeusClient.cpp" />
     <ClCompile Include="DeusConnection.cpp" />
-    <ClCompile Include="WorldServer.cpp" />
+    <ClCompile Include="GameHandler.cpp" />
+    <ClCompile Include="GameNetworkServer.cpp" />
+    <ClCompile Include="NetworkServer.cpp" />
+    <ClCompile Include="WorldNetworkServer.cpp" />
     <ClCompile Include="DeusTcpConnection.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -165,7 +168,10 @@
   <ItemGroup>
     <ClInclude Include="DeusClient.h" />
     <ClInclude Include="DeusConnection.h" />
-    <ClInclude Include="WorldServer.h" />
+    <ClInclude Include="GameHandler.h" />
+    <ClInclude Include="GameNetworkServer.h" />
+    <ClInclude Include="NetworkServer.h" />
+    <ClInclude Include="WorldNetworkServer.h" />
     <ClInclude Include="DeusTcpConnection.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

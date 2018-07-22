@@ -3,6 +3,8 @@
 #include "DeusCore/PacketTest.h"
 #include "DeusCore/Logger.h"
 #include "DeusCore/DeusException.h"
+#include "DeusCore/DeusSerializationException.h"
+#include "DeusCore/DeusSocketException.h"
 
 #define NOMINMAX
 
@@ -122,7 +124,11 @@ namespace DeusServer
 					}
 				}
 			}
-			catch (const DeusCore::DeusException& e)
+			catch (const DeusCore::DeusSerializationException& e)
+			{
+				DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Not blocking error : " + e.GetErrorMessage());
+			}
+			catch (const DeusCore::DeusSocketException& e)
 			{
 				DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Connection aborted. Error : " + e.GetErrorMessage());
 				m_cancellationRequested = true;

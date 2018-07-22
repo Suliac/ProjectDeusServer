@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Fichiers de ressources">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="ClientCommunication">
       <UniqueIdentifier>{7bf62c0d-19a2-4b0c-9f2b-053fa597b395}</UniqueIdentifier>
     </Filter>
@@ -13,6 +9,24 @@
     </Filter>
     <Filter Include="ClientCommunication\Sources">
       <UniqueIdentifier>{8d7b4ec3-f32c-4293-90b4-decabe153762}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Games">
+      <UniqueIdentifier>{3675a064-a548-432e-8abb-183db2669b01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Servers">
+      <UniqueIdentifier>{434f5ab4-0a2b-4a7c-963d-6704ea876ae0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Games\Headers">
+      <UniqueIdentifier>{f4e57836-12a7-4bf1-8a77-3d7999e9a29f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Games\Sources">
+      <UniqueIdentifier>{145e8082-c723-4d03-9d30-a4fc0a0a08ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Servers\Sources">
+      <UniqueIdentifier>{51f222be-e95d-4186-9854-883be2b9285e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Servers\Headers">
+      <UniqueIdentifier>{ed540a89-aa55-452e-99e4-ac9cf2375a80}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -26,7 +40,16 @@
     <ClCompile Include="DeusTcpConnection.cpp">
       <Filter>ClientCommunication\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="WorldServer.cpp" />
+    <ClCompile Include="GameHandler.cpp">
+      <Filter>Games\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldNetworkServer.cpp">
+      <Filter>Servers\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkServer.cpp">
+      <Filter>Servers\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="GameNetworkServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeusClient.h">
@@ -38,6 +61,15 @@
     <ClInclude Include="DeusTcpConnection.h">
       <Filter>ClientCommunication\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="WorldServer.h" />
+    <ClInclude Include="GameHandler.h">
+      <Filter>Games\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldNetworkServer.h">
+      <Filter>Servers\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkServer.h">
+      <Filter>Servers\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="GameNetworkServer.h" />
   </ItemGroup>
 </Project>

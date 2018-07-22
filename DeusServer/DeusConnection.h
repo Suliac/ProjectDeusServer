@@ -26,7 +26,7 @@ namespace DeusServer
 		
 		DeusConnection(int id) { m_id = id; }
 
-		void AddPacketToQueue(DeusCore::PacketUPtr& p_packet);
+		void AddPacketToQueue(DeusCore::PacketUPtr p_packet);
 
 		bool AddListener(const DeusEventDeleguate& eventDeleguate, const DeusConnectionEventsType type);
 		bool RemoveListener(const DeusEventDeleguate& eventDeleguate, const DeusConnectionEventsType type);

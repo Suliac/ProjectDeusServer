@@ -43,6 +43,12 @@
     <Filter Include="Log\Sources">
       <UniqueIdentifier>{a3a1624f-408a-494d-8f4d-9e341a30bb5e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Packets\Headers\Games">
+      <UniqueIdentifier>{27eb9e46-e91c-41df-a959-a1abd6c3c9ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Packets\Sources\Games">
+      <UniqueIdentifier>{7d051a11-cd2c-4b5c-9d97-61e76ca77e05}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Socket.cpp">
@@ -72,6 +78,25 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Log\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="PacketCreateGameRequest.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketGetGamesRequest.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketJoinGameRequest.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketCreateGameAnswer.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketGetGamesAnswer.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketJoinGameAnswer.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketAnswer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -106,6 +131,28 @@
     </ClInclude>
     <ClInclude Include="Logger.h">
       <Filter>Log\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketCreateGameRequest.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketGetGamesRequest.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketJoinGameRequest.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketCreateGameAnswer.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketGetGamesAnswer.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketJoinGameAnswer.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketAnswer.h" />
+    <ClInclude Include="Packets.h">
+      <Filter>Network\Packets\Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
