@@ -22,14 +22,11 @@ namespace DeusCore
 
 	Socket::~Socket()
 	{
-		/*if (m_handler != INVALID_SOCKET)
-			SocketClose();*/
-
 		if (m_isWsaAlive)
-		{
-			//std::cout << m_name << "WSACleanup (destructor)" << std::endl;
 			WSACleanup();
-		}
+
+		if (m_handler != INVALID_SOCKET)
+			closesocket(m_handler);
 	}
 
 	void Socket::SocketInit(short family, short type, IPPROTO protocol, short flags, const std::string& ipAdress, const std::string& port)
@@ -79,7 +76,7 @@ namespace DeusCore
 
 	}
 
-	SocketStateFlag Socket::CheckSocketStates(unsigned int timeoutSecond, unsigned int timeoutMicroseconds) 
+	SocketStateFlag Socket::CheckSocketStates(unsigned int timeoutSecond, unsigned int timeoutMicroseconds)
 	{
 		SocketStateFlag state = SocketStateFlag::SOCKET_READY;
 		fd_set readFlags, writeFlags, exceptFlags;							// the flag sets to be used
@@ -137,7 +134,7 @@ namespace DeusCore
 		if (!m_isNonBlocking)
 			return true;
 
-		states = CheckSocketStates(DEFAULT_SOCKETSTATE_TIMEOUT);
+		states = CheckSocketStates(timeoutSecond, timeoutMicroseconds);
 
 		if (states & SocketStateFlag::SOCKET_WRITE_NOT_READY && isWritable)
 			canUseSocket = false;
@@ -163,7 +160,7 @@ namespace DeusCore
 	void Socket::SocketClose()
 	{
 		closesocket(m_handler);
-		WSACleanup(); 
+		WSACleanup();
 		m_isWsaAlive = false;
 		//std::cout << m_name << "WSACleanup (SocketClose())" << std::endl;
 
@@ -175,7 +172,7 @@ namespace DeusCore
 		return shutdown(m_handler, SD_SEND);
 	}
 
-	bool Socket::DataAvailable() {
-		return CheckSocketStates(false, true);
+	bool Socket::DataAvailable(unsigned int timeoutSecond, unsigned int timeoutMicroseconds) {
+		return CheckSocketStates(false, true, timeoutSecond, timeoutMicroseconds);
 	}
 }

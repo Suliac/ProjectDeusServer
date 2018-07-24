@@ -13,7 +13,7 @@ namespace DeusCore
 		if(p_instance == nullptr) {
 			m_instanceLock.lock();
 			if (p_instance == nullptr) {
-				Logger* temp = new Logger; // volatile added
+				Logger* temp = new Logger;
 				p_instance = temp;
 			}
 			m_instanceLock.unlock();

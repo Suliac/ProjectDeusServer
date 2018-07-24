@@ -1,5 +1,6 @@
 #pragma once
 #include "DeusCore/TcpListener.h"
+#include "DeusCore/EventManagerHandler.h"
 
 #include "NetworkServer.h"
 #include "GameHandler.h"
@@ -16,7 +17,6 @@ namespace DeusServer
 		WorldNetworkServer();
 		~WorldNetworkServer();
 
-		/*void Run(std::string ipAddr = "127.0.0.1", std::string port = "27015");*/
 		void SetConnectInfo(std::string ipAddr, std::string port)
 		{
 			m_ipAddr = ipAddr;
@@ -27,27 +27,35 @@ namespace DeusServer
 		/////////////////////////// 
 		//         SERVER        // 
 		/////////////////////////// 
-		virtual void OnUpdate() override;
 
 		virtual void OnStart() override;
+		virtual void OnStop() override;
+		virtual void OnDisconnectClient(int clientId) override;
+		//virtual void OnUpdate() override;
+		//virtual void OnEnd() override;
 
-		virtual void OnEnd() override;
-
-		virtual void OnInterpretPacket(int senderId, DeusCore::PacketSPtr p_packet) override;
-
-		// Accept new connection
-		bool AcceptConnection(const unsigned int id, const unsigned int timeoutSecond = DEFAULT_SOCKETSTATE_TIMEOUT);
+		// Threaded function to accept new connection
+		void AcceptConnection();
 			
 		// Threaded function to accept users input
 		void HandleInput();
 
 		/////////////////////////// 
+		//       DELEGUATES      // 
+		///////////////////////////
+		
+		void InitDeleguate();
+		void DeleteDeleguate();
+		
+		/////////////////////////// 
 		//          GAMES        // 
 		///////////////////////////
+
+		void InterpretPacket(DeusCore::DeusEventSPtr p_packet);
 		void GetGames(int clientId);
 		void CreateGame(int clientId);
 		void JoinGame(int clientId, int gameId);
-				
+		void DeleteGame(int gameId);
 
 		/**************** Attributes ********************/
 
@@ -64,17 +72,23 @@ namespace DeusServer
 		// Socket that listen TCP connection
 		DeusCore::TcpListener m_listener;
 
-		size_t m_nextClientId = 1;
+		size_t m_nextClientId;
 
 		std::thread m_inputHandlerThread;
+		std::thread m_acceptConnectionsThread;
 		
+		bool m_stopped = false;
+
 		/////////////////////////// 
 		//          GAMES        // 
 		///////////////////////////
 		unsigned int m_nextGameId;
 		DeusGames m_games;
+		std::mutex m_gamesLocker;
+		std::mutex m_connectionsLocker;
 
-		/************************************/
+
+		/************************************************/
 	};
 }
 

@@ -11,26 +11,28 @@ namespace DeusServer
 	{
 		// Debug
 		m_name = m_name + std::to_string(gameId);
-		DeusCore::Logger::Instance()->Log(m_name, "New game. ID : " + std::to_string(gameId));
+		DeusCore::Logger::Instance()->Log(m_name, "New " + m_name);
 
 		// Init Game Network Server
 		mp_gameNetServer = new GameNetworkServer(gameId);
+		mp_gameNetServer->Start(gameId);
 	}
 
+	//---------------------------------------------------------------------------------
 	GameHandler::~GameHandler()
 	{
-		delete mp_gameNetServer;
+		if (mp_gameNetServer != nullptr)
+			delete mp_gameNetServer;
+
 		DeusCore::Logger::Instance()->Log(m_name, "Delete " + m_name);
 	}
 
-	bool GameHandler::NewPlayer(int clientId, DeusClientSPtr clientConnection)
+	//---------------------------------------------------------------------------------
+	void GameHandler::Stop()
 	{
-		if (!mp_gameNetServer)
-			return false;
-
-		return mp_gameNetServer->NewPlayer(clientId, clientConnection);
-		return false;
+		mp_gameNetServer->Stop();
 	}
+
 
 
 }

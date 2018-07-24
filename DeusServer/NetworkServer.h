@@ -1,6 +1,7 @@
 #pragma once
 #include "DeusCore/Packet.h"
 #include "DeusClient.h"
+#include "DeusCore/EventManagerHandler.h"
 
 #include <map>
 #include <queue>
@@ -14,78 +15,69 @@ namespace DeusServer
 		NetworkServer();
 		~NetworkServer();
 
-		void Run();
+		void Start(unsigned int gameId);
+		void Stop();
+		void WaitForStop();
+
+		bool IsStop() { return m_isStop; }
+
 	protected:
-		/****************** RUN *********************/
-
-		// Execute at each tick of Run()
-		virtual void OnUpdate() = 0;
-
-		// Execute before the loop of Run()
+		// Execute during the Start()
 		virtual void OnStart() = 0;
+
+		// Execute during the Stop()
+		virtual void OnStop() = 0;
 		
-		// Execute after the loop of Run()
-		virtual void OnEnd() = 0;
-
-		// Poll client id from queue of client to disconnect 
-		// and delete them from the active clients
-		void HandleDisconnection();
-
-		// clear client connection after remove deleguate
-		void StopConnections();
-
-
-		/********************************************/
-
-		/*****************  PACKETS *****************/
-
-		// Get the paquets from the queue and interpret them
-		void ProcessPackets();
+		// To execute by the childrens class when a client disconnects
+		virtual void OnDisconnectClient(int clientId) = 0;
 
 		// The way we want our server to interpret packet we get in ProcessPackets()
-		virtual void OnInterpretPacket(int senderId, DeusCore::PacketSPtr p_packet) = 0;
+		//virtual void OnInterpretPacket(int senderId, DeusCore::PacketSPtr p_packet) = 0;
+		void DisconnectDeleguate(DeusCore::DeusEventSPtr p_packet);
 
 		// Send Packet to a client
 		bool SendPacket(DeusCore::PacketUPtr&& p_packet, int clientId, bool sendTcp);
 
 		/********************************************/
 
-		/**************** DELEGUATES ****************/
-
-		void ManageOnReceivedPacketEvent(int idSender, DeusCore::PacketSPtr p_packet);
-		void ManageDisconnectedEvent(int idSender, DeusCore::PacketSPtr p_packet);
-
-		// Subscribe to onmessage and disconnect event
-		bool SubscribeToBasicEvents(int clientId);
-		/********************************************/
+		// Do we want to stop the server ?
+		bool m_wantToStop = false;
+		
+		// Id of the game : 0 for the world server, 1 for the game server #1, 2 for the #2 and so on
+		unsigned int m_gameId;
 
 		// Save all the client connection accepted with an id
 		DeusClientConnections m_clientsConnections;
+		
+		// Locker for the access of the client connections
+		std::recursive_mutex m_lockClients;
 
-		// Queue of clients id to disconnect
-		std::queue<int> m_clientToDisconnect;
+		// debug name
+		std::string m_name;
+	private:
+		bool m_isStop = false;
+
+		/////////////////////////// 
+		//       DISCONNECT      // 
+		///////////////////////////
+		std::thread m_disconnectThread;
+
+		// Poll client id from queue of client to disconnect 
+		// and delete them from the active clients
+		void HandleDisconnect();
+
+		std::condition_variable m_newDisconnectBlocker;
+		bool m_thereIsDisconnect = false;
 
 		// Mutex on queue as it is used by differents threads
 		std::mutex m_lockClientsToDisconnect;
 
-		// Queue of packet to interpret
-		std::queue<std::pair<int, DeusCore::PacketSPtr>> m_packetsToProcess;
+		// Queue of clients id to disconnect
+		std::queue<int> m_clientToDisconnect;
 
-		// Mutex on queue for packet to interpret as it is used by differents threads
-		std::mutex m_lockPacketsToProcess;
-
-		std::condition_variable m_newPacketBlocker;
-		bool m_thereIsPacket = false;
-
-		// Max disconnect per loop of the world server 
+		// Max time we try to handle disconnect
 		// To avoid to lock for too long the queue
-		const size_t MAX_DISCONNECT_PER_LOOP = 5;
-
-		// Do we want to stop the server ?
-		bool m_wantToStop = false;
-
-		// debug name
-		std::string m_name;
+		const unsigned long MAX_DISCONNECT_TIME_MS = 1000;
 	};
 }
 

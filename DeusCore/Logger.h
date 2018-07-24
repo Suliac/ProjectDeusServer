@@ -9,8 +9,8 @@ namespace DeusCore
 		static Logger* Instance();
 
 		void Log(std::string name, std::string message);
-	private:
 
+	private:
 		static Logger* p_instance;
 		static std::mutex m_instanceLock;
 

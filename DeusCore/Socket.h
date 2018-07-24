@@ -48,7 +48,7 @@ namespace DeusCore
 		int SocketShutdown() const;
 
 		// Is there any pending data on the socket?
-		bool DataAvailable();
+		bool DataAvailable(unsigned int timeoutSecond = DEFAULT_SOCKETSTATE_TIMEOUT, unsigned int timeoutMicroseconds = 0);
 	protected:
 
 		///////////////

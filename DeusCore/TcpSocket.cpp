@@ -70,7 +70,7 @@ namespace DeusCore
 		Packet::Serialize(buffer, paquet);
 
 		bool sendSuccess = TCPSend(buffer, byteSent);
-		DeusCore::Logger::Instance()->Log("Client", "Bytes sent: "+std::to_string(byteSent));
+		//DeusCore::Logger::Instance()->Log("Client", "Bytes sent: "+std::to_string(byteSent));
 		//std::cout << "Bytes sent: " << byteSent << std::endl;
 		return sendSuccess;
 	}
@@ -109,10 +109,10 @@ namespace DeusCore
 
 		if (byteRecv > 0)
 		{
-			DeusCore::Logger::Instance()->Log("Client", "Bytes received: " + std::to_string(byteRecv));
+			//DeusCore::Logger::Instance()->Log("Client", "Bytes received: " + std::to_string(byteRecv));
 			//std::cout << "Bytes received: " << byteRecv << std::endl;
 			p_packetReceived = Packet::Deserialize(buffer);
-			DeusCore::Logger::Instance()->Log("Client", "Deserialized size: " + std::to_string(buffer.GetIndex()));
+			//DeusCore::Logger::Instance()->Log("Client", "Deserialized size: " + std::to_string(buffer.GetIndex()));
 			//std::cout << "Deserialized size: " << buffer.GetIndex() << std::endl;
 		}
 

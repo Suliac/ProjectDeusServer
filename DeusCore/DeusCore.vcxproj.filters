@@ -49,6 +49,18 @@
     <Filter Include="Network\Packets\Sources\Games">
       <UniqueIdentifier>{7d051a11-cd2c-4b5c-9d97-61e76ca77e05}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{c8837dcd-1929-4dbc-82f9-aaed174723a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events\Headers">
+      <UniqueIdentifier>{cdae3c57-39f1-4af2-b899-8597da877837}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events\Sources">
+      <UniqueIdentifier>{d9b0c18c-aa57-4760-bd02-920d6f921e13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{0596a296-2f6b-4434-a6cc-9620197c5fdb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Socket.cpp">
@@ -96,7 +108,27 @@
     <ClCompile Include="PacketJoinGameAnswer.cpp">
       <Filter>Network\Packets\Sources\Games</Filter>
     </ClCompile>
-    <ClCompile Include="PacketAnswer.cpp" />
+    <ClCompile Include="EventManager.cpp">
+      <Filter>Events\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketAnswer.cpp">
+      <Filter>Network\Packets\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="EventManagerHandler.cpp">
+      <Filter>Events\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketClientDisconnect.cpp">
+      <Filter>Network\Packets\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketLeaveGameRequest.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketLeaveGameAnswer.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketDeleteGameRequest.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -150,9 +182,29 @@
     <ClInclude Include="PacketJoinGameAnswer.h">
       <Filter>Network\Packets\Headers\Games</Filter>
     </ClInclude>
-    <ClInclude Include="PacketAnswer.h" />
     <ClInclude Include="Packets.h">
       <Filter>Network\Packets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="EventManager.h">
+      <Filter>Events\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketAnswer.h">
+      <Filter>Network\Packets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="EventManagerHandler.h">
+      <Filter>Events\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketClientDisconnect.h">
+      <Filter>Network\Packets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketLeaveGameRequest.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketLeaveGameAnswer.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketDeleteGameRequest.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

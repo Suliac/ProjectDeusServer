@@ -1,5 +1,6 @@
 #pragma once
 #include "Buffer.h"
+#include "DeusSerializationException.h"
 
 #include <memory>
 namespace DeusCore
@@ -10,16 +11,23 @@ namespace DeusCore
 	public:
 		enum EMessageType : uint8_t
 		{
-			Error = 0x0,
-			Test = 0x1,
+			Error				= 0,
+			Test				= 1,
+			
+			// General
+			Disconnect			= 2,
 
 			// Game management
-			CreateGameRequest = 0x2,
-			CreateGameAnswer = 0x3,
-			JoinGameRequest = 0x4,
-			JoinGameAnswer = 0x5,
-			GetGameRequest = 0x6,
-			GetGameAnswer = 0x7,
+			CreateGameRequest	= 3,
+			CreateGameAnswer	= 4,
+			JoinGameRequest		= 5,
+			JoinGameAnswer		= 6,
+			GetGameRequest		= 7,
+			GetGameAnswer		= 8,
+			LeaveGameRequest	= 9,
+			LeaveGameAnswer		= 10,
+			DeleteGameRequest	= 11,
+			NewPlayer			= 12,
 		};
 
 		Packet(EMessageType messageType) { m_id = messageType; }
@@ -38,7 +46,7 @@ namespace DeusCore
 		// - Call specific deserialization method with OnDeserialize which has to be override by the childrens packets
 		static void Serialize(Buffer512 &buffer, const Packet &paquet, const size_t bufferIndexOffset = 0);
 
-		uint8_t GetID() const { return m_id; }
+		Packet::EMessageType GetID() const { return m_id; }
 
 		uint16_t GetSerializedSize() const { return m_serializedSize; }
 		void SetSerializedSize(uint16_t serializedSize) { m_serializedSize = serializedSize; }
@@ -62,7 +70,7 @@ namespace DeusCore
 
 	private:
 		
-		uint8_t m_id = 0x0;
+		Packet::EMessageType m_id = EMessageType::Error;
 		uint16_t m_serializedSize = 0x0;
 	};
 

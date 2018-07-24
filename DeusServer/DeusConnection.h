@@ -10,33 +10,31 @@
 namespace DeusServer
 {
 	// FastDelegate2<connection id (int), shared_ptr on a packet>
-	using DeusEventDeleguate = fastdelegate::FastDelegate2<int, DeusCore::PacketSPtr>;
-	using DeusEventDeleguateVector = std::vector<DeusEventDeleguate>;
+	using DeusClientEventDeleguate = fastdelegate::FastDelegate2<int, DeusCore::PacketSPtr>;
+	using DeusClientEventDeleguateVector = std::vector<DeusClientEventDeleguate>;
 
 
 #define DEFAULT_DEUSCLIENT_BUFFER_SIZE 2048
 	class DeusConnection
 	{
 	public:
-		enum class DeusConnectionEventsType {
-			OnMessageReceived = 0x0,
-			Disconnected = 0x1
-		};
-		using DeusConnectionEventDeleguateMap = std::map<DeusConnectionEventsType, DeusEventDeleguateVector>;
 		
-		DeusConnection(int id) { m_id = id; }
+		DeusConnection(int id) { 
+			m_id = id;
+			m_gameId = 0;
+		}
 
 		void AddPacketToQueue(DeusCore::PacketUPtr p_packet);
-
-		bool AddListener(const DeusEventDeleguate& eventDeleguate, const DeusConnectionEventsType type);
-		bool RemoveListener(const DeusEventDeleguate& eventDeleguate, const DeusConnectionEventsType type);
+		void SetGameId(unsigned int value) { 
+			m_gameIdLock.lock();
+			m_gameId = value; 
+			m_gameIdLock.unlock();
+		}
 
 	protected:
 		// Entry point for the communication thread
 		// Recv(), Send() and raise OnMessageRecevied/Disconnected events
 		virtual void ThreadSendAndReceive() = 0;
-
-		bool TriggerEvent(const DeusCore::PacketSPtr& p_packet, const DeusConnectionEventsType type);
 
 		// Try to take pack in the sending queue
 		bool TryTakePacket(DeusCore::PacketUPtr& p_packet);
@@ -47,6 +45,7 @@ namespace DeusServer
 		///////////////////////////////////////
 		
 		int m_id;
+		unsigned int m_gameId;
 
 		// Send/Receive thread
 		std::thread m_communicationThread;
@@ -56,7 +55,9 @@ namespace DeusServer
 
 		// mutex on packet's queue
 		std::mutex m_packetQueueLock;
-		
+
+		// mutex on gameid
+		std::mutex m_gameIdLock;
 
 		///////////////////////////////////////
 		//            COMMUNICATION          //
@@ -70,14 +71,7 @@ namespace DeusServer
 
 		// Counter 
 		int sentByteCount, readedByteCount;
-
-		///////////////////////////////////////
-		//               Events              //
-		///////////////////////////////////////
-
-		// map of 'DeusConnectionEventsType' paired with list of deleguate
-		DeusConnectionEventDeleguateMap m_eventListeners;
-
+		
 	};
 }
 

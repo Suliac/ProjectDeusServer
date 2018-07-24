@@ -1,5 +1,6 @@
 #pragma once
 #include "NetworkServer.h"
+#include "DeusCore/EventManagerHandler.h"
 
 namespace DeusServer
 {
@@ -10,20 +11,23 @@ namespace DeusServer
 		~GameNetworkServer();
 
 		bool NewPlayer(int clientId, DeusClientSPtr clientConnection);
-	protected:	
+	protected:
 		/////////////////////////// 
 		//         SERVER        // 
 		///////////////////////////
-		virtual void OnUpdate() override;
 		virtual void OnStart() override;
-		virtual void OnEnd() override;
-		virtual void OnInterpretPacket(int senderId, DeusCore::PacketSPtr p_packet) override;
-	
+		virtual void OnStop() override;
+		virtual void OnDisconnectClient(int clientId) override;
+		
 		/////////////////////////// 
 		//          GAMES        // 
 		///////////////////////////
+		void InterpretPacket(DeusCore::DeusEventSPtr p_packet);
+		void LeaveGame(unsigned int clientId);
+		void TryDeleteGame();
 	private:
 		unsigned int m_gameId;
+		unsigned int m_stopped;
 	};
 	using GameNetworkServerUPtr = std::unique_ptr<GameNetworkServer>;
 	using GameNetworkServerSPtr = std::shared_ptr<GameNetworkServer>;

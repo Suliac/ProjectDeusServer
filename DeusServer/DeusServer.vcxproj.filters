@@ -28,6 +28,9 @@
     <Filter Include="Servers\Headers">
       <UniqueIdentifier>{ed540a89-aa55-452e-99e4-ac9cf2375a80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Packets">
+      <UniqueIdentifier>{6aaa1b9f-1d35-4793-b9cd-d4d0d9144bc4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -49,7 +52,12 @@
     <ClCompile Include="NetworkServer.cpp">
       <Filter>Servers\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="GameNetworkServer.cpp" />
+    <ClCompile Include="GameNetworkServer.cpp">
+      <Filter>Games\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketNewPlayer.cpp">
+      <Filter>Packets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeusClient.h">
@@ -70,6 +78,11 @@
     <ClInclude Include="NetworkServer.h">
       <Filter>Servers\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="GameNetworkServer.h" />
+    <ClInclude Include="GameNetworkServer.h">
+      <Filter>Games\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketNewPlayer.h">
+      <Filter>Packets</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

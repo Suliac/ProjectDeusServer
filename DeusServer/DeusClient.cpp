@@ -18,61 +18,18 @@ namespace DeusServer
 	DeusClient::~DeusClient()
 	{		
 	}
-
-	bool DeusClient::AddListener(const DeusEventDeleguate& eventDeleguate, const DeusClientEventsType type)
-	{
-		switch (type)
-		{
-		case DeusClientEventsType::OnTCPMessageReceived:
-			return m_tcpConnection.AddListener(eventDeleguate, DeusConnection::DeusConnectionEventsType::OnMessageReceived);
-
-		case DeusClientEventsType::OnTCPDisconnect:
-			return m_tcpConnection.AddListener(eventDeleguate, DeusConnection::DeusConnectionEventsType::Disconnected);
-
-		case DeusClientEventsType::OnUDPMessageReceived:
-			// TODO when implement UDP connections
-			break;
-
-		case DeusClientEventsType::OnUDPDisconnect:
-			// TODO when implement UDP connections
-			break;
-		default:
-			break;
-		}
-		
-		return false;
-	}
-
-	bool DeusClient::RemoveListener(const DeusEventDeleguate& eventDeleguate, const DeusClientEventsType type)
-	{
-		switch (type)
-		{
-		case DeusClientEventsType::OnTCPMessageReceived:
-			return m_tcpConnection.RemoveListener(eventDeleguate, DeusConnection::DeusConnectionEventsType::OnMessageReceived);
-
-		case DeusClientEventsType::OnTCPDisconnect:
-			return m_tcpConnection.RemoveListener(eventDeleguate, DeusConnection::DeusConnectionEventsType::Disconnected);
-
-		case DeusClientEventsType::OnUDPMessageReceived:
-			// TODO when implement UDP connections
-			break;
-
-		case DeusClientEventsType::OnUDPDisconnect:
-			// TODO when implement UDP connections
-			break;
-		default:
-			break;
-		}
-
-		return false;
-	}
-
+	
 	void DeusClient::SendPacket(DeusCore::PacketUPtr p_packet, bool isTcp)
 	{
 		if (isTcp)
 			m_tcpConnection.AddPacketToQueue(std::move(p_packet));
 		else
 			throw std::exception("UDP Not implemented");
+	}
+
+	void DeusClient::SetConnectionGameId(unsigned int gameId)
+	{
+		m_tcpConnection.SetGameId(gameId);
 	}
 
 

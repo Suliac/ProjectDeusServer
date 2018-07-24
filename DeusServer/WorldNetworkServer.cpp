@@ -1,17 +1,12 @@
 #include "WorldNetworkServer.h"
 
 #include "DeusCore\DeusSocketException.h"
+#include "DeusCore\EventManagerHandler.h"
 #include "DeusCore\Logger.h"
 
-#include "DeusCore\PacketTest.h"
-#include "DeusCore\PacketJoinGameRequest.h"
-#include "DeusCore\PacketJoinGameAnswer.h"
-#include "DeusCore\PacketCreateGameAnswer.h"
-#include "DeusCore\PacketGetGamesAnswer.h"
-
+#include "DeusCore\Packets.h"
+#include "PacketNewPlayer.h"
 #include <stdio.h>
-
-
 
 namespace DeusServer
 {
@@ -23,95 +18,104 @@ namespace DeusServer
 
 	WorldNetworkServer::~WorldNetworkServer()
 	{
-		//StopConnections();
-		m_listener.SocketShutdown();
-		m_listener.SocketClose();
+		if (!m_stopped)
+		{
+			OnStop();
+		}
 	}
 
 	/////////////////////////// 
 	//         SERVER        // 
 	///////////////////////////
 
+	//---------------------------------------------------------------------------------
 	void WorldNetworkServer::OnStart()
 	{
-		// launch the thread which handle inputs
+		// 1 - subscribe to our EventQueue
+		InitDeleguate();
+
+		//  2 - Launch the thread which handle inputs
 		m_inputHandlerThread = std::thread([this] { HandleInput(); });
 
-		//Init listener
+		//  3 - Init listener
 		DeusCore::Logger::Instance()->Log(m_name, "Init & Start tcp listener");
 		m_listener.Init(m_ipAddr, m_port, true);
 		m_listener.Start();
-	}
 
-	void WorldNetworkServer::OnUpdate()
-	{
-		if (AcceptConnection(m_nextClientId))
-			m_nextClientId++;
+		// 4 - launch thread to accept new connections
+		m_acceptConnectionsThread = std::thread([this] { AcceptConnection(); });
 	}
-
-	void WorldNetworkServer::OnEnd()
+	
+	//---------------------------------------------------------------------------------
+	void WorldNetworkServer::OnStop()
 	{
-		// We stop the listener socket
+		// 1 - Unsub from EventQueue
+		DeleteDeleguate();
+
+		// 2 - We stop the listener socket
 		m_listener.SocketShutdown();
 		m_listener.SocketClose();
 
-		// we wait for the end of the input handler thread
+		if (m_acceptConnectionsThread.joinable())
+			m_acceptConnectionsThread.join();
+
+		// 4 - we wait for the end of the input handler thread
 		if (m_inputHandlerThread.joinable())
 			m_inputHandlerThread.join();
+
+		// 5 - clear games
+		m_gamesLocker.lock();		// <--------------- LOCK
+		for (DeusGames::iterator it = m_games.begin(); it != m_games.end(); it++)
+			it->second->Stop();
+		m_gamesLocker.unlock();		// <--------------- UNLOCK
+
+		m_gamesLocker.lock();		// <--------------- LOCK
+		m_games.clear();
+		m_gamesLocker.unlock();		// <--------------- UNLOCK
+
+		m_stopped = true;
 	}
 
-	void WorldNetworkServer::OnInterpretPacket(int senderId, DeusCore::PacketSPtr p_packet)
+	//---------------------------------------------------------------------------------
+	void WorldNetworkServer::OnDisconnectClient(int clientId)
 	{
-		switch (p_packet->GetID())
-		{
-		case DeusCore::Packet::EMessageType::Test:
-			DeusCore::Logger::Instance()->Log(m_name, "Interpret packet id : " + std::to_string(p_packet->GetID()) + ". Sent by client :" + std::to_string(senderId));
-			DeusCore::Logger::Instance()->Log(m_name, "Message : " + ((DeusCore::PacketTest*)p_packet.get())->GetTextMessage());
-			break;
-
-		case DeusCore::Packet::EMessageType::CreateGameRequest:
-			CreateGame(senderId);
-			break;
-
-		case DeusCore::Packet::EMessageType::JoinGameRequest:
-			JoinGame(senderId, ((DeusCore::PacketJoinGameRequest*)p_packet.get())->GetGameId());
-			break;
-
-		case DeusCore::Packet::EMessageType::GetGameRequest:
-			GetGames(senderId);
-			break;
-		default:
-			DeusCore::Logger::Instance()->Log(m_name, "Try to interpret packet failed. Unknown packet id : " + std::to_string(p_packet->GetID()) + ". Sent by client :" + std::to_string(senderId));
-			break;
-		}
 	}
 
-	bool WorldNetworkServer::AcceptConnection(const unsigned int id, const unsigned int timeoutSecond)
-	{
-		// create a pointer on empty tcp socket
-		std::unique_ptr<DeusCore::TcpSocket> p_client = std::make_unique<DeusCore::TcpSocket>();
-
-		// timeout is in the accept function
-		// block until timeout (3sec currently)
-		if (m_listener.Accept(*p_client, timeoutSecond))
-		{
-			DeusCore::Logger::Instance()->Log(m_name, "Connection accepted !");
-
-			// we want to transfert the ownership of our TCP socket to our DeusClient instance
-			// which handle the communication behavior for TCP (and UDP too in the futur)
-			m_clientsConnections.insert(
-				std::make_pair(
-					id,
-					DeusClientSPtr(new DeusServer::DeusClient(id, std::move(p_client)))));
-
-			SubscribeToBasicEvents(id);
-			return true;
-		}
-
-		return false;
-	}
-
+	//---------------------------------------------------------------------------------
 	// Threaded function
+	//---------------------------------------------------------------------------------
+	void WorldNetworkServer::AcceptConnection()
+	{
+		m_nextClientId = 1;
+		while (!m_wantToStop)
+		{
+			// create a pointer on empty tcp socket
+			std::unique_ptr<DeusCore::TcpSocket> p_client = std::make_unique<DeusCore::TcpSocket>();
+
+			// timeout is in the accept function
+			// block until timeout ('timeoutSecond' sec currently)
+			if (m_listener.Accept(*p_client, DEFAULT_SOCKETSTATE_TIMEOUT))
+			{
+				DeusCore::Logger::Instance()->Log(m_name, "Connection accepted !");
+
+				// we want to transfert the ownership of our TCP socket to our DeusClient instance
+				// which handle the communication behavior for TCP (and UDP too in the futur)
+				m_connectionsLocker.lock(); // <------------------- LOCK
+				m_clientsConnections.insert(
+					std::make_pair(
+						m_nextClientId,
+						DeusClientSPtr(new DeusServer::DeusClient(m_nextClientId, std::move(p_client)))));
+				m_connectionsLocker.unlock(); // <------------------- UNLOCK
+
+				m_nextClientId++;
+			}
+		}
+
+	}
+
+	//---------------------------------------------------------------------------------
+	// Threaded function
+	//---------------------------------------------------------------------------------
 	void WorldNetworkServer::HandleInput()
 	{
 		while (!m_wantToStop)
@@ -128,100 +132,158 @@ namespace DeusServer
 			else {
 				DeusCore::Logger::Instance()->Log(m_name, "Command unkown : to stop the server enter 'stop'");
 			}
-
 		}
-		DeusCore::Logger::Instance()->Log(m_name, "End HandleInput");
+
+		DeusCore::Logger::Instance()->Log(m_name, "End HandleInput Thread");
+	}
+
+
+	/////////////////////////// 
+	//       DELEGUATES      // 
+	///////////////////////////
+
+	//---------------------------------------------------------------------------------
+	void WorldNetworkServer::InitDeleguate()
+	{
+		// create deleguate functions
+		DeusCore::DeusEventDeleguate messageInterpretDeleguate = fastdelegate::MakeDelegate(this, &WorldNetworkServer::InterpretPacket);
+
+		// register deleguates with connection
+		DeusCore::EventManagerHandler::Instance()->AddListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::Test);
+		DeusCore::EventManagerHandler::Instance()->AddListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::CreateGameRequest);
+		DeusCore::EventManagerHandler::Instance()->AddListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::JoinGameRequest);
+		DeusCore::EventManagerHandler::Instance()->AddListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::GetGameRequest);
+		DeusCore::EventManagerHandler::Instance()->AddListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::DeleteGameRequest);
+
+		//NB : Disconnect event already managed in NetworkServer
+	}
+
+	void WorldNetworkServer::DeleteDeleguate()
+	{
+		// create deleguate functions
+		DeusCore::DeusEventDeleguate messageInterpretDeleguate = fastdelegate::MakeDelegate(this, &WorldNetworkServer::InterpretPacket);
+
+		// delete deleguates with connection
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::Test);
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::CreateGameRequest);
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::JoinGameRequest);
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::GetGameRequest);
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::DeleteGameRequest);
+
+		//NB : Disconnect event already managed in NetworkServer
 	}
 
 	/////////////////////////// 
 	//          GAMES        // 
 	///////////////////////////
 
+	//---------------------------------------------------------------------------------
+	void WorldNetworkServer::InterpretPacket(DeusCore::DeusEventSPtr p_packet)
+	{
+		// Nb : call from EventManager thread during the process of events
+		switch (p_packet->second->GetID())
+		{
+		case DeusCore::Packet::EMessageType::Error:
+			DeusCore::Logger::Instance()->Log(m_name, "Try to interpret packet failed. Unknown packet id : " + std::to_string(p_packet->second->GetID()) + ". Sent by client :" + std::to_string(p_packet->first));
+			break;
+
+		case DeusCore::Packet::EMessageType::Test:
+			//DeusCore::Logger::Instance()->Log(m_name, "Interpret packet id : " + std::to_string(p_packet->second->GetID()) + ". Sent by client :" + std::to_string(p_packet->first));
+			DeusCore::Logger::Instance()->Log(m_name, "Message : " + ((DeusCore::PacketTest*)p_packet->second.get())->GetTextMessage());
+			break;
+
+		case DeusCore::Packet::EMessageType::CreateGameRequest:
+			CreateGame(p_packet->first);
+			break;
+
+		case DeusCore::Packet::EMessageType::JoinGameRequest:
+			JoinGame(p_packet->first, ((DeusCore::PacketJoinGameRequest*)p_packet->second.get())->GetGameId());
+			break;
+
+		case DeusCore::Packet::EMessageType::GetGameRequest:
+			GetGames(p_packet->first);
+			break;
+
+		case DeusCore::Packet::EMessageType::DeleteGameRequest:
+			DeleteGame(p_packet->first);
+			break;
+			//NB : Disconnect event already managed in NetworkServer
+		default:
+			break;
+		}
+	}
+
+	//---------------------------------------------------------------------------------
 	void WorldNetworkServer::GetGames(int clientId)
 	{
 		std::vector<unsigned int> gamesIds;
+		m_gamesLocker.lock(); // <------------------ LOCK
 		for (DeusGames::iterator it = m_games.begin(); it != m_games.end(); ++it) {
 			gamesIds.push_back(it->first);
 		}
+		m_gamesLocker.unlock();// <------------------ UNLOCK
 
+		// Send answer
 		std::unique_ptr<DeusCore::PacketGetGamesAnswer> p_packet = std::unique_ptr<DeusCore::PacketGetGamesAnswer>(new DeusCore::PacketGetGamesAnswer());
 		p_packet->SetGames(gamesIds);
-
+		p_packet->SetSuccess(true);
 		SendPacket(std::move(p_packet), clientId, true);
+
+		DeusCore::Logger::Instance()->Log(m_name, "Client (id:" + std::to_string(clientId) + ") wants to get games");
 	}
 
+	//---------------------------------------------------------------------------------
 	void WorldNetworkServer::CreateGame(int clientId)
 	{
-		bool error = false;
+		m_connectionsLocker.lock(); // <-------------- LOCK
+
 		DeusClientConnections::iterator findClientIt = m_clientsConnections.find(clientId);
 		if (findClientIt != m_clientsConnections.end())
 		{
-			/////////////
-			// we don't need to listen the events anymore because
-			// the game network server will do it, we are only intersted by disconnect event
-			DeusServer::DeusEventDeleguate messageTcpReceivedDeleguate = fastdelegate::MakeDelegate(this, &WorldNetworkServer::ManageOnReceivedPacketEvent);
-			findClientIt->second->RemoveListener(messageTcpReceivedDeleguate, DeusServer::DeusClient::DeusClientEventsType::OnTCPMessageReceived);
-
+			m_gamesLocker.lock(); // <------------------ LOCK
 			m_games.insert(std::make_pair(m_nextGameId, std::unique_ptr<GameHandler>(new GameHandler(m_nextGameId))));
+			m_gamesLocker.unlock();// <------------------ UNLOCK
 
-			/////////////
-			// Let the gamehandler notify our client that he is connected to a game
-			if (!m_games[m_nextGameId]->NewPlayer(findClientIt->first, findClientIt->second))
-			{
-				findClientIt->second->AddListener(messageTcpReceivedDeleguate, DeusServer::DeusClient::DeusClientEventsType::OnTCPMessageReceived);
-				error = true;
-			}
-			else
-				m_nextGameId++;
-		}
-		else
-			error = true;
+			// we queue a server event for the game 
+			std::shared_ptr<DeusCore::Packet> p_packet = std::shared_ptr<DeusServer::PacketNewPlayer>(new DeusServer::PacketNewPlayer(findClientIt->second));
+			DeusCore::EventManagerHandler::Instance()->QueueEvent(m_nextGameId, clientId, p_packet);
 
-		if (error)
-		{
-			// Send error answer
-			std::unique_ptr<DeusCore::PacketCreateGameAnswer> p_packet = std::unique_ptr<DeusCore::PacketCreateGameAnswer>(new DeusCore::PacketCreateGameAnswer());
-			p_packet->SetSuccess(false);
-			SendPacket(std::move(p_packet), clientId, true);
+			m_nextGameId++;
 		}
+
+		m_connectionsLocker.unlock(); // <-------------- UNLOCK
+		DeusCore::Logger::Instance()->Log(m_name, "Client (id:" + std::to_string(clientId) + ") wants to create game");
 	}
 
+	//---------------------------------------------------------------------------------
 	void WorldNetworkServer::JoinGame(int clientId, int gameId)
 	{
-		bool error = false;
+		m_connectionsLocker.lock(); // <-------------- LOCK
+
 		DeusClientConnections::iterator findClientIt = m_clientsConnections.find(clientId);
 		if (findClientIt != m_clientsConnections.end())
 		{
-			DeusGames::iterator findGameIt = m_games.find(gameId);
-			if (findGameIt != m_games.end())
-			{
-				/////////////
-				// we don't need to listen the events anymore because
-				// the game network server will do it, we are only intersted by disconnect event
-				DeusServer::DeusEventDeleguate messageTcpReceivedDeleguate = fastdelegate::MakeDelegate(this, &WorldNetworkServer::ManageOnReceivedPacketEvent);
-				findClientIt->second->RemoveListener(messageTcpReceivedDeleguate, DeusServer::DeusClient::DeusClientEventsType::OnTCPMessageReceived);
-
-				/////////////
-				// Let the gamehandler notify our client that he is connected to a game
-				if (!m_games[gameId]->NewPlayer(findClientIt->first, findClientIt->second))
-				{
-					error = true;
-					findClientIt->second->AddListener(messageTcpReceivedDeleguate, DeusServer::DeusClient::DeusClientEventsType::OnTCPMessageReceived);
-				}
-			}
-			else
-				error = true;
+			std::shared_ptr<DeusCore::Packet> p_packet = std::shared_ptr<DeusServer::PacketNewPlayer>(new DeusServer::PacketNewPlayer(findClientIt->second));
+			DeusCore::EventManagerHandler::Instance()->QueueEvent(gameId, clientId, p_packet);
 		}
-		else
-			error = true;
 
-		if (error)
-		{
-			// Send error answer
-			std::unique_ptr<DeusCore::PacketJoinGameAnswer> p_packet = std::unique_ptr<DeusCore::PacketJoinGameAnswer>(new DeusCore::PacketJoinGameAnswer());
-			p_packet->SetGame(gameId);
-			p_packet->SetSuccess(false);
-			SendPacket(std::move(p_packet), clientId, true);
-		}
+		m_connectionsLocker.unlock(); // <-------------- UNLOCK
+		DeusCore::Logger::Instance()->Log(m_name, "Client (id:" + std::to_string(clientId) + ") wants to join game");
 	}
+
+	void WorldNetworkServer::DeleteGame(int gameId)
+	{
+		m_gamesLocker.lock(); // <------------------ LOCK
+		DeusGames::iterator findGameIt = m_games.find(gameId);
+		if (findGameIt != m_games.end())
+		{
+			findGameIt->second->Stop();
+			m_games.erase(findGameIt);
+			DeusCore::Logger::Instance()->Log(m_name, "Delete game number : " + std::to_string(gameId));
+
+		}
+		m_gamesLocker.unlock();// <------------------ UNLOCK
+		DeusCore::Logger::Instance()->Log(m_name, "Game " + std::to_string(gameId) + " will be removed");
+	}
+
 }

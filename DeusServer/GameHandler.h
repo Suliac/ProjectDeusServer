@@ -13,8 +13,9 @@ namespace DeusServer
 		GameHandler() {};
 		GameHandler(int gameId);
 		~GameHandler();
-				
-		bool NewPlayer(int clientId, DeusClientSPtr clientConnection);
+		
+		void Stop();
+
 	private:
 		// Unique pointer on the Game Network Server
 		GameNetworkServer* mp_gameNetServer = nullptr;
