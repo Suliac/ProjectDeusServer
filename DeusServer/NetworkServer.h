@@ -8,28 +8,32 @@
 namespace DeusServer
 {
 	using DeusClientConnections = std::map<int, std::shared_ptr<DeusServer::DeusClient>>;
-	
+
 	class NetworkServer
 	{
 	public:
 		NetworkServer();
 		~NetworkServer();
 
+		// Init and launch the disconnect handler thread
 		void Start(unsigned int gameId);
-		void Stop();
+
+		// Wait for stop request then Stop() the server
 		void WaitForStop();
-
-		bool IsStop() { return m_isStop; }
-
+		
+		// Stop the server
+		void RequestStop();
 	protected:
+
 		// Execute during the Start()
-		virtual void OnStart() = 0;
+		virtual void OnStart() {};
 
 		// Execute during the Stop()
-		virtual void OnStop() = 0;
-		
+		virtual void OnStop() {};
+		virtual void OnLateStop() {};
+
 		// To execute by the childrens class when a client disconnects
-		virtual void OnDisconnectClient(int clientId) = 0;
+		virtual void OnDisconnectClient(int clientId) {};
 
 		// The way we want our server to interpret packet we get in ProcessPackets()
 		//virtual void OnInterpretPacket(int senderId, DeusCore::PacketSPtr p_packet) = 0;
@@ -38,33 +42,52 @@ namespace DeusServer
 		// Send Packet to a client
 		bool SendPacket(DeusCore::PacketUPtr&& p_packet, int clientId, bool sendTcp);
 
+		bool GetWantToStop() const { return m_wantToStop; };
+
 		/********************************************/
 
-		// Do we want to stop the server ?
-		bool m_wantToStop = false;
-		
 		// Id of the game : 0 for the world server, 1 for the game server #1, 2 for the #2 and so on
 		unsigned int m_gameId;
 
 		// Save all the client connection accepted with an id
 		DeusClientConnections m_clientsConnections;
-		
+
 		// Locker for the access of the client connections
 		std::recursive_mutex m_lockClients;
 
 		// debug name
 		std::string m_name;
+
 	private:
+		
+		// Poll client id from queue of client to disconnect 
+		// and delete them from the active clients
+		void HandleDisconnect();
+
+		// Wait for a RequestStop()
+		void HandleStop();
+
+		void Stop();
+
+		/////////////////////////// 
+		//       DISCONNECT      // 
+		///////////////////////////
+		std::thread m_stopServerThread;
+		
 		bool m_isStop = false;
+		
+		std::condition_variable m_waitForStopBlocker; // For HandleStop()
+		std::condition_variable m_isStopBlocker; // for WaitToStop()
+		std::mutex m_wantToStopLocker;
+		std::mutex m_isStopLocker;
+
+		// Do we want to stop the server ?
+		bool m_wantToStop = false;
 
 		/////////////////////////// 
 		//       DISCONNECT      // 
 		///////////////////////////
 		std::thread m_disconnectThread;
-
-		// Poll client id from queue of client to disconnect 
-		// and delete them from the active clients
-		void HandleDisconnect();
 
 		std::condition_variable m_newDisconnectBlocker;
 		bool m_thereIsDisconnect = false;

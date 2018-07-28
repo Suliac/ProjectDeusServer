@@ -22,6 +22,16 @@ namespace DeusCore
 		return p_instance;
 	}
 
+	void Logger::Free() {
+		if (p_instance != nullptr) {
+			m_instanceLock.lock();
+			if (p_instance != nullptr) {
+				delete p_instance;
+			}
+			m_instanceLock.unlock();
+		}
+	}
+
 	void Logger::Log(std::string name, std::string message)
 	{
 		m_cliLock.lock();
@@ -35,7 +45,6 @@ namespace DeusCore
 	
 	Logger::~Logger()
 	{
-		if (p_instance != nullptr)
-			delete p_instance;
+		
 	}
 }

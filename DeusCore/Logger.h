@@ -7,6 +7,7 @@ namespace DeusCore
 	{
 	public:
 		static Logger* Instance();
+		static void Free();
 
 		void Log(std::string name, std::string message);
 

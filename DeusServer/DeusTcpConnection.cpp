@@ -17,6 +17,7 @@ namespace DeusServer
 		allByteReceivedBuffer.reserve(DEFAULT_DEUSCLIENT_BUFFER_SIZE);
 	}
 
+	//---------------------------------------------------------------------------------
 	DeusTcpConnection::~DeusTcpConnection()
 	{
 		m_cancellationRequested = true;
@@ -24,9 +25,10 @@ namespace DeusServer
 		if (m_communicationThread.joinable())
 			m_communicationThread.join();
 
-		DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Delete connection");
+		DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Delete TCP connection");
 	}
 
+	//---------------------------------------------------------------------------------
 	void DeusTcpConnection::Init(std::unique_ptr<DeusCore::TcpSocket> communicationSocket)
 	{
 		m_clientTCPSocket = std::move(communicationSocket); // transfert ownership
@@ -40,6 +42,9 @@ namespace DeusServer
 	//---------------------------------------------------------------------------------
 	void DeusTcpConnection::ThreadSendAndReceive()
 	{
+		assert(m_clientTCPSocket);
+		assert(!m_clientTCPSocket->IsClosed());
+
 		DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Start thread");
 
 		while (!m_cancellationRequested)
@@ -50,24 +55,21 @@ namespace DeusServer
 				bool dataToRecv = m_clientTCPSocket->DataAvailable(0, TIMEOUT_US);
 				if (dataToRecv || !m_packetsToSend.empty())
 				{
+					DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Something to get or deliver");
 					///////////////////////////////////////////////////
 					//       1- We first try to send our message     //
 					///////////////////////////////////////////////////
-					std::unique_ptr<DeusCore::Packet> p_toSendPacket = nullptr;
+					std::shared_ptr<DeusCore::Packet> p_toSendPacket = nullptr;
 					while (TryTakePacket(p_toSendPacket))
 					{
 						// reset buffer & counter
 						sentByteCount = 0;
-						writeBuffer.SetIndex(0);
 
 						// NB : we send packet per packet
 						if (p_toSendPacket)
 						{
-							// Serialize our packet
-							DeusCore::Packet::Serialize(writeBuffer, *(p_toSendPacket.get()));
-
 							// Send our serialized packet
-							m_clientTCPSocket->TCPSend(*(p_toSendPacket), sentByteCount);
+							m_clientTCPSocket->Send(*(p_toSendPacket), sentByteCount);
 						}
 					}
 
@@ -84,7 +86,7 @@ namespace DeusServer
 							readBuffer.SetIndex(0);
 
 							// Receive information in the readBuffer
-							if (m_clientTCPSocket->TCPRecv(readBuffer, readedByteCount))
+							if (m_clientTCPSocket->Recv(readBuffer, readedByteCount))
 							{
 								if (readedByteCount == 0)
 								{
@@ -145,6 +147,11 @@ namespace DeusServer
 				DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Connection aborted. Error : " + e.GetErrorMessage());
 				m_cancellationRequested = true;
 			}
+			catch (const std::exception& e)
+			{
+				DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Connection aborted. ");
+				m_cancellationRequested = true;
+			}
 		}
 
 		///////////////////////////////////////////////////////////
@@ -156,19 +163,25 @@ namespace DeusServer
 	}
 
 	//---------------------------------------------------------------------------------
-	// Threaded function
-	//---------------------------------------------------------------------------------
-	//void DeusTcpConnection::CheckRecvOrSend()
-	//{
-	//	if (m_dataToSendOrRecvLock.try_lock())
-	//	{
-	//		m_dataToSendOrRecv = m_clientTCPSocket->DataAvailable(0, 5000) || !m_packetsToSend.empty();
-	//		m_dataToSendOrRecvLock.unlock();
-	//		m_sendOrRecvBlocker.notify_one();
-	//	}
-	//	else {
-	//		std::this_thread::sleep_for(std::chrono::microseconds(5000));
-	//	}
-	//}
+	bool DeusTcpConnection::TryTakePacket(DeusCore::PacketSPtr & p_packet)
+	{
+		bool popedElement = false;
 
+		// don't block the execution :
+		// add packet is more important than try to take them
+		if (m_packetQueueLock.try_lock())
+		{
+			if (m_packetsToSend.size() > 0)
+			{
+				p_packet = std::move(m_packetsToSend.front().second);
+				m_packetsToSend.pop_front();
+
+				popedElement = true;
+			}
+			m_packetQueueLock.unlock();
+		}
+
+		return popedElement;
+	}
+	
 }

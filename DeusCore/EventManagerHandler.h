@@ -14,7 +14,7 @@ namespace DeusCore
 		//     SINGLETON	   //
 		/////////////////////////
 		static EventManagerHandler* Instance();
-
+		static void Free();
 		/////////////////////////
 		//   IMPLEMENTATION	   //
 		/////////////////////////

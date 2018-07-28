@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CommunicationSocket.cpp" />
     <ClCompile Include="DeusException.cpp" />
     <ClCompile Include="DeusSerializationException.cpp" />
     <ClCompile Include="DeusSocketException.cpp" />
@@ -26,6 +27,7 @@
     <ClCompile Include="EventManagerHandler.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="Packet.cpp" />
+    <ClCompile Include="PacketAck.cpp" />
     <ClCompile Include="PacketAnswer.cpp" />
     <ClCompile Include="PacketClientDisconnect.cpp" />
     <ClCompile Include="PacketCreateGameAnswer.cpp" />
@@ -41,8 +43,10 @@
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="TcpListener.cpp" />
     <ClCompile Include="TcpSocket.cpp" />
+    <ClCompile Include="UdpSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommunicationSocket.h" />
     <ClInclude Include="DeusException.h" />
     <ClInclude Include="DeusSerializationException.h" />
     <ClInclude Include="DeusSocketException.h" />
@@ -52,6 +56,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Packet.h" />
+    <ClInclude Include="PacketAck.h" />
     <ClInclude Include="PacketAnswer.h" />
     <ClInclude Include="PacketClientDisconnect.h" />
     <ClInclude Include="PacketCreateGameAnswer.h" />
@@ -68,6 +73,7 @@
     <ClInclude Include="Socket.h" />
     <ClInclude Include="TcpListener.h" />
     <ClInclude Include="TcpSocket.h" />
+    <ClInclude Include="UdpSocket.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

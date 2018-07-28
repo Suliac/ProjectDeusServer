@@ -16,22 +16,22 @@ namespace DeusCore
 			
 			// General
 			Disconnect			= 2,
+			Ack					= 3,
 
 			// Game management
-			CreateGameRequest	= 3,
-			CreateGameAnswer	= 4,
-			JoinGameRequest		= 5,
-			JoinGameAnswer		= 6,
-			GetGameRequest		= 7,
-			GetGameAnswer		= 8,
-			LeaveGameRequest	= 9,
-			LeaveGameAnswer		= 10,
-			DeleteGameRequest	= 11,
-			NewPlayer			= 12,
+			CreateGameRequest	= 10,
+			CreateGameAnswer	= 11,
+			JoinGameRequest		= 12,
+			JoinGameAnswer		= 13,
+			GetGameRequest		= 14,
+			GetGameAnswer		= 15,
+			LeaveGameRequest	= 16,
+			LeaveGameAnswer		= 17,
+			DeleteGameRequest	= 18,
+			NewPlayer			= 19,
 		};
 
-		Packet(EMessageType messageType) { m_id = messageType; }
-
+		Packet(EMessageType messageType);
 		~Packet();
 
 		// Entry point to deserialize packets :
@@ -46,12 +46,14 @@ namespace DeusCore
 		// - Call specific deserialization method with OnDeserialize which has to be override by the childrens packets
 		static void Serialize(Buffer512 &buffer, const Packet &paquet, const size_t bufferIndexOffset = 0);
 
-		Packet::EMessageType GetID() const { return m_id; }
+		Packet::EMessageType GetType() const { return m_type; }
+
+		uint32_t GetId() const { return m_uniqueId; }
 
 		uint16_t GetSerializedSize() const { return m_serializedSize; }
 		void SetSerializedSize(uint16_t serializedSize) { m_serializedSize = serializedSize; }
 		
-		const uint16_t HEADER_SIZE = 3;
+		const uint16_t HEADER_SIZE = 7;
 	protected:
 		template<typename T>
 		static void SerializeData(Buffer512& buffer, const T& value);
@@ -69,8 +71,10 @@ namespace DeusCore
 		virtual uint16_t EstimateCurrentSerializedSize() const = 0;
 
 	private:
-		
-		Packet::EMessageType m_id = EMessageType::Error;
+		void SetId(uint32_t value) { m_uniqueId = value; }
+
+		unsigned int m_uniqueId;
+		Packet::EMessageType m_type = EMessageType::Error;
 		uint16_t m_serializedSize = 0x0;
 	};
 
@@ -79,14 +83,15 @@ namespace DeusCore
 	inline void Packet::DeserializeData(Buffer512& buffer, T& value)
 	{
 		static_assert(sizeof(T) <= 8, "Size higher than 8 bytes"); // only work for small types
+
 		unsigned char tmp[sizeof(T)];
 		buffer.Select(tmp, sizeof(T));
+		
+		value = T();
 
-#ifdef BIG_ENDIAN
-		value = bswap(*(tmp));
-#else // #ifdef BIG_ENDIAN
-		value = *(tmp);
-#endif // #ifdef BIG_ENDIAN
+		// we decode the big endian
+		for (size_t i = 0; i < sizeof(T); i++)
+			value |= tmp[i] << (8 * ((sizeof(T) - 1) - i));
 		
 	}
 
@@ -98,12 +103,14 @@ namespace DeusCore
 	inline void Packet::SerializeData(Buffer512& buffer, const T& value) {
 		static_assert(sizeof(T) <= 8, "Size higher than 8 bytes"); // only work for small types
 		unsigned char datas[sizeof(T)];
+				
+		size_t size = sizeof(T);
 
-#ifdef BIG_ENDIAN
-		*(datas) = bswap(value);
-#else // #ifdef BIG_ENDIAN
-		*(datas) = value;
-#endif // #ifdef BIG_ENDIAN
+		// we encode a big endian value as shifting involve 'auto' convert to big endian
+		// then we take the strongest byte as first buffer byte, and so on
+		// src : https://stackoverflow.com/questions/7184789/does-bit-shift-depend-on-endianness
+		for (size_t i = 0; i < size; i++)
+			datas[i] = value >> (8 * ((size - 1) - i));
 
 		buffer.Insert(datas, sizeof(T));
 	}

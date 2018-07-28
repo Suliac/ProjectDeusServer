@@ -6,14 +6,16 @@
 
 namespace DeusCore
 {
-	TcpSocket::TcpSocket() : Socket("TcpSocket")
+	TcpSocket::TcpSocket() : CommunicationSocket("TcpSocket")
 	{
 	}
 
+	//---------------------------------------------------------------------------------
 	TcpSocket::~TcpSocket()
 	{
 	}
 
+	//---------------------------------------------------------------------------------
 	void TcpSocket::TCPConnect(const SOCKET socket, const bool setNonBlocking)
 	{
 		assert(socket != INVALID_SOCKET);
@@ -24,6 +26,7 @@ namespace DeusCore
 			SetNonBlocking();
 	}
 
+	//---------------------------------------------------------------------------------
 	bool TcpSocket::TCPConnect(const std::string& ipAdress, const std::string& port, const bool setNonBlocking)
 	{
 		// 1 - Init socket : get ipadress etc
@@ -50,7 +53,7 @@ namespace DeusCore
 			SetNonBlocking();		
 
 		// we don't need those informations anymore
-		freeaddrinfo(m_distantInfos);
+		FreeInfos();
 
 		if (m_handler == INVALID_SOCKET) {
 			SocketClose();
@@ -60,27 +63,11 @@ namespace DeusCore
 		return true;
 	}
 
-	/*************************************/
-	/*                SEND               */
-	/*************************************/
-
-	bool TcpSocket::TCPSend(const Packet& paquet, int& byteSent)
-	{
-		Buffer512 buffer;
-		Packet::Serialize(buffer, paquet);
-
-		bool sendSuccess = TCPSend(buffer, byteSent);
-		//DeusCore::Logger::Instance()->Log("Client", "Bytes sent: "+std::to_string(byteSent));
-		//std::cout << "Bytes sent: " << byteSent << std::endl;
-		return sendSuccess;
-	}
-
-	bool TcpSocket::TCPSend(const Buffer512& buffer, int& byteSent)
-	{
-		return TCPSend((const char*)buffer.Data(), buffer.GetIndex(), byteSent);
-	}
-
-	bool TcpSocket::TCPSend(const char * data, size_t size, int& byteSent)
+	
+	//---------------------------------------------------------------------------------
+	// Send char* buffer of datas
+	//---------------------------------------------------------------------------------
+	bool TcpSocket::SendDatas(const char * data, size_t size, int& byteSent)
 	{
 		if (!CheckSocketStates(true, false)) // Check if socket is writable
 			return false;
@@ -95,42 +82,11 @@ namespace DeusCore
 		return true;
 	}
 
-	/*************************************/
-	/*             RECEIVED              */
-	/*************************************/
 
-	bool TcpSocket::TCPRecv(std::unique_ptr<Packet>& p_packetReceived, int& byteRecv)
-	{
-		p_packetReceived.reset();
-		Buffer512 buffer;
-
-		if (!TCPRecv(buffer, byteRecv))
-			return false;
-
-		if (byteRecv > 0)
-		{
-			//DeusCore::Logger::Instance()->Log("Client", "Bytes received: " + std::to_string(byteRecv));
-			//std::cout << "Bytes received: " << byteRecv << std::endl;
-			p_packetReceived = Packet::Deserialize(buffer);
-			//DeusCore::Logger::Instance()->Log("Client", "Deserialized size: " + std::to_string(buffer.GetIndex()));
-			//std::cout << "Deserialized size: " << buffer.GetIndex() << std::endl;
-		}
-
-		return true;
-	}
-
-	bool TcpSocket::TCPRecv(Buffer512& buffer, int& byteRecv)
-	{
-		char tmpBuffer[SIZE_BUFFER];
-
-		if (!TCPRecv(tmpBuffer, SIZE_BUFFER, byteRecv))
-			return false; // nothing to read ! 
-
-		buffer.Set((const unsigned char*)tmpBuffer, byteRecv);
-		return true;
-	}
-
-	bool TcpSocket::TCPRecv(char * data, size_t size, int & byteRecv)
+	//---------------------------------------------------------------------------------
+	// Receive char* buffer of datas 
+	//---------------------------------------------------------------------------------
+	bool TcpSocket::RecvDatas(char * data, size_t size, int & byteRecv)
 	{
 		if (!CheckSocketStates(false, true)) // Check if socket is readable
 			return false;

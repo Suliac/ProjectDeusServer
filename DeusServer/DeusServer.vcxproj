@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClCompile Include="DeusClient.cpp" />
     <ClCompile Include="DeusConnection.cpp" />
+    <ClCompile Include="DeusUdpConnection.cpp" />
     <ClCompile Include="GameHandler.cpp" />
     <ClCompile Include="GameNetworkServer.cpp" />
     <ClCompile Include="NetworkServer.cpp" />
@@ -169,6 +170,7 @@
   <ItemGroup>
     <ClInclude Include="DeusClient.h" />
     <ClInclude Include="DeusConnection.h" />
+    <ClInclude Include="DeusUdpConnection.h" />
     <ClInclude Include="GameHandler.h" />
     <ClInclude Include="GameNetworkServer.h" />
     <ClInclude Include="NetworkServer.h" />

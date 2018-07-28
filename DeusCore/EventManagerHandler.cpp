@@ -26,6 +26,16 @@ namespace DeusCore
 		return p_instance;
 	}
 
+	void EventManagerHandler::Free() {
+		if (p_instance != nullptr) {
+			m_instanceLock.lock();
+			if (p_instance != nullptr) {
+				delete p_instance;
+			}
+			m_instanceLock.unlock();
+		}
+	}
+
 	//---------------------------------------------------------------------------------
 	EventManagerHandler::EventManagerHandler()
 	{
@@ -34,8 +44,7 @@ namespace DeusCore
 	//---------------------------------------------------------------------------------
 	EventManagerHandler::~EventManagerHandler()
 	{
-		if (p_instance != nullptr)
-			delete p_instance;
+		m_gamesEventManagers.clear();
 	}
 
 	/////////////////////////

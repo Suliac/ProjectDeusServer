@@ -30,7 +30,7 @@ namespace DeusServer
 	//---------------------------------------------------------------------------------
 	void GameHandler::Stop()
 	{
-		mp_gameNetServer->Stop();
+		mp_gameNetServer->RequestStop();
 	}
 
 

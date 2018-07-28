@@ -12,3 +12,4 @@
 #include "PacketLeaveGameAnswer.h"
 #include "PacketLeaveGameRequest.h"
 #include "PacketDeleteGameRequest.h"
+#include "PacketAck.h"

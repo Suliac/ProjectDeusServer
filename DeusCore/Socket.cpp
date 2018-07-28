@@ -1,37 +1,46 @@
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include "Socket.h"
 #include "DeusSocketException.h"
+#include "Logger.h"
 
 #include <sstream>
 #include <WS2tcpip.h>
+#include <assert.h>
 
 
 namespace DeusCore
 {
 	Socket::Socket(std::string name)
 	{
-		m_name = "[" + name + " | " + std::to_string(std::rand()) + "]";
-		// Initialize WSA
-		int iResult = WSAStartup(MAKEWORD(2, 2), &m_wsaData);
-		if (iResult != 0) {
-			throw DeusSocketException("WSAStartup failed: " + std::to_string(iResult));
-		}
+		m_name = name + " | " + std::to_string(std::rand());
+		//// Initialize WSA
+		//int iResult = WSAStartup(MAKEWORD(2, 2), &m_wsaData);
+		//if (iResult != 0) {
+		//	throw DeusSocketException("WSAStartup failed: " + std::to_string(iResult));
+		//}
 
-		//std::cout << m_name << "WSAStartup" << std::endl;
-		m_isWsaAlive = true;
+		////std::cout << m_name << "WSAStartup" << std::endl;
+		//m_isWsaAlive = true;
 	}
 
 	Socket::~Socket()
 	{
-		if (m_isWsaAlive)
-			WSACleanup();
+		if (!m_freeInfos)
+			FreeInfos();
 
-		if (m_handler != INVALID_SOCKET)
-			closesocket(m_handler);
+		closesocket(m_handler);
+
+		/*WSACleanup();
+		m_isWsaAlive = false;*/
+
+		m_handler = INVALID_SOCKET;
 	}
 
 	void Socket::SocketInit(short family, short type, IPPROTO protocol, short flags, const std::string& ipAdress, const std::string& port)
 	{
 		m_distantInfos = nullptr;
+		m_ipAddr = ipAdress;
+		m_port = port;
 
 		// Get/init addr infos
 		ZeroMemory(&m_hints, sizeof(m_hints));
@@ -41,16 +50,18 @@ namespace DeusCore
 		m_hints.ai_flags = flags;
 
 		// Resolve the local address and port to be used by the peer
-		int iResult = getaddrinfo(ipAdress.c_str(), port.c_str(), &m_hints, &m_distantInfos);
+		int iResult = getaddrinfo(m_ipAddr.c_str(), m_port.c_str(), &m_hints, &m_distantInfos);
 		if (iResult != 0) {
 			WSACleanup();
-			throw DeusSocketException("Error when retreiving informations for [" + ipAdress + "@" + port + "]. Error " + std::to_string(iResult));
+			throw DeusSocketException("Error when retreiving informations for [" + m_ipAddr + "@" + m_port + "]. Error " + std::to_string(iResult));
 		}
 
 	}
 
 	void Socket::SocketCreate()
 	{
+		assert(m_distantInfos != nullptr);
+
 		// Socket creation : to listen client connections
 		m_handler = socket(m_distantInfos->ai_family, m_distantInfos->ai_socktype, m_distantInfos->ai_protocol);
 		if (m_handler == INVALID_SOCKET)
@@ -60,6 +71,28 @@ namespace DeusCore
 			throw DeusSocketException("Error during the socket creation : " + std::to_string(errorNumber));
 		}
 		//m_state = SocketState::SOCKET_READY;
+	}
+
+	void Socket::SocketBind()
+	{
+		assert(m_distantInfos != nullptr);
+		char* ip = inet_ntoa(((sockaddr_in*)(m_distantInfos->ai_addr))->sin_addr);
+		u_short port = htons(((sockaddr_in*)(m_distantInfos->ai_addr))->sin_port);
+		DeusCore::Logger::Instance()->Log(m_name, "Bind to : "+ std::string(ip)+" "+ std::to_string(port));
+
+		int result = bind(m_handler, m_distantInfos->ai_addr, (int)m_distantInfos->ai_addrlen);
+		if (result == SOCKET_ERROR) {
+			std::string message = "Socket binding failed with error: " + std::to_string(WSAGetLastError());
+			FreeInfos();
+			SocketClose();
+			throw DeusSocketException(message);
+		}
+	}
+
+	void Socket::FreeInfos()
+	{
+		freeaddrinfo(m_distantInfos);
+		m_freeInfos = true;
 	}
 
 	void Socket::SetNonBlocking(bool value)
@@ -91,6 +124,7 @@ namespace DeusCore
 		FD_SET(m_handler, &writeFlags);
 		FD_SET(m_handler, &exceptFlags);
 
+		//DeusCore::Logger::Instance()->Log(m_name, "select()");
 		selectResult = select(m_handler + 1, &readFlags, &writeFlags, &exceptFlags, &waitTime);
 		if (selectResult < 0)
 		{
@@ -131,8 +165,8 @@ namespace DeusCore
 		SocketStateFlag states;
 		bool canUseSocket = true;
 
-		if (!m_isNonBlocking)
-			return true;
+		/*if (!m_isNonBlocking)
+			return true;*/
 
 		states = CheckSocketStates(timeoutSecond, timeoutMicroseconds);
 
@@ -159,10 +193,15 @@ namespace DeusCore
 
 	void Socket::SocketClose()
 	{
+		DeusCore::Logger::Instance()->Log(m_name, "CloseSocket()");
+		
+		if (!m_freeInfos)
+			FreeInfos();
+
 		closesocket(m_handler);
-		WSACleanup();
-		m_isWsaAlive = false;
-		//std::cout << m_name << "WSACleanup (SocketClose())" << std::endl;
+
+		/*WSACleanup();
+		m_isWsaAlive = false;*/
 
 		m_handler = INVALID_SOCKET;
 	}

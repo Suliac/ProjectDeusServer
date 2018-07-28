@@ -32,17 +32,12 @@ namespace DeusCore
 	void TcpListener::Start()
 	{
 		// Setup the TCP listening socket
-		int result = bind(m_handler, m_distantInfos->ai_addr, (int)m_distantInfos->ai_addrlen);
-		if (result == SOCKET_ERROR) {
-			std::string message = "Socket binding failed with error: " + std::to_string(WSAGetLastError());
-			freeaddrinfo(m_distantInfos);
-			SocketClose();
-			throw DeusSocketException(message);
-		}
+		SocketBind();
 
-		freeaddrinfo(m_distantInfos);
+		// for TCP, we don't need thoses informations anymore
+		FreeInfos();
 
-		result = listen(m_handler, SOMAXCONN);
+		int result = listen(m_handler, SOMAXCONN);
 		if (result == SOCKET_ERROR) {
 			std::string message = "Socket listening failed with error: " + std::to_string(WSAGetLastError());
 			SocketClose();

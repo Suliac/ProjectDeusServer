@@ -11,30 +11,54 @@ namespace DeusServer
 		m_gameId = 0;
 	}
 
-	NetworkServer::~ NetworkServer()
+	//---------------------------------------------------------------------------------
+	NetworkServer::~NetworkServer()
 	{
+		m_newDisconnectBlocker.notify_one(); 
+		if (m_disconnectThread.joinable())
+			m_disconnectThread.join();
+
+		m_waitForStopBlocker.notify_one();
+		if (m_stopServerThread.joinable())
+			m_stopServerThread.join();
+
 		if (!m_isStop)
 		{
-			if (m_disconnectThread.joinable())
-				m_disconnectThread.join();
+			DeusCore::DeusEventDeleguate disconnectDeleguate = fastdelegate::MakeDelegate(this, &NetworkServer::DisconnectDeleguate);
+			DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, disconnectDeleguate, DeusCore::Packet::EMessageType::Disconnect);
 
+			// then clear connections
 			m_clientsConnections.clear();
+
+			DeusCore::EventManagerHandler::Instance()->StopGameChannel(m_gameId);
+			m_isStop = true;
 		}
+		m_isStopBlocker.notify_one();
 	}
 
+	//---------------------------------------------------------------------------------
 	void NetworkServer::Start(unsigned int gameId)
 	{
 		m_gameId = gameId;
+
+		//init threads
 		m_disconnectThread = std::thread([this] { HandleDisconnect(); });
+		m_stopServerThread = std::thread([this] { HandleStop(); });
+
+		// Start event queue channel
 		DeusCore::EventManagerHandler::Instance()->StartGameChannel(m_gameId);
-		
+
+		//Init deleguate
 		DeusCore::DeusEventDeleguate disconnectDeleguate = fastdelegate::MakeDelegate(this, &NetworkServer::DisconnectDeleguate);
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, disconnectDeleguate, DeusCore::Packet::EMessageType::Disconnect);
-				
+
 		OnStart();
+
 	}
 
-
+	//---------------------------------------------------------------------------------
+	// Called by HandleStop() threaded function
+	//---------------------------------------------------------------------------------
 	void NetworkServer::Stop()
 	{
 		m_wantToStop = true;
@@ -57,21 +81,42 @@ namespace DeusServer
 
 			DeusCore::EventManagerHandler::Instance()->StopGameChannel(m_gameId);
 
+			// call late children Stop function
+			OnLateStop();
+
 			m_isStop = true;
 		}
 
 	}
 
+	//---------------------------------------------------------------------------------
 	void NetworkServer::WaitForStop()
 	{
-		if (m_disconnectThread.joinable())
-			m_disconnectThread.join();
-
-		Stop();
+		std::unique_lock<std::mutex> lk(m_isStopLocker);
+		m_isStopBlocker.wait(lk, [this] {return m_isStop; });
+		lk.unlock();
 	}
 
-
+	//---------------------------------------------------------------------------------
 	// Threaded
+	//---------------------------------------------------------------------------------
+	void NetworkServer::HandleStop()
+	{
+		std::unique_lock<std::mutex> lk(m_wantToStopLocker); // <------ LOCK
+															 // wait for any request to stop server
+		m_waitForStopBlocker.wait(lk, [this] {return m_wantToStop; });
+
+		Stop();
+
+		lk.unlock(); // <------------  UNLOCK
+		m_isStopBlocker.notify_all(); // notify WaitForStop
+
+		DeusCore::Logger::Instance()->Log(m_name, "End HandleStop() Thread");
+	}
+
+	//---------------------------------------------------------------------------------
+	// Threaded
+	//---------------------------------------------------------------------------------
 	void NetworkServer::HandleDisconnect()
 	{
 		while (!m_wantToStop)
@@ -94,14 +139,12 @@ namespace DeusServer
 			{
 				int idConnectionToDelete = m_clientToDisconnect.front();
 				m_clientToDisconnect.pop();
-				
+
 				m_lockClients.lock();// <------------ CLIENT LOCK
 				DeusClientConnections::iterator matchingConnectionIt = m_clientsConnections.find(idConnectionToDelete);
 				if (matchingConnectionIt != m_clientsConnections.end())
 				{
 					// Delete connection
-					DeusCore::Logger::Instance()->Log(m_name, "Count : " + std::to_string(matchingConnectionIt->second.use_count()));
-
 					m_clientsConnections.erase(matchingConnectionIt);
 					DeusCore::Logger::Instance()->Log(m_name, "Client " + std::to_string(idConnectionToDelete) + " successfully deleted. There are now : " + std::to_string(m_clientsConnections.size()) + "client(s) connected");
 
@@ -116,8 +159,9 @@ namespace DeusServer
 			m_thereIsDisconnect = false;
 			lk.unlock(); // <------------ DISCONNECT QUEUE UNLOCK
 		}
+		DeusCore::Logger::Instance()->Log(m_name, "End HandleDisconnect Thread");
 	}
-	
+
 	//---------------------------------------------------------------------------------
 	bool NetworkServer::SendPacket(DeusCore::PacketUPtr&& p_packet, int clientId, bool sendTcp)
 	{
@@ -129,6 +173,15 @@ namespace DeusServer
 		}
 
 		return false;
+	}
+
+	//---------------------------------------------------------------------------------
+	void NetworkServer::RequestStop()
+	{
+		m_wantToStopLocker.lock(); // <----------- LOCK
+		m_wantToStop = true;
+		m_wantToStopLocker.unlock(); // <----------- UNLOCK
+		m_waitForStopBlocker.notify_one();
 	}
 
 	/////////////////////////// 

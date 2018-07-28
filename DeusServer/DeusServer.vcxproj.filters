@@ -58,6 +58,9 @@
     <ClCompile Include="PacketNewPlayer.cpp">
       <Filter>Packets</Filter>
     </ClCompile>
+    <ClCompile Include="DeusUdpConnection.cpp">
+      <Filter>ClientCommunication\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeusClient.h">
@@ -83,6 +86,9 @@
     </ClInclude>
     <ClInclude Include="PacketNewPlayer.h">
       <Filter>Packets</Filter>
+    </ClInclude>
+    <ClInclude Include="DeusUdpConnection.h">
+      <Filter>ClientCommunication\Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

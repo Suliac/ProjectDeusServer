@@ -73,7 +73,7 @@ namespace DeusCore
 		bool processed = false;
 
 		// try to find our deleguate list for the given type
-		DeusEventDeleguateMap::iterator matchingList = m_eventListeners.find(deusEvent->second->GetID());
+		DeusEventDeleguateMap::iterator matchingList = m_eventListeners.find(deusEvent->second->GetType());
 
 		if (matchingList != m_eventListeners.end())
 		{
@@ -98,7 +98,7 @@ namespace DeusCore
 		assert(m_activeQueue >= 0 && m_activeQueue < EVENTMANAGER_NUM_QUEUE);
 		assert(deusEvent->second);
 
-		DeusEventDeleguateMap::iterator matchingList = m_eventListeners.find(deusEvent->second->GetID());
+		DeusEventDeleguateMap::iterator matchingList = m_eventListeners.find(deusEvent->second->GetType());
 		if (matchingList != m_eventListeners.end())
 		{
 			m_queueLock.lock(); // <---------- Lock
@@ -138,7 +138,7 @@ namespace DeusCore
 				auto thisIt = it;
 				it++;
 
-				if ((*thisIt)->second->GetID() == type)
+				if ((*thisIt)->second->GetType() == type)
 				{
 					eventQueue.erase(thisIt);
 					success = true;
@@ -211,12 +211,11 @@ namespace DeusCore
 				// pop event
 				DeusEventSPtr p_event = m_queues[queueToProcess].front();
 				m_queues[queueToProcess].pop_front();
-
-				
-				Logger::Instance()->Log(m_name, "Packet of type :" + std::to_string(p_event->second->GetID())+" | ID sender : "+ std::to_string(p_event->first));
+								
+				//Logger::Instance()->Log(m_name, "Packet of type :" + std::to_string(p_event->second->GetType())+" | ID sender : "+ std::to_string(p_event->first));
 				// We trigger the event
 				TriggerEvent(p_event);
-				Logger::Instance()->Log(m_name, "Just triggered type :" + std::to_string(p_event->second->GetID()) + " | ID sender : " + std::to_string(p_event->first));
+				//Logger::Instance()->Log(m_name, "Just triggered type :" + std::to_string(p_event->second->GetType()) + " | ID sender : " + std::to_string(p_event->first));
 
 				currentMs = GetTickCount();
 				if (currentMs > MAX_TIME_PROCESS_MS) // we ran out of time

@@ -7,6 +7,8 @@
 #include <iostream>
 #include <string>
 
+#include "Packet.h"
+
 namespace DeusCore
 {
 #define DEFAULT_SOCKETSTATE_TIMEOUT 1
@@ -37,7 +39,7 @@ namespace DeusCore
 	public:
 		Socket(std::string name);
 		~Socket();
-		
+
 		// Set our socket asynchronous 
 		void SetNonBlocking(bool value = true);
 
@@ -49,6 +51,12 @@ namespace DeusCore
 
 		// Is there any pending data on the socket?
 		bool DataAvailable(unsigned int timeoutSecond = DEFAULT_SOCKETSTATE_TIMEOUT, unsigned int timeoutMicroseconds = 0);
+
+		bool IsClosed() const { return m_handler == INVALID_SOCKET; };
+		const std::string& GetSocketNumber() const { return std::to_string(m_handler); }
+
+		const std::string& GetIpAddr() const { return m_ipAddr; };
+		const std::string& GetIpPort() const { return m_port; };
 	protected:
 
 		///////////////
@@ -59,9 +67,16 @@ namespace DeusCore
 
 		// Real Socket creation
 		void SocketCreate();
-		
+
+		void SocketBind();
+
+		void FreeInfos();
+
 		bool CheckSocketStates(bool isWritable, bool isReadable, unsigned int timeoutSecond = DEFAULT_SOCKETSTATE_TIMEOUT, unsigned int timeoutMicroseconds = 0);
-		
+
+		// Check if socket is writable, readable or blocked
+		SocketStateFlag CheckSocketStates(unsigned int timeoutSecond, unsigned int timeoutMicroseconds = 0);
+
 		///////////////
 		// Attributes
 
@@ -71,11 +86,11 @@ namespace DeusCore
 		// Pre-Informations to find informations 
 		addrinfo m_hints;
 
-		// Informations of the peer 
+		// Informations of the server
 		addrinfo* m_distantInfos = nullptr;
 
-		// Current state of our socket
-		//SocketState m_state;
+		std::string m_ipAddr;
+		std::string m_port;
 
 		bool m_isNonBlocking = false;
 	private:
@@ -85,11 +100,10 @@ namespace DeusCore
 		// Manage Wsa lifetime
 		bool m_isWsaAlive = false;
 
+		bool m_freeInfos = false;
+
 		// Debug name
 		std::string m_name;
-
-		// Check if socket is writable, readable or blocked
-		SocketStateFlag CheckSocketStates(unsigned int timeoutSecond, unsigned int timeoutMicroseconds = 0);
 	};
 }
 

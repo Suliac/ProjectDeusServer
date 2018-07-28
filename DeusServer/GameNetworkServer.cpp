@@ -74,10 +74,10 @@ namespace DeusServer
 	{
 		//DeusCore::Logger::Instance()->Log(m_name, "Packet id : " + std::to_string(p_packet->second->GetID()) + ". Sent by client :" + std::to_string(p_packet->first));
 
-		switch (p_packet->second->GetID())
+		switch (p_packet->second->GetType())
 		{
 		case DeusCore::Packet::EMessageType::Error:
-			DeusCore::Logger::Instance()->Log(m_name, "Try to interpret packet failed. Unknown packet id : " + std::to_string(p_packet->second->GetID()) + ". Sent by client :" + std::to_string(p_packet->first));
+			DeusCore::Logger::Instance()->Log(m_name, "Try to interpret packet failed. Unknown packet id : " + std::to_string(p_packet->second->GetType()) + ". Sent by client :" + std::to_string(p_packet->first));
 			break;
 
 		case DeusCore::Packet::EMessageType::Test:
@@ -125,7 +125,7 @@ namespace DeusServer
 
 		if (nbrClients <= 0)
 		{
-			m_wantToStop = true;
+			RequestStop();
 			DeusCore::PacketSPtr p_deleteGameEvent = std::shared_ptr<DeusCore::PacketDeleteGameRequest>(new DeusCore::PacketDeleteGameRequest());
 			DeusCore::EventManagerHandler::Instance()->QueueEvent(0, m_gameId, p_deleteGameEvent);
 			DeusCore::Logger::Instance()->Log(m_name, "Request game deletion");

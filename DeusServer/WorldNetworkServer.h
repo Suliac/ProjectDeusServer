@@ -22,6 +22,9 @@ namespace DeusServer
 			m_ipAddr = ipAddr;
 			m_port = port;
 		}
+		
+		const std::string& GetAddr() const { return m_ipAddr; };
+		const std::string& GetPort() const { return m_port; };
 	private:
 
 		/////////////////////////// 
@@ -30,9 +33,7 @@ namespace DeusServer
 
 		virtual void OnStart() override;
 		virtual void OnStop() override;
-		virtual void OnDisconnectClient(int clientId) override;
-		//virtual void OnUpdate() override;
-		//virtual void OnEnd() override;
+		virtual void OnLateStop() override;
 
 		// Threaded function to accept new connection
 		void AcceptConnection();

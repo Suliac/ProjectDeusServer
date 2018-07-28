@@ -61,6 +61,18 @@
     <Filter Include="Utilities">
       <UniqueIdentifier>{0596a296-2f6b-4434-a6cc-9620197c5fdb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Packets\Headers\Base">
+      <UniqueIdentifier>{6a0d16c0-0d68-456f-a700-5a687744bb9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Packets\Sources\Base">
+      <UniqueIdentifier>{0435417a-db16-4560-b893-e2d4a9664958}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Packets\Headers\General">
+      <UniqueIdentifier>{dafcd109-91f5-4102-aee9-5b059dc62a3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Packets\Sources\General">
+      <UniqueIdentifier>{d0828b81-9e67-47ed-9125-ec84c670686d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Socket.cpp">
@@ -74,12 +86,6 @@
     </ClCompile>
     <ClCompile Include="DeusSocketException.cpp">
       <Filter>Network\Exceptions\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="PacketTest.cpp">
-      <Filter>Network\Packets\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Packet.cpp">
-      <Filter>Network\Packets\Sources</Filter>
     </ClCompile>
     <ClCompile Include="DeusSerializationException.cpp">
       <Filter>Network\Exceptions\Sources</Filter>
@@ -111,14 +117,8 @@
     <ClCompile Include="EventManager.cpp">
       <Filter>Events\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="PacketAnswer.cpp">
-      <Filter>Network\Packets\Sources</Filter>
-    </ClCompile>
     <ClCompile Include="EventManagerHandler.cpp">
       <Filter>Events\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="PacketClientDisconnect.cpp">
-      <Filter>Network\Packets\Sources</Filter>
     </ClCompile>
     <ClCompile Include="PacketLeaveGameRequest.cpp">
       <Filter>Network\Packets\Sources\Games</Filter>
@@ -128,6 +128,27 @@
     </ClCompile>
     <ClCompile Include="PacketDeleteGameRequest.cpp">
       <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="UdpSocket.cpp">
+      <Filter>Network\Sockets\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="CommunicationSocket.cpp">
+      <Filter>Network\Sockets\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet.cpp">
+      <Filter>Network\Packets\Sources\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketAnswer.cpp">
+      <Filter>Network\Packets\Sources\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketAck.cpp">
+      <Filter>Network\Packets\Sources\General</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketClientDisconnect.cpp">
+      <Filter>Network\Packets\Sources\General</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketTest.cpp">
+      <Filter>Network\Packets\Sources\General</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -143,17 +164,8 @@
     <ClInclude Include="DeusSocketException.h">
       <Filter>Network\Exceptions\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Packet.h">
-      <Filter>Network\Packets\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="PacketTest.h">
-      <Filter>Network\Packets\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="DeusSerializationException.h">
       <Filter>Network\Exceptions\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="Buffer.h">
-      <Filter>Network\Packets\Headers</Filter>
     </ClInclude>
     <ClInclude Include="DeusException.h">
       <Filter>Network\Exceptions\Headers</Filter>
@@ -182,20 +194,11 @@
     <ClInclude Include="PacketJoinGameAnswer.h">
       <Filter>Network\Packets\Headers\Games</Filter>
     </ClInclude>
-    <ClInclude Include="Packets.h">
-      <Filter>Network\Packets\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="EventManager.h">
       <Filter>Events\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="PacketAnswer.h">
-      <Filter>Network\Packets\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="EventManagerHandler.h">
       <Filter>Events\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="PacketClientDisconnect.h">
-      <Filter>Network\Packets\Headers</Filter>
     </ClInclude>
     <ClInclude Include="PacketLeaveGameRequest.h">
       <Filter>Network\Packets\Headers\Games</Filter>
@@ -205,6 +208,33 @@
     </ClInclude>
     <ClInclude Include="PacketDeleteGameRequest.h">
       <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="UdpSocket.h">
+      <Filter>Network\Sockets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="CommunicationSocket.h">
+      <Filter>Network\Sockets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>Network\Packets\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Packet.h">
+      <Filter>Network\Packets\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketAnswer.h">
+      <Filter>Network\Packets\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Packets.h">
+      <Filter>Network\Packets\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketTest.h">
+      <Filter>Network\Packets\Headers\General</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketAck.h">
+      <Filter>Network\Packets\Headers\General</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketClientDisconnect.h">
+      <Filter>Network\Packets\Headers\General</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
