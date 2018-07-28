@@ -33,6 +33,13 @@ namespace DeusServer
 	{
 		m_clientTCPSocket = std::move(communicationSocket); // transfert ownership
 
+		//we already prepare our first message which will give UDP infos to our clients
+		DeusCore::PacketClientConnected packet;
+		packet.SetAddrUdp(m_clientTCPSocket->GetIpAddr());
+		packet.SetPortUdp(m_clientTCPSocket->GetIpNumberPort() + DECAL_PORT_UDP + m_id);
+		DeusCore::PacketUPtr p_packetConnected = std::make_unique<DeusCore::PacketClientConnected>(packet);
+		AddPacketToQueue(std::move(p_packetConnected));
+
 		// init thread only here
 		m_communicationThread = std::thread([this] { ThreadSendAndReceive(); });
 	}
@@ -55,7 +62,7 @@ namespace DeusServer
 				bool dataToRecv = m_clientTCPSocket->DataAvailable(0, TIMEOUT_US);
 				if (dataToRecv || !m_packetsToSend.empty())
 				{
-					DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Something to get or deliver");
+					//DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Something to get or deliver");
 					///////////////////////////////////////////////////
 					//       1- We first try to send our message     //
 					///////////////////////////////////////////////////

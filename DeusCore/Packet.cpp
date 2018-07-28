@@ -50,6 +50,9 @@ namespace DeusCore
 		case Packet::Ack:
 			p_packetDeserialized = std::make_unique<PacketAck>();
 			break;
+		case Packet::Connected:
+			p_packetDeserialized = std::make_unique<PacketClientConnected>();
+			break;
 		case Packet::CreateGameRequest:
 			p_packetDeserialized = std::make_unique<PacketCreateGameRequest>();
 			break;

@@ -29,6 +29,7 @@
     <ClCompile Include="Packet.cpp" />
     <ClCompile Include="PacketAck.cpp" />
     <ClCompile Include="PacketAnswer.cpp" />
+    <ClCompile Include="PacketClientConnected.cpp" />
     <ClCompile Include="PacketClientDisconnect.cpp" />
     <ClCompile Include="PacketCreateGameAnswer.cpp" />
     <ClCompile Include="PacketCreateGameRequest.cpp" />
@@ -58,6 +59,7 @@
     <ClInclude Include="Packet.h" />
     <ClInclude Include="PacketAck.h" />
     <ClInclude Include="PacketAnswer.h" />
+    <ClInclude Include="PacketClientConnected.h" />
     <ClInclude Include="PacketClientDisconnect.h" />
     <ClInclude Include="PacketCreateGameAnswer.h" />
     <ClInclude Include="PacketCreateGameRequest.h" />

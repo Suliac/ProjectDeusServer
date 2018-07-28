@@ -13,3 +13,4 @@
 #include "PacketLeaveGameRequest.h"
 #include "PacketDeleteGameRequest.h"
 #include "PacketAck.h"
+#include "PacketClientConnected.h"

@@ -8,6 +8,8 @@
 #include "DeusCore/DeusSerializationException.h"
 #include "DeusCore/DeusSocketException.h"
 
+#include <sstream>
+#include <iostream>
 namespace DeusServer
 {
 	DeusUdpConnection::DeusUdpConnection(int id) : DeusConnection(id)
@@ -31,7 +33,14 @@ namespace DeusServer
 	void DeusUdpConnection::Init(const std::string& ipAddr, const std::string& port)
 	{
 		m_clientUDPSocket = std::make_unique<DeusCore::UdpSocket>(DeusCore::UdpSocket());
-		m_clientUDPSocket->Init(ipAddr, std::to_string(30015 + std::rand()), false, false);
+
+		std::stringstream sPort(port);
+		uint32_t numberPort = 0;
+		sPort >> numberPort;
+
+		numberPort += m_id + DECAL_PORT_UDP;
+
+		m_clientUDPSocket->Init(ipAddr, std::to_string(numberPort), false, false);
 
 		// init thread only here
 		m_communicationThread = std::thread([this] { ThreadSendAndReceive(); });

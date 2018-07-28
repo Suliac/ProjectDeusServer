@@ -39,8 +39,11 @@ namespace DeusCore
 	void Socket::SocketInit(short family, short type, IPPROTO protocol, short flags, const std::string& ipAdress, const std::string& port)
 	{
 		m_distantInfos = nullptr;
+
 		m_ipAddr = ipAdress;
 		m_port = port;
+		/*std::stringstream ssPort(port);
+		ssPort >> m_port;*/
 
 		// Get/init addr infos
 		ZeroMemory(&m_hints, sizeof(m_hints));

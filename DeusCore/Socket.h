@@ -5,6 +5,7 @@
 
 #include <WinSock2.h>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include "Packet.h"
@@ -57,6 +58,18 @@ namespace DeusCore
 
 		const std::string& GetIpAddr() const { return m_ipAddr; };
 		const std::string& GetIpPort() const { return m_port; };
+		uint32_t GetIpNumberPort() const { 
+			uint32_t value = 0;
+			std::stringstream ssValue(m_port);
+			ssValue >> value;
+			return value;
+		};
+
+		void SetIPEndpoint(const std::string& addr, const std::string& port)
+		{
+			m_port = port;
+			m_ipAddr = addr;
+		}
 	protected:
 
 		///////////////

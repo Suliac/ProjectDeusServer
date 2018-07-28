@@ -101,6 +101,7 @@ namespace DeusServer
 				if (m_listener.Accept(*p_client, DEFAULT_SOCKETSTATE_TIMEOUT))
 				{
 					DeusCore::Logger::Instance()->Log(m_name, "Connection accepted !");
+					p_client->SetIPEndpoint(m_listener.GetIpAddr(), m_listener.GetIpPort());
 
 					// we want to transfert the ownership of our TCP socket to our DeusClient instance
 					// which handle the communication behavior for TCP (and UDP too in the futur)
