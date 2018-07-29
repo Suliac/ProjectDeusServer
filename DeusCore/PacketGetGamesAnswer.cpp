@@ -39,6 +39,6 @@ namespace DeusCore
 
 	uint16_t PacketGetGamesAnswer::EstimateAnswerCurrentSerializedSize() const
 	{
-		return sizeof(size_t) + m_gamesIds.size();
+		return sizeof(size_t) + (m_gamesIds.size() * sizeof(unsigned int));
 	}
 }

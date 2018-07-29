@@ -49,7 +49,7 @@ namespace DeusCore
 	uint16_t PacketClientConnected::EstimateCurrentSerializedSize() const
 	{
 		// 1 PacketClientConnected uses :
-		// - 1 byte						: to save an unsigned int for the length of the next string
+		// - 4 byte						: to save an unsigned int for the length of the next string
 		// - m_message.size()+1 bytes	: to save the string ip address ('+1' is for the \0)
 		// - 4 bytes					: to save the udp port
 		return sizeof(size_t) + (m_addrUdp.size() + 1) + sizeof(m_portUdp);

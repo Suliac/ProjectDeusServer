@@ -23,7 +23,7 @@ namespace DeusCore
 		// - 1 byte		: packet type
 		// - 2 bytes	: serialized size of packet (in byte) 
 
-		// Serialize type
+		// Deerialize type
 		uint32_t uniqueId;
 		Packet::DeserializeData(buffer, uniqueId);
 
@@ -106,7 +106,7 @@ namespace DeusCore
 		// - 1 byte		: packet type
 		// - 2 bytes	: serialized size of packet (in byte) 
 
-		// Serialize type
+		// Serialize id
 		paquet.SerializeData(buffer, paquet.GetId());
 
 		// Serialize type

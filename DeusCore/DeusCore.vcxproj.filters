@@ -150,7 +150,9 @@
     <ClCompile Include="PacketTest.cpp">
       <Filter>Network\Packets\Sources\General</Filter>
     </ClCompile>
-    <ClCompile Include="PacketClientConnected.cpp" />
+    <ClCompile Include="PacketClientConnected.cpp">
+      <Filter>Network\Packets\Sources\General</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -237,6 +239,8 @@
     <ClInclude Include="PacketClientDisconnect.h">
       <Filter>Network\Packets\Headers\General</Filter>
     </ClInclude>
-    <ClInclude Include="PacketClientConnected.h" />
+    <ClInclude Include="PacketClientConnected.h">
+      <Filter>Network\Packets\Headers\General</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
