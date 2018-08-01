@@ -16,7 +16,7 @@ namespace DeusCore
 		virtual uint16_t EstimateAnswerCurrentSerializedSize() const override;
 
 	private:
-		std::vector<unsigned int> m_gamesIds;
+		std::vector<uint32_t> m_gamesIds;
 	};
 }
 

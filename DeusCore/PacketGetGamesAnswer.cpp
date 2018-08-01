@@ -15,7 +15,7 @@ namespace DeusCore
 	
 	void PacketGetGamesAnswer::OnAnswerDeserialize(Buffer512 & buffer)
 	{
-		size_t gamesNumber;
+		uint32_t gamesNumber;
 		DeserializeData(buffer, gamesNumber);
 
 		for (size_t i = 0; i < gamesNumber; i++)

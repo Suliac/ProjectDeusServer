@@ -72,7 +72,7 @@ namespace DeusServer
 
 		// Timout before retry send or receive
 		const unsigned int TIMEOUT_US = 5000;
-		const unsigned int PACKET_DELAY_CHECK_ACK_MS = 1000;
+		const unsigned int PACKET_DELAY_CHECK_ACK_MS = 100;
 		const unsigned int DECAL_PORT_UDP = 10000;
 
 

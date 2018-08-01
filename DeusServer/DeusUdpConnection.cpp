@@ -140,7 +140,7 @@ namespace DeusServer
 							deserializeBuffer.SetIndex(0);
 							deserializeBuffer.Set(((unsigned char*)allByteReceivedBuffer.data()), maxBufferSize);
 
-							assert(allByteReceivedBuffer.size() >= 3); // headers need at least 3 bytes
+							assert(allByteReceivedBuffer.size() >= DeusCore::Packet::HEADER_SIZE); // headers need at least 3 bytes
 
 							DeusCore::PacketSPtr p_packetDeserialized = std::move(DeusCore::Packet::Deserialize(deserializeBuffer));
 							if (p_packetDeserialized)
@@ -261,15 +261,13 @@ namespace DeusServer
 					// we need to know if there is already an ACK for this packet
 					if (std::find(m_idsAcknoledged.begin(), m_idsAcknoledged.end(), m_packetsToSend.front().second->GetId()) != m_idsAcknoledged.end())
 					{
-						// this packet is already acknowledged
-						// just pop it 
+						// this packet is already acknowledged : just pop it 
 						DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Message Acked : " + std::to_string(m_packetsToSend.front().second->GetId()));
 						m_packetsToSend.pop_front();
 
 					}
 					else {
-						//DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Message to send : " + std::to_string(m_packetsToSend.front().second->GetId()));
-						// This packet wasn't send or didn't received ack
+						// This packet wasn't sent or didn't received ack
 						p_packet = std::move(m_packetsToSend.front().second);
 						m_packetsToSend.pop_front();
 						getPacket = true;

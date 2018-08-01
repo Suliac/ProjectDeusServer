@@ -54,7 +54,7 @@ namespace DeusCore
 		uint16_t GetSerializedSize() const { return m_serializedSize; }
 		void SetSerializedSize(uint16_t serializedSize) { m_serializedSize = serializedSize; }
 		
-		const uint16_t HEADER_SIZE = 7;
+		static const uint16_t HEADER_SIZE = 7;
 	protected:
 		template<typename T>
 		static void SerializeData(Buffer512& buffer, const T& value);

@@ -16,7 +16,7 @@ namespace DeusCore
 	void PacketClientConnected::OnDeserialize(Buffer512 & buffer)
 	{
 		// get the size of the string
-		size_t dataSize;
+		uint32_t dataSize;
 		DeserializeData(buffer, dataSize);
 
 		// get the string
@@ -31,7 +31,7 @@ namespace DeusCore
 
 	void PacketClientConnected::OnSerialize(Buffer512 & buffer) const
 	{
-		size_t dataSize = m_addrUdp.size() + 1; // +1 to add the \0 of string
+		uint32_t dataSize = m_addrUdp.size() + 1; // +1 to add the \0 of string
 		SerializeData(buffer, dataSize); // SerializeData only for primitive
 
 										 //  then we add the string 
