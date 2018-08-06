@@ -153,6 +153,18 @@
     <ClCompile Include="PacketClientConnected.cpp">
       <Filter>Network\Packets\Sources\General</Filter>
     </ClCompile>
+    <ClCompile Include="PacketFactory.cpp">
+      <Filter>Network\Packets\Sources\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketPlayerNotReady.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketPlayerReady.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketStartGame.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -241,6 +253,18 @@
     </ClInclude>
     <ClInclude Include="PacketClientConnected.h">
       <Filter>Network\Packets\Headers\General</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketFactory.h">
+      <Filter>Network\Packets\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketStartGame.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketPlayerNotReady.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketPlayerReady.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

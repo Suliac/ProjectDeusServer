@@ -10,17 +10,8 @@
     <Filter Include="ClientCommunication\Sources">
       <UniqueIdentifier>{8d7b4ec3-f32c-4293-90b4-decabe153762}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Games">
-      <UniqueIdentifier>{3675a064-a548-432e-8abb-183db2669b01}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Servers">
       <UniqueIdentifier>{434f5ab4-0a2b-4a7c-963d-6704ea876ae0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Games\Headers">
-      <UniqueIdentifier>{f4e57836-12a7-4bf1-8a77-3d7999e9a29f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Games\Sources">
-      <UniqueIdentifier>{145e8082-c723-4d03-9d30-a4fc0a0a08ad}</UniqueIdentifier>
     </Filter>
     <Filter Include="Servers\Sources">
       <UniqueIdentifier>{51f222be-e95d-4186-9854-883be2b9285e}</UniqueIdentifier>
@@ -30,6 +21,33 @@
     </Filter>
     <Filter Include="Packets">
       <UniqueIdentifier>{6aaa1b9f-1d35-4793-b9cd-d4d0d9144bc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\Headers">
+      <UniqueIdentifier>{61e95c7e-36bc-4831-977e-d53ed6cc7e06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\Sources">
+      <UniqueIdentifier>{8ed6842e-2be3-4a07-9076-8338c4d7c24a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logic">
+      <UniqueIdentifier>{64ac5a0d-c187-4a05-90a8-92eba9f164fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logic\Headers">
+      <UniqueIdentifier>{aa8dfa91-d91d-416d-8410-a32ac426d6fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logic\Sources">
+      <UniqueIdentifier>{4fe5b412-79a6-44e5-8d2f-5c5540f0805c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logic\Headers\Base">
+      <UniqueIdentifier>{1fffdec2-3eaa-4171-93ff-03e97301fb0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logic\Sources\Base">
+      <UniqueIdentifier>{6a96a2be-0a91-40c6-aabb-4ed4fa1b21a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logic\Headers\Components">
+      <UniqueIdentifier>{18d5ffaa-21cd-41e6-bf35-592eefacc39c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logic\Sources\Components">
+      <UniqueIdentifier>{c1bb38c1-01e8-4a48-8bcd-fdf418740490}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -43,23 +61,53 @@
     <ClCompile Include="DeusTcpConnection.cpp">
       <Filter>ClientCommunication\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="GameHandler.cpp">
-      <Filter>Games\Sources</Filter>
-    </ClCompile>
     <ClCompile Include="WorldNetworkServer.cpp">
       <Filter>Servers\Sources</Filter>
     </ClCompile>
     <ClCompile Include="NetworkServer.cpp">
       <Filter>Servers\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="GameNetworkServer.cpp">
-      <Filter>Games\Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="PacketNewPlayer.cpp">
-      <Filter>Packets</Filter>
-    </ClCompile>
     <ClCompile Include="DeusUdpConnection.cpp">
       <Filter>ClientCommunication\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketUpdateHealth.cpp">
+      <Filter>Packets\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketNewPlayer.cpp">
+      <Filter>Packets\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketObjectEnter.cpp">
+      <Filter>Packets\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketObjectLeave.cpp">
+      <Filter>Packets\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="GameNetworkServer.cpp">
+      <Filter>Servers\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="GameHandler.cpp">
+      <Filter>Servers\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="GameLogicServer.cpp">
+      <Filter>Servers\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="IIdentifiable.cpp">
+      <Filter>Logic\Sources\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Logic\Sources\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectComponent.cpp">
+      <Filter>Logic\Sources\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="IExecutable.cpp">
+      <Filter>Logic\Sources\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectFactory.cpp">
+      <Filter>Logic\Sources\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="HealthTimeLineComponent.cpp">
+      <Filter>Logic\Sources\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -72,23 +120,56 @@
     <ClInclude Include="DeusTcpConnection.h">
       <Filter>ClientCommunication\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="GameHandler.h">
-      <Filter>Games\Headers</Filter>
-    </ClInclude>
     <ClInclude Include="WorldNetworkServer.h">
       <Filter>Servers\Headers</Filter>
     </ClInclude>
     <ClInclude Include="NetworkServer.h">
       <Filter>Servers\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="GameNetworkServer.h">
-      <Filter>Games\Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="PacketNewPlayer.h">
-      <Filter>Packets</Filter>
-    </ClInclude>
     <ClInclude Include="DeusUdpConnection.h">
       <Filter>ClientCommunication\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketUpdateHealth.h">
+      <Filter>Packets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketNewPlayer.h">
+      <Filter>Packets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketObjectEnter.h">
+      <Filter>Packets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketObjectLeave.h">
+      <Filter>Packets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="GameNetworkServer.h">
+      <Filter>Servers\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="GameHandler.h">
+      <Filter>Servers\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="GameLogicServer.h">
+      <Filter>Servers\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="IExecutable.h">
+      <Filter>Logic\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Logic\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectComponent.h">
+      <Filter>Logic\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="IIdentifiable.h">
+      <Filter>Logic\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectFactory.h">
+      <Filter>Logic\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="HealthTimeLineComponent.h">
+      <Filter>Logic\Headers\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeLineComponent.h">
+      <Filter>Logic\Headers\Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

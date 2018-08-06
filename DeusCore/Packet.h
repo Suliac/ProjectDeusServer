@@ -30,6 +30,15 @@ namespace DeusCore
 			LeaveGameAnswer		= 17,
 			DeleteGameRequest	= 18,
 			NewPlayer			= 19,
+			PlayerReady			= 20,
+			StartGame			= 21,
+
+			// Game Logic
+			ObjectEnter = 50,
+			ObjectLeave = 51,
+			UpdateHealth = 52,
+
+			// /!\ Game view  : 100-150 /!\ 
 		};
 
 		Packet(EMessageType messageType);

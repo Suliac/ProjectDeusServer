@@ -1,4 +1,5 @@
 #include "Packets.h"
+#include "PacketFactory.h"
 #include "DeusSerializationException.h"
 namespace DeusCore
 {
@@ -42,45 +43,7 @@ namespace DeusCore
 			return p_packetDeserialized; // cannot deserialize because we don't have enough datas
 
 		// Specific packet deserialzation
-		switch (type)
-		{
-		case Packet::Test:
-			p_packetDeserialized = std::make_unique<PacketTest>();
-			break;
-		case Packet::Ack:
-			p_packetDeserialized = std::make_unique<PacketAck>();
-			break;
-		case Packet::Connected:
-			p_packetDeserialized = std::make_unique<PacketClientConnected>();
-			break;
-		case Packet::CreateGameRequest:
-			p_packetDeserialized = std::make_unique<PacketCreateGameRequest>();
-			break;
-		case Packet::CreateGameAnswer:
-			p_packetDeserialized = std::make_unique<PacketCreateGameAnswer>();
-			break;
-		case Packet::JoinGameRequest:
-			p_packetDeserialized = std::make_unique<PacketJoinGameRequest>();
-			break;
-		case Packet::JoinGameAnswer:
-			p_packetDeserialized = std::make_unique<PacketJoinGameAnswer>();
-			break;
-		case Packet::GetGameRequest:
-			p_packetDeserialized = std::make_unique<PacketGetGamesRequest>();
-			break;
-		case Packet::GetGameAnswer:
-			p_packetDeserialized = std::make_unique<PacketGetGamesAnswer>();
-			break;
-		case Packet::LeaveGameRequest:
-			p_packetDeserialized = std::make_unique<PacketLeaveGameRequest>();
-			break;
-		case Packet::LeaveGameAnswer:
-			p_packetDeserialized = std::make_unique<PacketLeaveGameAnswer>();
-			break;
-		default:
-			throw DeusSerializationException("Impossible to deserialize object : unknown message type");
-		}
-
+		p_packetDeserialized = PacketFactory::CreatePacket((EMessageType)type);
 		assert(p_packetDeserialized);
 
 		// set the id of our packet

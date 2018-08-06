@@ -37,6 +37,7 @@ namespace DeusServer
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::Test);
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::LeaveGameRequest);
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::NewPlayer);
+		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::PlayerReady);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -49,6 +50,7 @@ namespace DeusServer
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::Test);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::LeaveGameRequest);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::NewPlayer);
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::PlayerReady);
 
 		m_stopped = true;
 	}
@@ -92,6 +94,10 @@ namespace DeusServer
 			NewPlayer(p_packet->first, ((PacketNewPlayer*)p_packet->second.get())->GetConnection());
 			break;
 
+		case DeusCore::Packet::EMessageType::PlayerReady:
+			PlayerReady(p_packet->first);
+			break;
+
 			//NB : Disconnect event already managed in NetworkServer
 		default:
 			break;
@@ -130,6 +136,38 @@ namespace DeusServer
 			DeusCore::EventManagerHandler::Instance()->QueueEvent(0, m_gameId, p_deleteGameEvent);
 			DeusCore::Logger::Instance()->Log(m_name, "Request game deletion");
 		}
+	}
+
+	void GameNetworkServer::PlayerReady(unsigned int clientId)
+	{
+		if (std::find(m_playersReady.begin(), m_playersReady.end(), clientId) != m_playersReady.end())
+			return; // player already ready
+
+		m_playersReady.push_back(clientId);
+		if (CanStartGame())
+		{
+			DeusCore::PacketSPtr p_startGamePacket = std::shared_ptr<DeusCore::PacketStartGame>(new DeusCore::PacketStartGame());;
+			DeusCore::EventManagerHandler::Instance()->QueueEvent(0, m_gameId, p_startGamePacket);
+			DeusCore::Logger::Instance()->Log(m_name, "Request start game");
+		}
+	}
+
+	void GameNetworkServer::PlayerNotReady(unsigned int clientId)
+	{
+		const auto& idIt = std::find(m_playersReady.begin(), m_playersReady.end(), clientId);
+		if (idIt == m_playersReady.end())
+			return; // this player wasn't ready
+
+		m_playersReady.erase(idIt);
+	}
+
+	bool GameNetworkServer::CanStartGame()
+	{
+		m_lockClients.lock(); // <----------------- LOCK
+		unsigned int nbrClients = m_clientsConnections.size();
+		m_lockClients.unlock();// <----------------- UNLOCK
+
+		return nbrClients <= m_playersReady.size();
 	}
 
 	//---------------------------------------------------------------------------------

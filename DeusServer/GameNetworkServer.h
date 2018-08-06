@@ -25,9 +25,14 @@ namespace DeusServer
 		void InterpretPacket(DeusCore::DeusEventSPtr p_packet);
 		void LeaveGame(unsigned int clientId);
 		void TryDeleteGame();
+		void PlayerReady(unsigned int clientId);
+		void PlayerNotReady(unsigned int clientId);
 	private:
+		bool CanStartGame();
+
 		unsigned int m_gameId;
 		unsigned int m_stopped;
+		std::vector<unsigned int> m_playersReady;
 	};
 	using GameNetworkServerUPtr = std::unique_ptr<GameNetworkServer>;
 	using GameNetworkServerSPtr = std::shared_ptr<GameNetworkServer>;
