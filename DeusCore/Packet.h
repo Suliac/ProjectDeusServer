@@ -3,40 +3,42 @@
 #include "DeusSerializationException.h"
 
 #include <memory>
+
+using Id = uint32_t;
 namespace DeusCore
 {
-
 	class Packet
 	{
 	public:
 		enum EMessageType : uint8_t
 		{
-			Error				= 0,
-			Test				= 1,
-			
+			Error					= 0,
+			Test					= 1,
+
 			// General
-			Disconnect			= 2,
-			Ack					= 3,
-			Connected			= 4,
+			Disconnect				= 2,
+			Ack						= 3,
+			Connected				= 4,
 
 			// Game management
-			CreateGameRequest	= 10,
-			CreateGameAnswer	= 11,
-			JoinGameRequest		= 12,
-			JoinGameAnswer		= 13,
-			GetGameRequest		= 14,
-			GetGameAnswer		= 15,
-			LeaveGameRequest	= 16,
-			LeaveGameAnswer		= 17,
-			DeleteGameRequest	= 18,
-			NewPlayer			= 19,
-			PlayerReady			= 20,
-			StartGame			= 21,
+			CreateGameRequest		= 10,
+			CreateGameAnswer		= 11,
+			JoinGameRequest			= 12,
+			JoinGameAnswer			= 13,
+			GetGameRequest			= 14,
+			GetGameAnswer			= 15,
+			LeaveGameRequest		= 16,
+			LeaveGameAnswer			= 17,
+			DeleteGameRequest		= 18,
+			NewPlayer				= 19,
+			PlayerReady				= 20,
+			StartGame				= 21,
 
 			// Game Logic
-			ObjectEnter = 50,
-			ObjectLeave = 51,
-			UpdateHealth = 52,
+			ObjectEnter				= 50,
+			ObjectLeave				= 51,
+			ObjectChangeCell		= 52,
+			UpdateHealth			= 53,
 
 			// /!\ Game view  : 100-150 /!\ 
 		};
@@ -49,7 +51,7 @@ namespace DeusCore
 		// - Deserialize custom headers (message id type)
 		// - Call specific deserialization method for right message type with OnDeserialize which has to be override by the childrens packets
 		static std::unique_ptr<Packet> Deserialize(Buffer512 &buffer, const size_t bufferIndexOffset = 0);
-				
+
 		// Entry point to serialize packets :
 		// - Set buffer's index to 'bufferIndexOffset' param (0 by default)
 		// - Serialize custom headers (message id type)
@@ -58,11 +60,11 @@ namespace DeusCore
 
 		Packet::EMessageType GetType() const { return m_type; }
 
-		uint32_t GetId() const { return m_uniqueId; }
+		Id GetId() const { return m_uniqueId; }
 
 		uint16_t GetSerializedSize() const { return m_serializedSize; }
 		void SetSerializedSize(uint16_t serializedSize) { m_serializedSize = serializedSize; }
-		
+
 		static const uint16_t HEADER_SIZE = 7;
 	protected:
 		template<typename T>
@@ -76,14 +78,14 @@ namespace DeusCore
 
 		// Specific method to serialize specific packets
 		virtual void OnSerialize(Buffer512 &buffer) const = 0;
-				
+
 		// Specific method to get the serialize size of packets
 		virtual uint16_t EstimateCurrentSerializedSize() const = 0;
 
 	private:
-		void SetId(uint32_t value) { m_uniqueId = value; }
+		void SetId(Id value) { m_uniqueId = value; }
 
-		unsigned int m_uniqueId;
+		Id m_uniqueId;
 		Packet::EMessageType m_type = EMessageType::Error;
 		uint16_t m_serializedSize = 0x0;
 	};
@@ -96,13 +98,13 @@ namespace DeusCore
 
 		unsigned char tmp[sizeof(T)];
 		buffer.Select(tmp, sizeof(T));
-		
+
 		value = T();
 
 		// we decode the big endian
 		for (size_t i = 0; i < sizeof(T); i++)
 			value |= tmp[i] << (8 * ((sizeof(T) - 1) - i));
-		
+
 	}
 
 #pragma endregion
@@ -113,7 +115,7 @@ namespace DeusCore
 	inline void Packet::SerializeData(Buffer512& buffer, const T& value) {
 		static_assert(sizeof(T) <= 8, "Size higher than 8 bytes"); // only work for small types
 		unsigned char datas[sizeof(T)];
-				
+
 		size_t size = sizeof(T);
 
 		// we encode a big endian value as shifting involve 'auto' convert to big endian

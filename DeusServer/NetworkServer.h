@@ -7,7 +7,7 @@
 #include <queue>
 namespace DeusServer
 {
-	using DeusClientConnections = std::map<int, std::shared_ptr<DeusServer::DeusClient>>;
+	using DeusClientConnections = std::map<Id, std::shared_ptr<DeusServer::DeusClient>>;
 
 	class NetworkServer
 	{
@@ -16,7 +16,7 @@ namespace DeusServer
 		~NetworkServer();
 
 		// Init and launch the disconnect handler thread
-		void Start(unsigned int gameId);
+		void Start(Id gameId);
 
 		// Wait for stop request then Stop() the server
 		void WaitForStop();
@@ -33,21 +33,21 @@ namespace DeusServer
 		virtual void OnLateStop() {};
 
 		// To execute by the childrens class when a client disconnects
-		virtual void OnDisconnectClient(int clientId) {};
+		virtual void OnDisconnectClient(Id clientId) {};
 
 		// The way we want our server to interpret packet we get in ProcessPackets()
 		//virtual void OnInterpretPacket(int senderId, DeusCore::PacketSPtr p_packet) = 0;
 		void DisconnectDeleguate(DeusCore::DeusEventSPtr p_packet);
 
 		// Send Packet to a client
-		bool SendPacket(DeusCore::PacketUPtr&& p_packet, int clientId, bool sendTcp);
+		bool SendPacket(DeusCore::PacketUPtr&& p_packet, Id clientId, bool sendTcp);
 
 		bool GetWantToStop() const { return m_wantToStop; };
 
 		/********************************************/
 
 		// Id of the game : 0 for the world server, 1 for the game server #1, 2 for the #2 and so on
-		unsigned int m_gameId;
+		Id m_gameId;
 
 		// Save all the client connection accepted with an id
 		DeusClientConnections m_clientsConnections;
@@ -96,7 +96,7 @@ namespace DeusServer
 		std::mutex m_lockClientsToDisconnect;
 
 		// Queue of clients id to disconnect
-		std::queue<int> m_clientToDisconnect;
+		std::queue<Id> m_clientToDisconnect;
 
 		// Max time we try to handle disconnect
 		// To avoid to lock for too long the queue

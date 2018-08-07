@@ -52,7 +52,7 @@ namespace DeusCore
 	/////////////////////////
 
 	//---------------------------------------------------------------------------------
-	bool EventManagerHandler::StartGameChannel(unsigned int gameId)
+	bool EventManagerHandler::StartGameChannel(Id gameId)
 	{
 		m_gamesEventsManagersLock.lock(); //<------- Lock
 		GamesEventManagers::iterator findIt = m_gamesEventManagers.find(gameId);
@@ -67,7 +67,7 @@ namespace DeusCore
 	}
 
 	//---------------------------------------------------------------------------------
-	bool EventManagerHandler::StopGameChannel(unsigned int gameId)
+	bool EventManagerHandler::StopGameChannel(Id gameId)
 	{
 		m_gamesEventsManagersLock.lock(); //<------- Lock
 
@@ -85,7 +85,7 @@ namespace DeusCore
 	}
 
 	//---------------------------------------------------------------------------------
-	bool EventManagerHandler::AddListener(unsigned int gameId, const DeusEventDeleguate & eventDeleguate, const Packet::EMessageType & type)
+	bool EventManagerHandler::AddListener(Id gameId, const DeusEventDeleguate & eventDeleguate, const Packet::EMessageType & type)
 	{
 		m_gamesEventsManagersLock.lock(); //<------- Lock
 		bool success = false;
@@ -99,7 +99,7 @@ namespace DeusCore
 	}
 
 	//---------------------------------------------------------------------------------
-	bool EventManagerHandler::RemoveListener(unsigned int gameId, const DeusEventDeleguate & eventDeleguate, const Packet::EMessageType & type)
+	bool EventManagerHandler::RemoveListener(Id gameId, const DeusEventDeleguate & eventDeleguate, const Packet::EMessageType & type)
 	{
 		m_gamesEventsManagersLock.lock(); //<------- Lock
 		bool success = false;
@@ -113,7 +113,7 @@ namespace DeusCore
 	}
 
 	//---------------------------------------------------------------------------------
-	bool EventManagerHandler::TriggerEvent(unsigned int gameId, const DeusEventSPtr & deusEvent)
+	bool EventManagerHandler::TriggerEvent(Id gameId, const DeusEventSPtr & deusEvent)
 	{
 		m_gamesEventsManagersLock.lock(); //<------- Lock
 		bool success = false;
@@ -127,7 +127,7 @@ namespace DeusCore
 	}
 
 	//---------------------------------------------------------------------------------
-	bool EventManagerHandler::QueueEvent(unsigned int gameId, const DeusEventSPtr & deusEvent)
+	bool EventManagerHandler::QueueEvent(Id gameId, const DeusEventSPtr & deusEvent)
 	{
 		m_gamesEventsManagersLock.lock(); //<------- Lock
 		bool success = false;
@@ -140,13 +140,13 @@ namespace DeusCore
 		return success;
 	}
 
-	bool EventManagerHandler::QueueEvent(unsigned int gameId, int senderId, PacketSPtr p_packet)
+	bool EventManagerHandler::QueueEvent(Id gameId, Id senderId, PacketSPtr p_packet)
 	{
-		return QueueEvent(gameId, std::shared_ptr<DeusEvent>(new std::pair<int, DeusCore::PacketSPtr>(senderId, p_packet)));
+		return QueueEvent(gameId, std::shared_ptr<DeusEvent>(new std::pair<Id, DeusCore::PacketSPtr>(senderId, p_packet)));
 	}
 
 	//---------------------------------------------------------------------------------
-	bool EventManagerHandler::AbortEvent(unsigned int gameId, const Packet::EMessageType & type, bool allOfType)
+	bool EventManagerHandler::AbortEvent(Id gameId, const Packet::EMessageType & type, bool allOfType)
 	{
 		m_gamesEventsManagersLock.lock(); //<------- Lock
 		bool success = false;

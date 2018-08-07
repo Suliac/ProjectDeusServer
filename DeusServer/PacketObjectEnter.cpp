@@ -2,11 +2,12 @@
 
 namespace DeusServer
 {
-	PacketObjectEnter::PacketObjectEnter(uint32_t objectId, GameObject::EObjectType objectType)
+	PacketObjectEnter::PacketObjectEnter(Id objectId, GameObject::EObjectType objectType, bool isLocalPlayer)
 		: DeusCore::Packet(Packet::EMessageType::ObjectEnter)
 	{
 		m_objectId = objectId;
 		m_objectType = objectType;
+		m_isLocalPlayer = isLocalPlayer;
 	}
 
 	PacketObjectEnter::~PacketObjectEnter()
@@ -20,6 +21,8 @@ namespace DeusServer
 		uint8_t objectType = m_objectType;
 		DeserializeData(buffer, objectType);
 		m_objectType = (GameObject::EObjectType)objectType;
+
+		DeserializeData(buffer, m_isLocalPlayer);
 	}
 
 	void PacketObjectEnter::OnSerialize(DeusCore::Buffer512 & buffer) const
@@ -28,10 +31,12 @@ namespace DeusServer
 
 		uint8_t objectType = m_objectType;
 		SerializeData(buffer, objectType);
+
+		SerializeData(buffer, m_isLocalPlayer);
 	}
 
 	uint16_t PacketObjectEnter::EstimateCurrentSerializedSize() const
 	{
-		return uint16_t(sizeof(m_objectId) + sizeof(m_objectType));
+		return uint16_t(sizeof(m_objectId) + sizeof(m_objectType) + sizeof(m_isLocalPlayer));
 	}
 }

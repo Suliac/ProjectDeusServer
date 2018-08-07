@@ -5,7 +5,7 @@ namespace DeusServer
 {
 	class GameNetworkServer;
 
-	using DeusClientConnections = std::map<int, std::shared_ptr<DeusServer::DeusClient>>;
+	using DeusClientConnections = std::map<Id, std::shared_ptr<DeusServer::DeusClient>>;
 	
 	class GameHandler
 	{

@@ -165,6 +165,7 @@
     <ClCompile Include="IIdentifiable.cpp" />
     <ClCompile Include="NetworkServer.cpp" />
     <ClCompile Include="PacketNewPlayer.cpp" />
+    <ClCompile Include="PacketObjectChangeCell.cpp" />
     <ClCompile Include="PacketObjectEnter.cpp" />
     <ClCompile Include="PacketObjectLeave.cpp" />
     <ClCompile Include="PacketUpdateHealth.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="IIdentifiable.h" />
     <ClInclude Include="NetworkServer.h" />
     <ClInclude Include="PacketNewPlayer.h" />
+    <ClInclude Include="PacketObjectChangeCell.h" />
     <ClInclude Include="PacketObjectEnter.h" />
     <ClInclude Include="PacketObjectLeave.h" />
     <ClInclude Include="PacketUpdateHealth.h" />

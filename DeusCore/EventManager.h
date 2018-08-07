@@ -9,14 +9,15 @@
 
 namespace DeusCore
 {
+
 	// A deus event is the id of the sender with the packet he sends
-	using DeusEvent = std::pair<int, DeusCore::PacketSPtr>;
+	using DeusEvent = std::pair<Id, DeusCore::PacketSPtr>;
 	using DeusEventSPtr = std::shared_ptr<DeusEvent>;
 
 	using DeusEventDeleguate = fastdelegate::FastDelegate1<DeusEventSPtr>;
 	using DeusEventDeleguateList = std::list<DeusEventDeleguate>;
 	using DeusEventDeleguateMap = std::map<Packet::EMessageType, DeusEventDeleguateList>;
-	
+
 	using DeusEventQueue = std::list<DeusEventSPtr>;
 
 	const unsigned int EVENTMANAGER_NUM_QUEUE = 2;

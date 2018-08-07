@@ -8,7 +8,7 @@
 
 namespace DeusServer
 {
-	DeusClient::DeusClient(int id, std::unique_ptr<DeusCore::TcpSocket> communicationSocket, const std::string& servAddr, const std::string& servPort)
+	DeusClient::DeusClient(Id id, std::unique_ptr<DeusCore::TcpSocket> communicationSocket, const std::string& servAddr, const std::string& servPort)
 		: m_tcpConnection(id), m_udpConnection(id)
 	{
 		m_id = id;
@@ -29,7 +29,7 @@ namespace DeusServer
 			m_udpConnection.AddPacketToQueue(std::move(p_packet));
 	}
 
-	void DeusClient::SetConnectionGameId(unsigned int gameId)
+	void DeusClient::SetConnectionGameId(Id gameId)
 	{
 		m_tcpConnection.SetGameId(gameId);
 		m_udpConnection.SetGameId(gameId);

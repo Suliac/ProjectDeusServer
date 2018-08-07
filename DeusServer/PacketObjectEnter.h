@@ -7,7 +7,7 @@ namespace DeusServer
 	class PacketObjectEnter : public DeusCore::Packet
 	{
 	public:
-		PacketObjectEnter(uint32_t objectId, GameObject::EObjectType objectType);
+		PacketObjectEnter(Id objectId, GameObject::EObjectType objectType, bool isLocalPlayer);
 		~PacketObjectEnter();
 
 	protected:
@@ -16,7 +16,8 @@ namespace DeusServer
 		virtual uint16_t EstimateCurrentSerializedSize() const override;
 
 	private:
-		uint32_t m_objectId;
+		Id m_objectId;
 		GameObject::EObjectType m_objectType;
+		bool m_isLocalPlayer;
 	};
 }

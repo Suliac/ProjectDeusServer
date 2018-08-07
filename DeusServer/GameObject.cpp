@@ -3,7 +3,7 @@
 
 namespace DeusServer
 {
-	GameObject::GameObject(std::vector<GameObjectComponent>& components)
+	GameObject::GameObject(std::vector<GameObjectComponent>& components, EObjectType typeObject)
 	{
 		for (const auto& component : components) {
 			if (m_components.find(component.GetId()) != m_components.end())
@@ -11,6 +11,8 @@ namespace DeusServer
 
 			m_components.insert(std::make_pair(component.GetId(), std::make_shared<GameObjectComponent>(component)));
 		}
+
+		m_type = typeObject;
 	}
 	
 	GameObject::~GameObject()

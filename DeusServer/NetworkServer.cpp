@@ -37,7 +37,7 @@ namespace DeusServer
 	}
 
 	//---------------------------------------------------------------------------------
-	void NetworkServer::Start(unsigned int gameId)
+	void NetworkServer::Start(Id gameId)
 	{
 		m_gameId = gameId;
 
@@ -163,7 +163,7 @@ namespace DeusServer
 	}
 
 	//---------------------------------------------------------------------------------
-	bool NetworkServer::SendPacket(DeusCore::PacketUPtr&& p_packet, int clientId, bool sendTcp)
+	bool NetworkServer::SendPacket(DeusCore::PacketUPtr&& p_packet, Id clientId, bool sendTcp)
 	{
 		DeusClientConnections::iterator findClientIt = m_clientsConnections.find(clientId);
 		if (findClientIt != m_clientsConnections.end())

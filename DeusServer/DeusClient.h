@@ -12,12 +12,12 @@ namespace DeusServer
 	class DeusClient
 	{
 	public:
-		DeusClient(int id, std::unique_ptr<DeusCore::TcpSocket> communicationSocket, const std::string& servAddr, const std::string& servPort);
+		DeusClient(Id id, std::unique_ptr<DeusCore::TcpSocket> communicationSocket, const std::string& servAddr, const std::string& servPort);
 		~DeusClient();
-		
+
 		void SendPacket(DeusCore::PacketUPtr p_packet, bool isTcp);
-		void SetConnectionGameId(unsigned int gameId);
-	
+		void SetConnectionGameId(Id gameId);
+
 	private:
 		// TCP communication interface
 		DeusTcpConnection m_tcpConnection;
@@ -26,7 +26,7 @@ namespace DeusServer
 		DeusUdpConnection m_udpConnection;
 
 		// ID of the connection
-		int m_id;
+		Id m_id;
 	};
 
 	using DeusClientUPtr = std::unique_ptr<DeusServer::DeusClient>;

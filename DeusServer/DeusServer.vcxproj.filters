@@ -109,6 +109,9 @@
     <ClCompile Include="HealthTimeLineComponent.cpp">
       <Filter>Logic\Sources\Components</Filter>
     </ClCompile>
+    <ClCompile Include="PacketObjectChangeCell.cpp">
+      <Filter>Packets\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeusClient.h">
@@ -170,6 +173,9 @@
     </ClInclude>
     <ClInclude Include="TimeLineComponent.h">
       <Filter>Logic\Headers\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketObjectChangeCell.h">
+      <Filter>Packets\Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

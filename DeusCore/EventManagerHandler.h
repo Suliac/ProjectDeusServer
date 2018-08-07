@@ -5,7 +5,7 @@
 #include "EventManager.h"
 namespace DeusCore
 {
-	using GamesEventManagers = std::map<unsigned int, std::unique_ptr<EventManager>>;
+	using GamesEventManagers = std::map<Id, std::unique_ptr<EventManager>>;
 	
 	class EventManagerHandler
 	{
@@ -20,17 +20,17 @@ namespace DeusCore
 		/////////////////////////
 		// Channel management
 
-		bool StartGameChannel	(unsigned int gameId);
-		bool StopGameChannel	(unsigned int gameId);
+		bool StartGameChannel	(Id gameId);
+		bool StopGameChannel	(Id gameId);
 		
 		// Event manager methods
 
-		bool AddListener	(unsigned int gameId, const DeusEventDeleguate& eventDeleguate, const Packet::EMessageType& type);
-		bool RemoveListener	(unsigned int gameId, const DeusEventDeleguate& eventDeleguate, const Packet::EMessageType& type);
-		bool TriggerEvent	(unsigned int gameId, const DeusEventSPtr& deusEvent);
-		bool AbortEvent		(unsigned int gameId, const Packet::EMessageType& type, bool allOfType = false);
-		bool QueueEvent		(unsigned int gameId, const DeusEventSPtr& deusEvent);
-		bool QueueEvent		(unsigned int gameId, int senderId, PacketSPtr p_packet);
+		bool AddListener	(Id gameId, const DeusEventDeleguate& eventDeleguate, const Packet::EMessageType& type);
+		bool RemoveListener	(Id gameId, const DeusEventDeleguate& eventDeleguate, const Packet::EMessageType& type);
+		bool TriggerEvent	(Id gameId, const DeusEventSPtr& deusEvent);
+		bool AbortEvent		(Id gameId, const Packet::EMessageType& type, bool allOfType = false);
+		bool QueueEvent		(Id gameId, const DeusEventSPtr& deusEvent);
+		bool QueueEvent		(Id gameId, Id senderId, PacketSPtr p_packet);
 
 
 	private:

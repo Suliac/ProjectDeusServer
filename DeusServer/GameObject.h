@@ -14,17 +14,18 @@ namespace DeusServer
 		};
 
 		GameObject() {};
-		GameObject(std::vector<GameObjectComponent>& components);
+		GameObject(std::vector<GameObjectComponent>& components, EObjectType typeObject);
 		~GameObject();
 
 		std::shared_ptr<GameObjectComponent> GetComponent(uint32_t identifier);
+		EObjectType GetType() const { return m_type; }
 	protected:
 		virtual void OnUpdate(double deltatimeMs) override;
 		virtual void OnStart() override;
 		virtual void OnStop() override;
 
 		GameObjectComponents m_components;
-
+		EObjectType m_type;
 	};
 }
 
