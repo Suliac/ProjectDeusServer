@@ -162,7 +162,6 @@
     <ClCompile Include="GameObjectFactory.cpp" />
     <ClCompile Include="HealthTimeLineComponent.cpp" />
     <ClCompile Include="IExecutable.cpp" />
-    <ClCompile Include="IIdentifiable.cpp" />
     <ClCompile Include="NetworkServer.cpp" />
     <ClCompile Include="PacketNewPlayer.cpp" />
     <ClCompile Include="PacketObjectChangeCell.cpp" />

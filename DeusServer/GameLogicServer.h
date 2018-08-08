@@ -49,7 +49,7 @@ namespace DeusServer
 		void PlayerDisconnected(Id clientId);
 	private:
 		Id GetCellIdOfGameObject(Id objectId);
-		void GetGameObjectOnChangeCells(Id cellLeavedId, Id cellEnteredId, std::vector<std::shared_ptr<GameObject>>& objectInCellsLeft, std::vector<std::shared_ptr<GameObject>>& objectInCellsEntered);
+		void GetGameObjectOnChangeCells(Id playerId, Id cellLeavedId, Id cellEnteredId, std::vector<std::shared_ptr<const GameObject>>& objectInCellsLeft, std::vector<std::shared_ptr<const GameObject>>& objectInCellsEntered);
 
 		ServerCells m_cellsGameObjects;
 		PlayerInfos m_playerWithGameObject;

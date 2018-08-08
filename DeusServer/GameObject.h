@@ -13,7 +13,7 @@ namespace DeusServer
 			Player = 1,
 		};
 
-		GameObject() {};
+		GameObject();
 		GameObject(std::vector<GameObjectComponent>& components, EObjectType typeObject);
 		~GameObject();
 
@@ -26,6 +26,8 @@ namespace DeusServer
 
 		GameObjectComponents m_components;
 		EObjectType m_type;
+
+		static Id NextId;
 	};
 }
 

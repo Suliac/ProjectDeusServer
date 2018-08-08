@@ -18,6 +18,7 @@ namespace DeusCore
 	//---------------------------------------------------------------------------------
 	UdpSocket::~UdpSocket()
 	{
+		freeaddrinfo(m_clientConnectedInfos);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -41,18 +42,18 @@ namespace DeusCore
 	//---------------------------------------------------------------------------------
 	bool UdpSocket::SendDatas(const char * data, size_t size, int & byteSent)
 	{
-		assert(m_distantInfos != nullptr);
+		assert(m_clientConnectedInfos != nullptr);
 
 		if (!CheckSocketStates(true, false)) // Check if socket is writable
 			return false;
 
-		char clienthost[NI_MAXHOST];  //The clienthost will hold the IP address.
-		char clientservice[NI_MAXSERV];
-		int theErrorCode = getnameinfo(m_distantInfos->ai_addr, sizeof(*m_distantInfos->ai_addr), clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST | NI_NUMERICSERV);
+		//char clienthost[NI_MAXHOST];  //The clienthost will hold the IP address.
+		//char clientservice[NI_MAXSERV];
+		//int theErrorCode = getnameinfo(m_clientConnectedInfos->ai_addr, sizeof(*m_clientConnectedInfos->ai_addr), clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST | NI_NUMERICSERV);
 
-		DeusCore::Logger::Instance()->Log(m_name, "sendto : "+ std::string(clienthost) + ":"+ std::string(clientservice));
+		//DeusCore::Logger::Instance()->Log(m_name, "sendto : "+ std::string(clienthost) + ":"+ std::string(clientservice));
 
-		byteSent = sendto(m_handler, data, size, 0, m_distantInfos->ai_addr, m_distantInfos->ai_addrlen);
+		byteSent = sendto(m_handler, data, size, 0, m_clientConnectedInfos->ai_addr, m_clientConnectedInfos->ai_addrlen);
 		if (byteSent == SOCKET_ERROR) {
 			std::string message = "UDP send failed with error: " + std::to_string(WSAGetLastError());
 			SocketClose();
@@ -67,11 +68,19 @@ namespace DeusCore
 	//---------------------------------------------------------------------------------
 	bool UdpSocket::RecvDatas(char * data, size_t size, int & byteRecv)
 	{
+		if (m_clientConnectedInfos == nullptr)
+		{
+			int iResult = getaddrinfo(m_ipAddr.c_str(), m_port.c_str(), &m_hints, &m_clientConnectedInfos);
+			if (iResult != 0) {
+				throw DeusSocketException("Error when init UDP client infos. Error " + std::to_string(iResult));
+			}
+		}
+
 		if (!CheckSocketStates(false, true)) // Check if socket is readable
 			return false;
 
-		int slen = (int)m_distantInfos->ai_addrlen;
-		byteRecv = recvfrom(m_handler, data, size, 0, m_distantInfos->ai_addr, &slen); // read socket's datas
+		int slen = (int)m_clientConnectedInfos->ai_addrlen;
+		byteRecv = recvfrom(m_handler, data, size, 0, m_clientConnectedInfos->ai_addr, &slen); // read socket's datas
 		if (byteRecv < 0) // if there error, throw a DeusSocketException
 		{
 			std::string message = "recv failed with error: " + std::to_string(WSAGetLastError());

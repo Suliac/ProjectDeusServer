@@ -22,6 +22,7 @@ namespace DeusCore
 			Disconnect				= 2,
 			Ack						= 3,
 			Connected				= 4,
+			ConnectedUdpAnswer		= 5,
 
 			// Game management
 			CreateGameRequest		= 10,

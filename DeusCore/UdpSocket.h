@@ -12,6 +12,9 @@ namespace DeusCore
 
 		virtual bool SendDatas(const char * data, size_t size, int & byteSent) override;
 		virtual bool RecvDatas(char * data, size_t size, int & byteRecv) override;
+	protected:
+		// Informations of the server
+		addrinfo* m_clientConnectedInfos = nullptr;
 	};
 }
 

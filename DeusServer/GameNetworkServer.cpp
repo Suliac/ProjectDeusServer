@@ -89,9 +89,12 @@ namespace DeusServer
 		UpdateCellSubscription(clientId, leftCell, 0);
 
 		// delete player infos
+		m_playersLocker.lock(); // <------------- LOCK
 		PlayersInfos::iterator playerIt = m_playersInfos.find(clientId);
 		if (playerIt != m_playersInfos.end())
 			m_playersInfos.erase(playerIt);
+		m_playersLocker.unlock(); // <------------- UNLOCK
+
 
 		// We echo back to the world server the disconnected client id
 		DeusCore::PacketSPtr p_disconnectedEvent = std::shared_ptr<DeusCore::PacketClientDisconnect>(new DeusCore::PacketClientDisconnect());
@@ -155,9 +158,11 @@ namespace DeusServer
 			m_clientsConnections.erase(matchingConnectionIt);
 
 			// delete player infos
+			m_playersLocker.lock(); // <------------- LOCK
 			PlayersInfos::iterator playerIt = m_playersInfos.find(clientId);
 			if (playerIt != m_playersInfos.end())
 				m_playersInfos.erase(playerIt);
+			m_playersLocker.unlock(); // <------------- UNLOCK
 
 			// we check if there is player left, otherwise we stop this game server
 			TryDeleteGame();
@@ -183,7 +188,10 @@ namespace DeusServer
 		DeusCore::Logger::Instance()->Log(m_name, "Client (id:" + std::to_string(clientId) + ") Joined the game");
 
 		// Init player datas
+
+		m_playersLocker.lock(); // <------------- LOCK
 		m_playersInfos[clientId] = DeusPlayerInfos();
+		m_playersLocker.unlock(); // <------------- UNLOCK
 
 		m_lockClients.unlock();
 		return true;
@@ -208,19 +216,17 @@ namespace DeusServer
 	//---------------------------------------------------------------------------------
 	void GameNetworkServer::PlayerReady(Id clientId)
 	{
-		DeusCore::Logger::Instance()->Log(m_name, "Client " + std::to_string(clientId) + " is ready !");
-		std::unique_ptr<DeusCore::PacketGetGamesAnswer> p_packet = std::unique_ptr<DeusCore::PacketGetGamesAnswer>(new DeusCore::PacketGetGamesAnswer());
-		p_packet->SetSuccess(true);
-		SendPacket(std::move(p_packet), 1, SEND_UDP);
-		DeusCore::Logger::Instance()->Log(m_name, "Client " + std::to_string(clientId) + " Packet sent ---------------------------------------");
-		return;
 
-
+		m_playersLocker.lock(); // <------------- LOCK
 		if (m_playersInfos.find(clientId) == m_playersInfos.end())
+		{
+			m_playersLocker.unlock(); // <------------- UNLOCK
 			return;
+		}
 
 		m_playersInfos[clientId].State = DeusPlayerInfos::EPlayerState::Ready;
 		DeusCore::Logger::Instance()->Log(m_name, "Client " + std::to_string(clientId) + " is ready !");
+
 		if (CanStartGame())
 		{
 			DeusCore::PacketSPtr p_startGamePacket = std::shared_ptr<DeusCore::PacketStartGame>(new DeusCore::PacketStartGame());
@@ -229,93 +235,44 @@ namespace DeusServer
 			for (auto& player : m_playersInfos)
 				std::dynamic_pointer_cast<DeusCore::PacketStartGame>(p_startGamePacket)->AddPlayerConnectionId(player.first);
 
-			DeusCore::EventManagerHandler::Instance()->QueueEvent(clientId, m_gameId, p_startGamePacket);
+			DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, m_gameId, p_startGamePacket);
 			DeusCore::Logger::Instance()->Log(m_name, "Request start game");
 		}
+		m_playersLocker.unlock(); // <------------- UNLOCK
 	}
 
 	//---------------------------------------------------------------------------------
 	void GameNetworkServer::PlayerNotReady(Id clientId)
 	{
+		m_playersLocker.lock(); // <------------- LOCK
 		if (m_playersInfos.find(clientId) == m_playersInfos.end())
+		{
+			m_playersLocker.unlock(); // <------------- UNLOCK
 			return;
+		}
 
 		m_playersInfos[clientId].State = DeusPlayerInfos::EPlayerState::NotReady;
+		m_playersLocker.unlock(); // <------------- UNLOCK
 	}
 
 	//---------------------------------------------------------------------------------
 	void GameNetworkServer::ObjectChangedCell(std::shared_ptr<PacketObjectChangeCell> p_packetReceived)
 	{
-
-		std::unique_ptr<DeusCore::PacketGetGamesAnswer> p_packet = std::unique_ptr<DeusCore::PacketGetGamesAnswer>(new DeusCore::PacketGetGamesAnswer());
-		p_packet->SetSuccess(true);
-		SendPacket(std::move(p_packet), 1, SEND_UDP);
-		/*
 		// 1 - Player update subscriptions : 
 		// - send ObjectEnter for each GameObjects in new interest cell
 		// - send ObjectLeave for each GameObject in cell that arn't in interest area anymore
-		if (p_packetReceived->GetClientId() > 0)
-			UpdateCellSubscription(p_packetReceived->GetClientId(), p_packetReceived->GetLeftCellId(), p_packetReceived->GetEnteredCellId());
+		UpdateCellSubscription(p_packetReceived->GetClientId(), p_packetReceived->GetLeftCellId(), p_packetReceived->GetEnteredCellId());
 
-		// 2 - Send ObjectLeave packet to other player
-		if (p_packetReceived->GetLeftCellId() > 0)
-		{
-			m_cellLocker[p_packetReceived->GetLeftCellId() - 1].lock(); // <------- LOCK
-			// check if there is listener on that cell
-			if (m_cells[p_packetReceived->GetLeftCellId()].size() > 0)
-			{
-				for (int listenerId : m_cells[p_packetReceived->GetLeftCellId()])
-				{
-					// we don't want to notify our player of his/her own actions
-					if (p_packetReceived->GetObjectId() == m_playersInfos[listenerId].GameObjectId)
-						break;
+		// 2 - Update gameobjectid for the player
+		if (p_packetReceived->IsInit())
+			UpdateGameObjectIdForPlayer(p_packetReceived->GetClientId(), p_packetReceived->GetGameObject()->GetId());
 
+		// 3 - Send ObjectLeave packet to other player
+		ManageLeftCell(p_packetReceived->GetLeftCellId(), p_packetReceived->GetEnteredCellId(), p_packetReceived->GetGameObject()->GetId(), p_packetReceived->GetObjectInLeavingCells());
 
-					// this client is eligible for the ObjectLeave packet
-					// if player already know this object (entered once in inner area)
-					// and the object is leaving the outter area
-					if (IsPlayerFollowingObject(listenerId, p_packetReceived->GetObjectId())
-						&& IsObjectLeavingOutterArea(listenerId, p_packetReceived->GetLeftCellId(), p_packetReceived->GetEnteredCellId()))
-					{
-						// Send packet ObjectLeave in UDP
-						DeusCore::PacketUPtr p_packetLeaveCell = std::unique_ptr<PacketObjectLeave>(new PacketObjectLeave(p_packetReceived->GetObjectId()));
-						SendPacket(std::move(p_packetLeaveCell), listenerId, SEND_UDP);
-					}
-				}
-			}
-			m_cellLocker[p_packetReceived->GetLeftCellId() - 1].unlock(); // <------- UNLOCK
+		// 4 - Send ObjectEnter packet to other player
+		ManageEnteredCell(p_packetReceived->GetLeftCellId(), p_packetReceived->GetEnteredCellId(), p_packetReceived->GetGameObject(), p_packetReceived->GetObjectInEnteringCells(), p_packetReceived->IsInit());
 
-		}
-
-		// 3 - Send ObjectEnter packet to other player
-		if (p_packetReceived->GetEnteredCellId() > 0)
-		{
-			m_cellLocker[p_packetReceived->GetEnteredCellId() - 1].lock(); // <------- LOCK
-
-			if (m_cells[p_packetReceived->GetEnteredCellId()].size() > 0)
-			{
-				for (int listenerId : m_cells[p_packetReceived->GetEnteredCellId()])
-				{
-					// we don't want to notify our player of his/her own actions
-					// exept if this is the init of the player
-					bool listenerIsThisGameObject = p_packetReceived->GetObjectId() == m_playersInfos[listenerId].GameObjectId;
-					if (listenerIsThisGameObject && !p_packetReceived->IsInit())
-						break;
-
-					// this client is eligible for the ObjectEnter packet
-					// if player DON'T already know this object
-					// and the object is inetering the inner area
-					if (!IsPlayerFollowingObject(listenerId, p_packetReceived->GetObjectId())
-						&& IsObjectEnteringInnerArea(listenerId, p_packetReceived->GetLeftCellId(), p_packetReceived->GetEnteredCellId()))
-					{
-						// Send packet ObjectLeave in UDP
-						DeusCore::PacketUPtr p_packetEnteredCell = std::unique_ptr<PacketObjectEnter>(new PacketObjectEnter(p_packetReceived->GetObjectId(), p_packetReceived->GetObjectType(), listenerIsThisGameObject));
-						SendPacket(std::move(p_packetEnteredCell), listenerId, SEND_UDP);
-					}
-				}
-			}
-			m_cellLocker[p_packetReceived->GetEnteredCellId() - 1].unlock(); // <------- UNLOCK
-		}*/
 	}
 
 	//---------------------------------------------------------------------------------
@@ -336,6 +293,7 @@ namespace DeusServer
 		return nbrClients <= nbrPlayerReady;
 	}
 
+	//---------------------------------------------------------------------------------
 	bool GameNetworkServer::IsPlayerFollowingObject(Id playerId, Id objectId)
 	{
 		bool result = false;
@@ -367,29 +325,169 @@ namespace DeusServer
 		return true;
 	}
 
-	void GameNetworkServer::UpdateCellSubscription(Id clientId, Id cellLeavedId, Id cellEnteredId)
+	void GameNetworkServer::UpdateCellSubscription(Id clientId, CellId cellLeavedId, CellId cellEnteredId)
 	{
 		// TODO : Interest management !!
 
-		if (cellLeavedId > 0)
+		if (clientId > 0)
 		{
-			m_cellLocker[cellLeavedId - 1].lock(); // <------- LOCK
+			if (cellLeavedId > 0)
+			{
+				m_cellLocker[cellLeavedId - 1].lock(); // <------- LOCK
 
-			auto listenerIdIt = std::find(m_cells[cellLeavedId].begin(), m_cells[cellLeavedId].end(), clientId);
-			if (listenerIdIt != m_cells[cellLeavedId].end())
-				m_cells[cellLeavedId].erase(listenerIdIt);
+				auto listenerIdIt = std::find(m_cells[cellLeavedId].begin(), m_cells[cellLeavedId].end(), clientId);
+				if (listenerIdIt != m_cells[cellLeavedId].end())
+					m_cells[cellLeavedId].erase(listenerIdIt);
 
-			m_cellLocker[cellLeavedId - 1].unlock(); // <------- UNLOCK
+				m_cellLocker[cellLeavedId - 1].unlock(); // <------- UNLOCK
+			}
+
+			if (cellEnteredId > 0)
+			{
+				m_cellLocker[cellEnteredId - 1].lock(); // <------- LOCK
+				m_cells[cellEnteredId].push_back(clientId);
+				m_cellLocker[cellEnteredId - 1].unlock(); // <------- UNLOCK
+			}
 		}
+	}
 
+	void GameNetworkServer::UpdateGameObjectIdForPlayer(Id clientId, Id objectId)
+	{
+		if (clientId)
+		{
+			m_playersLocker.lock(); // <----------------- LOCK
+			PlayersInfos::iterator playerIt = m_playersInfos.find(clientId);
+			if (playerIt != m_playersInfos.end())
+			{
+				//DeusCore::Logger::Instance()->Log(m_name, "Associate Client :"+std::to_string(clientId)+ " with GO :"+std::to_string(objectId));
+				if (playerIt->second.GameObjectId == 0)
+					playerIt->second.GameObjectId = objectId;
+				else if (playerIt->second.GameObjectId != objectId)
+					DeusCore::Logger::Instance()->Log(m_name, "Strange behavior : try to update ObjectId for the player");
+			}
+			m_playersLocker.unlock(); // <----------------- UNLOCK
+
+		}
+	}
+
+	void GameNetworkServer::ManageLeftCell(CellId cellLeftId, CellId cellEnteredId, Id objectId, const std::vector<std::shared_ptr<const GameObject>>& objectInCellsLeft)
+	{
+		if (cellLeftId > 0)
+		{
+			m_cellLocker[cellLeftId - 1].lock(); // <------- LOCK
+												 // check if there is listener on that cell
+			if (m_cells[cellLeftId].size() > 0)
+			{
+				for (int listenerId : m_cells[cellLeftId])
+				{
+					m_playersLocker.lock(); // <----------------- LOCK
+					// we don't want to notify our player of his/her own actions
+					if (objectId == m_playersInfos[listenerId].GameObjectId)
+					{
+						//////////////////////////////////////////////////////////////
+						// If there is object we left, tell it to the player so he/she can delete it!
+						if (objectInCellsLeft.size() > 0)
+						{
+							for (const auto& gameObjectWeLeave : objectInCellsLeft)
+							{
+								assert(gameObjectWeLeave->GetId() != m_playersInfos[listenerId].GameObjectId);
+								ObjectLeft(gameObjectWeLeave->GetId(), listenerId);
+							}
+						}
+						//////////////////////////////////////////////////////////////
+
+						m_playersLocker.unlock(); // <----------------- UNLOCK
+						continue;
+					}
+					// this client is eligible for the ObjectLeave packet
+					// if player already know this object (entered once in inner area)
+					// and the object is leaving the outter area
+					if (IsPlayerFollowingObject(listenerId, objectId)
+						&& IsObjectLeavingOutterArea(listenerId, cellLeftId, cellEnteredId))
+					{
+						ObjectLeft(objectId, listenerId);
+					}
+					m_playersLocker.unlock(); // <----------------- UNLOCK
+
+				}
+			}
+			m_cellLocker[cellLeftId - 1].unlock(); // <------- UNLOCK
+		}
+	}
+
+	void GameNetworkServer::ManageEnteredCell(CellId cellLeftId, CellId cellEnteredId, std::shared_ptr<const GameObject> object, const std::vector<std::shared_ptr<const GameObject>>& objectInCellsEntered, bool notifyAllPlayer)
+	{
 		if (cellEnteredId > 0)
 		{
 			m_cellLocker[cellEnteredId - 1].lock(); // <------- LOCK
 
-			m_cells[cellEnteredId].push_back(clientId);
+			if (m_cells[cellEnteredId].size() > 0)
+			{
+				for (int listenerId : m_cells[cellEnteredId])
+				{
+					m_playersLocker.lock(); // <----------------- LOCK
+					// we don't want to notify our player of his/her own actions
+					// exept if this is the init of the player
+					bool listenerIsThisGameObject = object->GetId() == m_playersInfos[listenerId].GameObjectId;
+					if (listenerIsThisGameObject)
+					{
+						//////////////////////////////////////////////////////////////
+						// If there is object already here, tell it to the player !
+						if (objectInCellsEntered.size() > 0)
+						{
+							for (const auto& gameObjectAlreadyHere : objectInCellsEntered)
+							{
+								assert(gameObjectAlreadyHere->GetId() != m_playersInfos[listenerId].GameObjectId);
+								ObjectEnter(listenerId, gameObjectAlreadyHere);
+							}
+						}
+						//////////////////////////////////////////////////////////////
 
+						if (!notifyAllPlayer)
+						{
+							m_playersLocker.unlock(); // <----------------- UNLOCK
+							continue;
+						}
+					}
+
+					//////////////////////////////////////////////////////////////
+					// this client is eligible for the ObjectEnter packet
+					// if player DON'T already know this object
+					// and the object is inetering the inner area
+					if (!IsPlayerFollowingObject(listenerId, object->GetId())
+						&& IsObjectEnteringInnerArea(listenerId, cellLeftId, cellEnteredId))
+					{
+						ObjectEnter(listenerId, object);
+					}
+					//////////////////////////////////////////////////////////////
+					
+					m_playersLocker.unlock(); // <----------------- UNLOCK
+				}
+			}
 			m_cellLocker[cellEnteredId - 1].unlock(); // <------- UNLOCK
 		}
+	}
+
+	void GameNetworkServer::ObjectEnter(Id clientId, std::shared_ptr<const GameObject> gameObject)
+	{
+		//update id we follow
+		m_playersInfos[clientId].ObjectsIdsFollowed.push_back(gameObject->GetId());
+
+		// Send packet ObjectEnter in UDP
+		DeusCore::PacketUPtr p_packetEnteredCell = std::unique_ptr<PacketObjectEnter>(new PacketObjectEnter(gameObject->GetId(), gameObject->GetType(), gameObject->GetId() == m_playersInfos[clientId].GameObjectId));
+		SendPacket(std::move(p_packetEnteredCell), clientId, SEND_UDP);
+	}
+
+	void GameNetworkServer::ObjectLeft(Id objectId, Id clientId)
+	{
+		// we don't follow this object anymore !
+		std::vector<Id>::iterator objectFollowedIt = std::find(m_playersInfos[clientId].ObjectsIdsFollowed.begin(), m_playersInfos[clientId].ObjectsIdsFollowed.end(), objectId);
+		if (objectFollowedIt != m_playersInfos[clientId].ObjectsIdsFollowed.end())
+			m_playersInfos[clientId].ObjectsIdsFollowed.erase(objectFollowedIt);
+
+		// Send packet ObjectLeave in UDP
+		DeusCore::PacketUPtr p_packetLeaveCell = std::unique_ptr<PacketObjectLeave>(new PacketObjectLeave(objectId));
+		SendPacket(std::move(p_packetLeaveCell), clientId, SEND_UDP);
 	}
 
 }

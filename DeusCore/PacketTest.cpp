@@ -14,7 +14,7 @@ namespace DeusCore
 	void PacketTest::OnDeserialize(Buffer512 & buffer)
 	{
 		// get the size of the string
-		uint32_t dataSize;
+		uint16_t dataSize;
 		DeserializeData(buffer, dataSize);
 
 		// get the string
@@ -27,7 +27,7 @@ namespace DeusCore
 
 	void PacketTest::OnSerialize(Buffer512 & buffer) const
 	{
-		uint32_t dataSize = m_message.size() + 1; // +1 to add the \0 of string
+		uint16_t dataSize = m_message.size() + 1; // +1 to add the \0 of string
 		SerializeData(buffer, dataSize); // SerializeData only for primitive
 
 		//  then we add the string 
@@ -44,6 +44,6 @@ namespace DeusCore
 		// 1 PacketTest packet uses :
 		// - 1 byte						: to save an unsigned int for the length of the next string
 		// - m_message.size()+1 bytes	: to save the string message ('+1' is for the \0)
-		return sizeof(size_t) + (m_message.size() + 1);
+		return sizeof(uint16_t) + (m_message.size() + 1);
 	}
 }

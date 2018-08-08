@@ -177,6 +177,7 @@ namespace DeusServer
 		DeusCore::EventManagerHandler::Instance()->AddListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::JoinGameRequest);
 		DeusCore::EventManagerHandler::Instance()->AddListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::GetGameRequest);
 		DeusCore::EventManagerHandler::Instance()->AddListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::DeleteGameRequest);
+		DeusCore::EventManagerHandler::Instance()->AddListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::ConnectedUdpAnswer);
 
 		//NB : Disconnect event already managed in NetworkServer
 	}
@@ -192,6 +193,7 @@ namespace DeusServer
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::JoinGameRequest);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::GetGameRequest);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::DeleteGameRequest);
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(0, messageInterpretDeleguate, DeusCore::Packet::EMessageType::ConnectedUdpAnswer);
 
 		//NB : Disconnect event already managed in NetworkServer
 	}
@@ -230,6 +232,13 @@ namespace DeusServer
 		case DeusCore::Packet::EMessageType::DeleteGameRequest:
 			DeleteGame(p_packet->first);
 			break;
+
+		case DeusCore::Packet::EMessageType::ConnectedUdpAnswer:
+			m_connectionsLocker.lock();
+			m_clientsConnections[p_packet->first]->SetUdpConnectionInitialized();
+			DeusCore::Logger::Instance()->Log(m_name, "ConnectedUdpAnswer client :" + std::to_string(p_packet->first));
+			m_connectionsLocker.unlock();
+			break;
 			//NB : Disconnect event already managed in NetworkServer
 		default:
 			break;
@@ -250,9 +259,8 @@ namespace DeusServer
 		std::unique_ptr<DeusCore::PacketGetGamesAnswer> p_packet = std::unique_ptr<DeusCore::PacketGetGamesAnswer>(new DeusCore::PacketGetGamesAnswer());
 		p_packet->SetGames(gamesIds);
 		p_packet->SetSuccess(true);
-		SendPacket(std::move(p_packet), clientId, SEND_UDP);
-
-
+		SendPacket(std::move(p_packet), clientId, SEND_TCP);
+		
 		DeusCore::Logger::Instance()->Log(m_name, "Client (id:" + std::to_string(clientId) + ") wants to get games");
 	}
 

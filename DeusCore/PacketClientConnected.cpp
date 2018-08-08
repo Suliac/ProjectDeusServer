@@ -16,7 +16,7 @@ namespace DeusCore
 	void PacketClientConnected::OnDeserialize(Buffer512 & buffer)
 	{
 		// get the size of the string
-		uint32_t dataSize;
+		uint8_t dataSize;
 		DeserializeData(buffer, dataSize);
 
 		// get the string
@@ -31,7 +31,7 @@ namespace DeusCore
 
 	void PacketClientConnected::OnSerialize(Buffer512 & buffer) const
 	{
-		uint32_t dataSize = m_addrUdp.size() + 1; // +1 to add the \0 of string
+		uint8_t dataSize = m_addrUdp.size() + 1; // +1 to add the \0 of string
 		SerializeData(buffer, dataSize); // SerializeData only for primitive
 
 										 //  then we add the string 
@@ -52,6 +52,6 @@ namespace DeusCore
 		// - 4 byte						: to save an unsigned int for the length of the next string
 		// - m_message.size()+1 bytes	: to save the string ip address ('+1' is for the \0)
 		// - 4 bytes					: to save the udp port
-		return sizeof(size_t) + (m_addrUdp.size() + 1) + sizeof(m_portUdp);
+		return sizeof(uint8_t) + (m_addrUdp.size() + 1) + sizeof(m_portUdp);
 	}
 }

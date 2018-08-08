@@ -3,11 +3,14 @@
 
 namespace DeusServer
 {
+	Id GameObjectComponent::NextId = 1;
 
 	GameObjectComponent::GameObjectComponent()
 	{
+		m_uniqueIdentifier = NextId;
+		NextId++;
 	}
-	
+
 	GameObjectComponent::~GameObjectComponent()
 	{
 	}

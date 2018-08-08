@@ -2,6 +2,7 @@
 #include "IExecutable.h"
 #include "IIdentifiable.h"
 #include <memory>
+#include <mutex>
 namespace DeusServer
 {
 	class GameObjectComponent : public IExecutable, public IIdentifiable
@@ -14,6 +15,9 @@ namespace DeusServer
 		virtual void OnUpdate(double deltatimeMs) override;
 		virtual void OnStart() override;
 		virtual void OnStop() override;
+
+	private:
+		static Id NextId;
 
 	};
 }

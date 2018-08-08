@@ -3,6 +3,14 @@
 
 namespace DeusServer
 {
+	Id GameObject::NextId = 1;
+	
+	GameObject::GameObject() 
+	{
+		m_uniqueIdentifier = NextId;
+		NextId++;
+	}
+
 	GameObject::GameObject(std::vector<GameObjectComponent>& components, EObjectType typeObject)
 	{
 		for (const auto& component : components) {
@@ -13,6 +21,9 @@ namespace DeusServer
 		}
 
 		m_type = typeObject;
+
+		m_uniqueIdentifier = NextId;
+		NextId++;
 	}
 	
 	GameObject::~GameObject()

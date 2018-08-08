@@ -91,9 +91,6 @@
     <ClCompile Include="GameLogicServer.cpp">
       <Filter>Servers\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="IIdentifiable.cpp">
-      <Filter>Logic\Sources\Base</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Logic\Sources\Base</Filter>
     </ClCompile>

@@ -41,7 +41,7 @@ namespace DeusServer
 
 	void GameLogicServer::OnStart()
 	{
-			
+
 	}
 
 	void GameLogicServer::OnStop()
@@ -49,7 +49,7 @@ namespace DeusServer
 		DeusCore::DeusEventDeleguate messageInterpretDeleguate = fastdelegate::MakeDelegate(this, &GameLogicServer::InterpretPacket);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::StartGame);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::Disconnect);
-	
+
 		m_cellsGameObjects.clear();
 		m_playerWithGameObject.clear();
 
@@ -66,6 +66,7 @@ namespace DeusServer
 		}
 
 		p_objectToAdd->Start();
+		//DeusCore::Logger::Instance()->Log(m_name, "Create GameObject : " + std::to_string(p_objectToAdd->GetId()));
 		m_cellsGameObjects[cellId].insert(std::make_pair(p_objectToAdd->GetId(), p_objectToAdd));
 
 		m_gameObjLocker[cellId - 1].unlock(); // <-----------UNLOCK
@@ -88,7 +89,7 @@ namespace DeusServer
 			}
 			m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
 		}
-		
+
 		return false;
 	}
 
@@ -100,46 +101,49 @@ namespace DeusServer
 			StartNewGame(((DeusCore::PacketStartGame*)p_packet->second.get())->GetPlayerConnectionId());
 			break;
 		case DeusCore::Packet::EMessageType::Disconnect:
+			//PlayerDisconnected(p_packet->first);
 			break;
 		}
 	}
 
 	void GameLogicServer::StartNewGame(const std::vector<uint32_t>& playerIds)
 	{
-		// Init cells
+		//DeusCore::Logger::Instance()->Log(m_name, "Yo");
+		// 1 - Init cells
 		for (size_t i = 0; i < NUMBER_CELLS; i++)
 		{
 			// We start Cells id at 1
-			m_cellsGameObjects.insert(std::make_pair(i+1, ServerGameObjects()));
+			m_cellsGameObjects.insert(std::make_pair(i + 1, ServerGameObjects()));
 		}
-
-		// Create a PlayerGameObject for each player
+		
+		// 2 - Create a GameObject for each player
 		for (const auto id : playerIds)
 		{
 			if (m_playerWithGameObject.find(id) != m_playerWithGameObject.end())
 				continue;// already init this player
 
-			std::unique_ptr<GameObject> p_gameObj = GameObjectFactory::Create(GameObject::EObjectType::Player);
+			std::shared_ptr<GameObject> p_gameObj = GameObjectFactory::Create(GameObject::EObjectType::Player);
 			m_playerWithGameObject[id] = p_gameObj->GetId();
-			AddObject(std::move(p_gameObj), DEFAULT_CELL_ID); // give ownership
-		}
+			AddObject(p_gameObj, DEFAULT_CELL_ID); // give ownership
 
-		Start();
-
-		// TODO : Manage this in futur PositionComponent -> manage enter/leave cell
-		for (const auto& playerWithGO : m_playerWithGameObject)
-		{
-			Id cellId = GetCellIdOfGameObject(playerWithGO.second);
-			assert(cellId > 0);
-
+			// TODO : Manage this in futur PositionComponent -> manage enter/leave cell
 			// Get already existing data
-			std::vector<std::shared_ptr<GameObject>> objectInCellsLeft;
-			std::vector<std::shared_ptr<GameObject>> objectInCellsEntered;
-			GetGameObjectOnChangeCells(0, DEFAULT_CELL_ID, objectInCellsLeft, objectInCellsEntered);
+			std::vector<std::shared_ptr<const GameObject>> objectInCellsLeft;
+			std::vector<std::shared_ptr<const GameObject>> objectInCellsEntered;
+			GetGameObjectOnChangeCells(id, 0, DEFAULT_CELL_ID, objectInCellsLeft, objectInCellsEntered);
+						
 
-			DeusCore::PacketSPtr p_packet = std::shared_ptr<PacketObjectChangeCell>(new PacketObjectChangeCell(playerWithGO.second, playerWithGO.first, GameObject::EObjectType::Player, 0, DEFAULT_CELL_ID, objectInCellsLeft, objectInCellsEntered));
+			DeusCore::PacketSPtr p_packet = std::shared_ptr<PacketObjectChangeCell>(new PacketObjectChangeCell(id, p_gameObj, 0, DEFAULT_CELL_ID, objectInCellsLeft, objectInCellsEntered, true));
 			DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, 0, p_packet);
 		}
+
+		for (const auto pGo : m_playerWithGameObject)
+			DeusCore::Logger::Instance()->Log(m_name, "Player : " + std::to_string(pGo.first) + " | GameObj : " + std::to_string(pGo.second));
+
+		// 3 - Start the game logic
+		Start();
+
+
 	}
 
 	void GameLogicServer::PlayerDisconnected(Id clientId)
@@ -164,20 +168,19 @@ namespace DeusServer
 				m_gameObjLocker[cellGameObjects.first - 1].lock(); // <-----------LOCK
 
 				const auto& gameObjIt = cellGameObjects.second.find(objectId);
-				if (gameObjIt != cellGameObjects.second.end()) 
+				if (gameObjIt != cellGameObjects.second.end())
 				{
 					//////////////////////////////////////////////
-					//GameObject found, delete it and send infos
-					cellGameObjects.second.erase(gameObjIt);
-
 					m_playersLocker.lock(); // <---------- LOCK					
 					if (m_playerWithGameObject.size() > 0)
 					{
-						DeusCore::PacketSPtr p_packet = std::shared_ptr<PacketObjectChangeCell>(new PacketObjectChangeCell(objectId, clientId, GameObject::EObjectType::Player, cellGameObjects.first, (Id)0));
+						DeusCore::PacketSPtr p_packet = std::shared_ptr<PacketObjectChangeCell>(new PacketObjectChangeCell(clientId, gameObjIt->second, cellGameObjects.first, (Id)0));
 						DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, 0, p_packet);
 					}
-
 					m_playersLocker.unlock(); // <---------- UNLOCK
+
+					//GameObject found, delete it and send infos
+					cellGameObjects.second.erase(gameObjIt);
 					//////////////////////////////////////////////
 					m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
 					break;
@@ -206,8 +209,8 @@ namespace DeusServer
 
 		return cellId;
 	}
-	
-	void GameLogicServer::GetGameObjectOnChangeCells(Id cellLeavedId, Id cellEnteredId, std::vector<std::shared_ptr<GameObject>>& objectInCellsLeft, std::vector<std::shared_ptr<GameObject>>& objectInCellsEntered)
+
+	void GameLogicServer::GetGameObjectOnChangeCells(Id playerId, Id cellLeavedId, Id cellEnteredId, std::vector<std::shared_ptr<const GameObject>>& objectInCellsLeft, std::vector<std::shared_ptr<const GameObject>>& objectInCellsEntered)
 	{
 		// TODO : Interest management here !
 		// For now, we juste assert that there is 1 cell
@@ -216,7 +219,8 @@ namespace DeusServer
 		{
 			for (const auto& gameObj : m_cellsGameObjects[cellEnteredId])
 			{
-				objectInCellsEntered.push_back(gameObj.second);
+				if (gameObj.second->GetId() != m_playerWithGameObject[playerId])
+					objectInCellsEntered.push_back(gameObj.second);
 			}
 		}
 	}

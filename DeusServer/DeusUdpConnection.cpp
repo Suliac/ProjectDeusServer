@@ -67,21 +67,27 @@ namespace DeusServer
 					//       1- We first try to send our messages    //
 					///////////////////////////////////////////////////
 					std::shared_ptr<DeusCore::Packet> p_toSendPacket = nullptr;
+
 					while (TryTakePacket(p_toSendPacket))
 					{
 						// reset buffer & counter
 						sentByteCount = 0;
-						DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Take packet");
+						//DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Take packet");
 
 						// NB : we send packet per packet
 						if (p_toSendPacket)
 						{
-							// Send our serialized packet
-							if (p_toSendPacket->GetType() != DeusCore::Packet::Ack)
-								DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Send message id: " + std::to_string(p_toSendPacket->GetId()));
+							if (m_udpConnectionInitialized)
+							{
+								// Send our serialized packet
+								//if (p_toSendPacket->GetType() != DeusCore::Packet::Ack)
+									//DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Send message id: " + std::to_string(p_toSendPacket->GetId()));
 
-							m_clientUDPSocket->Send(*(p_toSendPacket), sentByteCount);
-
+								m_clientUDPSocket->Send(*(p_toSendPacket), sentByteCount);
+							}
+							else {
+								DeusCore::Logger::Instance()->Log("UDP Client", "Want to send message but udp connection isn't initialized");
+							}
 							// then re-put our packet into packet to send queue
 							// in case of the packet isn't received by the client
 							// and need to be resend. We don't requeue ACK
@@ -93,6 +99,7 @@ namespace DeusServer
 							}
 						}
 					}
+
 
 					//m_packetQueueLock.lock();
 					// Requeue the packet to resend
@@ -169,7 +176,7 @@ namespace DeusServer
 										{
 											if (findIt->second->GetId() == idAck)
 											{
-												DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Received ACK for Message id: " + std::to_string(idAck));
+												//DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Received ACK for Message id: " + std::to_string(idAck));
 												// idAck isn't in our vector, we can add it
 												m_idsAcknoledged[m_indexForIdsAcknoledged] = idAck;
 												m_indexForIdsAcknoledged++;
@@ -198,7 +205,7 @@ namespace DeusServer
 									}
 
 									// Finally enqueue our event
-									DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Received Message id: " + std::to_string(p_packetDeserialized->GetId()));
+									//DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Received Message id: " + std::to_string(p_packetDeserialized->GetId()));
 									DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, m_id, p_packetDeserialized);
 								}
 							}
@@ -273,7 +280,7 @@ namespace DeusServer
 				if (std::find(m_idsAcknoledged.begin(), m_idsAcknoledged.end(), m_packetsToSend.front().second->GetId()) != m_idsAcknoledged.end())
 				{
 					// this packet is already acknowledged : just pop it 
-					DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Message Acked : " + std::to_string(m_packetsToSend.front().second->GetId()));
+					//DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Message Acked : " + std::to_string(m_packetsToSend.front().second->GetId()));
 					m_packetsToSend.pop_front();
 
 				}

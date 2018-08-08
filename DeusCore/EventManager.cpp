@@ -2,6 +2,7 @@
 #include "Logger.h"
 
 #include <Windows.h>
+#include <iostream>
 
 namespace DeusCore
 {
@@ -99,15 +100,24 @@ namespace DeusCore
 		assert(deusEvent->second);
 
 		DeusEventDeleguateMap::iterator matchingList = m_eventListeners.find(deusEvent->second->GetType());
+
 		if (matchingList != m_eventListeners.end())
 		{
-			m_queueLock.lock(); // <---------- Lock
+			try {
+				
+				m_queueLock.lock(); // <---------- Lock
+				m_queues[m_activeQueue].push_back(deusEvent);
+				m_thereIsPacket = true;
 
-			m_queues[m_activeQueue].push_back(deusEvent);
-			m_thereIsPacket = true;
+				m_queueLock.unlock(); // <---------- Unlock
+				m_waitForPacket.notify_all(); // Notify
+			}
+			catch (const std::system_error& e) {
+				Logger::Instance()->Log(m_name, "Caught system_error with code");
 
-			m_queueLock.unlock(); // <---------- Unlock
-			m_waitForPacket.notify_all(); // Notify
+				std::cout << "Caught system_error with code " << e.code()
+					<< " meaning " << e.what() << '\n';
+			}
 			return true;
 		}
 		else
@@ -171,8 +181,8 @@ namespace DeusCore
 				m_runThread.join();
 
 			m_stopped = true;
+			Logger::Instance()->Log(m_name, "Stopped");
 		}
-		Logger::Instance()->Log(m_name, "Sopped");
 
 	}
 
@@ -211,7 +221,7 @@ namespace DeusCore
 				DeusEventSPtr p_event = m_queues[queueToProcess].front();
 				m_queues[queueToProcess].pop_front();
 
-				//Logger::Instance()->Log(m_name, "Packet of type :" + std::to_string(p_event->second->GetType())+" | ID sender : "+ std::to_string(p_event->first));
+				//Logger::Instance()->Log(m_name, "Packet of type :" + std::to_string(p_event->second->GetType()) + " | ID sender : " + std::to_string(p_event->first));
 				// We trigger the event
 				TriggerEvent(p_event);
 				//Logger::Instance()->Log(m_name, "Just triggered type :" + std::to_string(p_event->second->GetType()) + " | ID sender : " + std::to_string(p_event->first));

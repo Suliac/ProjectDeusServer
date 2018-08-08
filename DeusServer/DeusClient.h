@@ -17,7 +17,9 @@ namespace DeusServer
 
 		void SendPacket(DeusCore::PacketUPtr p_packet, bool isTcp);
 		void SetConnectionGameId(Id gameId);
-
+		void SetUdpConnectionInitialized() { 
+			m_udpConnection.SetUdpConnectionInitialized();
+		}
 	private:
 		// TCP communication interface
 		DeusTcpConnection m_tcpConnection;
