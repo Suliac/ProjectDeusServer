@@ -3,6 +3,7 @@
 #include "PacketObjectChangeCell.h"
 #include "PacketObjectEnter.h"
 #include "PacketObjectLeave.h"
+#include "GameLogicServer.h"
 
 #include "DeusCore/EventManagerHandler.h"
 
@@ -27,9 +28,6 @@ namespace DeusServer
 		}
 	};
 	
-	const uint32_t NUMBER_CELLS = 1;
-	const uint32_t DEFAULT_CELL_ID = 1;
-
 	using CellId = Id;
 	using CellsWithListenersIds = std::map<CellId, std::vector<Id>>;
 	using PlayersInfos = std::map<Id, DeusPlayerInfos>;

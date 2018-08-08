@@ -15,7 +15,7 @@ namespace DeusServer
 			break;
 		}
 
-		std::unique_ptr<GameObject> gameObj = std::make_unique<GameObject>(GameObject(components));
+		std::unique_ptr<GameObject> gameObj = std::make_unique<GameObject>(GameObject(components, objectType));
 		return gameObj;
 	}
 

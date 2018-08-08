@@ -1,5 +1,5 @@
 #include "DeusConnection.h"
-
+#include "DeusCore/Logger.h"
 
 namespace DeusServer
 {
@@ -17,6 +17,7 @@ namespace DeusServer
 		DeusCore::PacketSPtr p_sPacket = std::move(p_packet);
 
 		m_packetQueueLock.lock();
+		DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Push packet");
 		m_packetsToSend.push_back(std::make_pair(0, p_sPacket));
 		m_packetQueueLock.unlock();
 

@@ -3,10 +3,17 @@
 #include "DeusSerializationException.h"
 namespace DeusCore
 {
+	Id Packet::nextId = 1;
+
 	Packet::Packet(Packet::EMessageType messageType)
 	{
 		m_type = messageType;
-		m_uniqueId = reinterpret_cast<uint32_t>(this);
+
+		m_packetIdLocker.lock();
+		m_uniqueId = Packet::nextId;
+		Packet::nextId++;
+		m_packetIdLocker.unlock();
+
 	}
 
 	Packet::~Packet()

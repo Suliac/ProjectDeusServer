@@ -8,6 +8,8 @@
 namespace DeusServer
 {
 	using DeusClientConnections = std::map<Id, std::shared_ptr<DeusServer::DeusClient>>;
+	const bool SEND_TCP = true;
+	const bool SEND_UDP = false;
 
 	class NetworkServer
 	{

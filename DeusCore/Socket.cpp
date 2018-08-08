@@ -81,6 +81,8 @@ namespace DeusCore
 		assert(m_distantInfos != nullptr);
 		char* ip = inet_ntoa(((sockaddr_in*)(m_distantInfos->ai_addr))->sin_addr);
 		u_short port = htons(((sockaddr_in*)(m_distantInfos->ai_addr))->sin_port);
+
+
 		DeusCore::Logger::Instance()->Log(m_name, "Bind to : "+ std::string(ip)+" "+ std::to_string(port));
 
 		int result = bind(m_handler, m_distantInfos->ai_addr, (int)m_distantInfos->ai_addrlen);

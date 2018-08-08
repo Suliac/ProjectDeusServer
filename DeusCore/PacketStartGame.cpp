@@ -3,7 +3,7 @@
 namespace DeusCore
 {
 	PacketStartGame::PacketStartGame()
-		:Packet(EMessageType::PlayerReady)
+		:Packet(EMessageType::StartGame)
 	{
 	}
 

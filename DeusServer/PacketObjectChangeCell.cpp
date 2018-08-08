@@ -2,7 +2,7 @@
 
 namespace DeusServer
 {
-	PacketObjectChangeCell::PacketObjectChangeCell(Id objectId, Id clientId, GameObject::EObjectType objectType, Id leftCellId, Id enteredCellId, std::vector<std::shared_ptr<GameObject>>& objectInCellsLeft, std::vector<std::shared_ptr<GameObject>>& objectInCellsEntered)
+	PacketObjectChangeCell::PacketObjectChangeCell(Id objectId, Id clientId, GameObject::EObjectType objectType, Id leftCellId, Id enteredCellId, std::vector<std::shared_ptr<GameObject>>& objectInCellsLeft, std::vector<std::shared_ptr<GameObject>>& objectInCellsEntered, bool isInit)
 		: DeusCore::Packet(Packet::EMessageType::ObjectChangeCell)
 	{
 		m_objectId = objectId;
@@ -10,10 +10,23 @@ namespace DeusServer
 		m_objectType = objectType;
 		m_enteredCellId = enteredCellId;
 		m_leftCellId = leftCellId;
+		m_isInit = isInit;
 
 		m_gameObjLeaving.swap(objectInCellsLeft);
 		m_gameObjEntering.swap(objectInCellsEntered);
 	}
+
+	PacketObjectChangeCell::PacketObjectChangeCell(Id objectId, Id clientId, GameObject::EObjectType objectType, Id leftCellId, Id enteredCellId, bool isInit)
+		: DeusCore::Packet(Packet::EMessageType::ObjectChangeCell)
+	{
+		m_objectId = objectId;
+		m_playerConnectionId = clientId;
+		m_objectType = objectType;
+		m_enteredCellId = enteredCellId;
+		m_leftCellId = leftCellId;
+		m_isInit = isInit;
+	}
+
 
 	PacketObjectChangeCell::~PacketObjectChangeCell()
 	{

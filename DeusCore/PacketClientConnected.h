@@ -5,6 +5,13 @@ namespace DeusCore
 	class PacketClientConnected : public Packet
 	{
 	public:
+		PacketClientConnected(std::string addrUdp, uint32_t portUdp)
+			: Packet(Packet::EMessageType::Connected)
+		{
+			m_addrUdp = addrUdp;
+			m_portUdp = portUdp;
+		}
+
 		PacketClientConnected();
 		~PacketClientConnected();
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "DeusClient.h"
+#include "GameLogicServer.h"
 
 namespace DeusServer
 {
@@ -19,6 +20,8 @@ namespace DeusServer
 	private:
 		// Unique pointer on the Game Network Server
 		GameNetworkServer* mp_gameNetServer = nullptr;
+
+		std::unique_ptr<GameLogicServer> mp_gameLogicServer = nullptr;
 
 		// Id of the game
 		int m_gameId = -1;

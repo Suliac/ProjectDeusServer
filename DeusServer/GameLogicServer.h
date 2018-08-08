@@ -46,6 +46,7 @@ namespace DeusServer
 		/////////////////////////// 
 		void InterpretPacket(DeusCore::DeusEventSPtr p_packet);
 		void StartNewGame(const std::vector<uint32_t>& playerIds);
+		void PlayerDisconnected(Id clientId);
 	private:
 		Id GetCellIdOfGameObject(Id objectId);
 		void GetGameObjectOnChangeCells(Id cellLeavedId, Id cellEnteredId, std::vector<std::shared_ptr<GameObject>>& objectInCellsLeft, std::vector<std::shared_ptr<GameObject>>& objectInCellsEntered);
@@ -57,6 +58,7 @@ namespace DeusServer
 		Id m_gameId;
 
 		std::mutex m_gameObjLocker[NUMBER_CELLS];
+		std::mutex m_playersLocker;
 	};
 }
 

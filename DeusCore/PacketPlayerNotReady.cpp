@@ -4,7 +4,7 @@
 namespace DeusCore
 {
 	PacketPlayerNotReady::PacketPlayerNotReady()
-		:Packet(EMessageType::PlayerReady)
+		:Packet(EMessageType::PlayerNotReady)
 	{
 	}
 

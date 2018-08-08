@@ -16,6 +16,8 @@ namespace DeusServer
 		// Init Game Network Server
 		mp_gameNetServer = new GameNetworkServer(gameId);
 		mp_gameNetServer->Start(gameId);
+
+		mp_gameLogicServer = std::make_unique<GameLogicServer>(gameId);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -31,6 +33,7 @@ namespace DeusServer
 	void GameHandler::Stop()
 	{
 		mp_gameNetServer->RequestStop();
+		mp_gameLogicServer->Stop();
 	}
 
 

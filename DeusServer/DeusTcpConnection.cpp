@@ -34,10 +34,11 @@ namespace DeusServer
 		m_clientTCPSocket = std::move(communicationSocket); // transfert ownership
 
 		//we already prepare our first message which will give UDP infos to our clients
-		DeusCore::PacketClientConnected packet;
-		packet.SetAddrUdp(m_clientTCPSocket->GetIpAddr());
-		packet.SetPortUdp(m_clientTCPSocket->GetIpNumberPort() + DECAL_PORT_UDP + m_id);
-		DeusCore::PacketUPtr p_packetConnected = std::make_unique<DeusCore::PacketClientConnected>(packet);
+		//DeusCore::PacketClientConnected packet;
+		//packet.SetAddrUdp(m_clientTCPSocket->GetIpAddr());
+		//packet.SetPortUdp(m_clientTCPSocket->GetIpNumberPort() + DECAL_PORT_UDP + m_id);
+		uint32_t newPort = m_clientTCPSocket->GetIpNumberPort() + DECAL_PORT_UDP + m_id;
+		DeusCore::PacketUPtr p_packetConnected = std::unique_ptr<DeusCore::PacketClientConnected>(new DeusCore::PacketClientConnected(m_clientTCPSocket->GetIpAddr(), newPort));
 		AddPacketToQueue(std::move(p_packetConnected));
 
 		// init thread only here
@@ -190,5 +191,5 @@ namespace DeusServer
 
 		return popedElement;
 	}
-	
+
 }

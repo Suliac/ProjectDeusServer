@@ -3,6 +3,7 @@
 #include "DeusSerializationException.h"
 
 #include <memory>
+#include <mutex>
 
 using Id = uint32_t;
 namespace DeusCore
@@ -10,6 +11,8 @@ namespace DeusCore
 	class Packet
 	{
 	public:
+		static Id nextId;
+
 		enum EMessageType : uint8_t
 		{
 			Error					= 0,
@@ -32,7 +35,8 @@ namespace DeusCore
 			DeleteGameRequest		= 18,
 			NewPlayer				= 19,
 			PlayerReady				= 20,
-			StartGame				= 21,
+			PlayerNotReady			= 21,
+			StartGame				= 22,
 
 			// Game Logic
 			ObjectEnter				= 50,
@@ -81,13 +85,14 @@ namespace DeusCore
 
 		// Specific method to get the serialize size of packets
 		virtual uint16_t EstimateCurrentSerializedSize() const = 0;
-
+		
 	private:
 		void SetId(Id value) { m_uniqueId = value; }
-
 		Id m_uniqueId;
 		Packet::EMessageType m_type = EMessageType::Error;
 		uint16_t m_serializedSize = 0x0;
+
+		std::mutex m_packetIdLocker;
 	};
 
 #pragma region Deserialization

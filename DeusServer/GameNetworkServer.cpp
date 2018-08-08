@@ -95,7 +95,7 @@ namespace DeusServer
 
 		// We echo back to the world server the disconnected client id
 		DeusCore::PacketSPtr p_disconnectedEvent = std::shared_ptr<DeusCore::PacketClientDisconnect>(new DeusCore::PacketClientDisconnect());
-		DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, clientId, p_disconnectedEvent);
+		DeusCore::EventManagerHandler::Instance()->QueueEvent(0, clientId, p_disconnectedEvent);
 
 
 		// we check if there is player left, otherwise we stop this game server
@@ -208,11 +208,19 @@ namespace DeusServer
 	//---------------------------------------------------------------------------------
 	void GameNetworkServer::PlayerReady(Id clientId)
 	{
+		DeusCore::Logger::Instance()->Log(m_name, "Client " + std::to_string(clientId) + " is ready !");
+		std::unique_ptr<DeusCore::PacketGetGamesAnswer> p_packet = std::unique_ptr<DeusCore::PacketGetGamesAnswer>(new DeusCore::PacketGetGamesAnswer());
+		p_packet->SetSuccess(true);
+		SendPacket(std::move(p_packet), 1, SEND_UDP);
+		DeusCore::Logger::Instance()->Log(m_name, "Client " + std::to_string(clientId) + " Packet sent ---------------------------------------");
+		return;
+
+
 		if (m_playersInfos.find(clientId) == m_playersInfos.end())
 			return;
 
 		m_playersInfos[clientId].State = DeusPlayerInfos::EPlayerState::Ready;
-
+		DeusCore::Logger::Instance()->Log(m_name, "Client " + std::to_string(clientId) + " is ready !");
 		if (CanStartGame())
 		{
 			DeusCore::PacketSPtr p_startGamePacket = std::shared_ptr<DeusCore::PacketStartGame>(new DeusCore::PacketStartGame());
@@ -221,7 +229,7 @@ namespace DeusServer
 			for (auto& player : m_playersInfos)
 				std::dynamic_pointer_cast<DeusCore::PacketStartGame>(p_startGamePacket)->AddPlayerConnectionId(player.first);
 
-			DeusCore::EventManagerHandler::Instance()->QueueEvent(0, m_gameId, p_startGamePacket);
+			DeusCore::EventManagerHandler::Instance()->QueueEvent(clientId, m_gameId, p_startGamePacket);
 			DeusCore::Logger::Instance()->Log(m_name, "Request start game");
 		}
 	}
@@ -238,6 +246,11 @@ namespace DeusServer
 	//---------------------------------------------------------------------------------
 	void GameNetworkServer::ObjectChangedCell(std::shared_ptr<PacketObjectChangeCell> p_packetReceived)
 	{
+
+		std::unique_ptr<DeusCore::PacketGetGamesAnswer> p_packet = std::unique_ptr<DeusCore::PacketGetGamesAnswer>(new DeusCore::PacketGetGamesAnswer());
+		p_packet->SetSuccess(true);
+		SendPacket(std::move(p_packet), 1, SEND_UDP);
+		/*
 		// 1 - Player update subscriptions : 
 		// - send ObjectEnter for each GameObjects in new interest cell
 		// - send ObjectLeave for each GameObject in cell that arn't in interest area anymore
@@ -266,7 +279,7 @@ namespace DeusServer
 					{
 						// Send packet ObjectLeave in UDP
 						DeusCore::PacketUPtr p_packetLeaveCell = std::unique_ptr<PacketObjectLeave>(new PacketObjectLeave(p_packetReceived->GetObjectId()));
-						SendPacket(std::move(p_packetLeaveCell), listenerId, false);
+						SendPacket(std::move(p_packetLeaveCell), listenerId, SEND_UDP);
 					}
 				}
 			}
@@ -284,7 +297,9 @@ namespace DeusServer
 				for (int listenerId : m_cells[p_packetReceived->GetEnteredCellId()])
 				{
 					// we don't want to notify our player of his/her own actions
-					if (p_packetReceived->GetObjectId() == m_playersInfos[listenerId].GameObjectId)
+					// exept if this is the init of the player
+					bool listenerIsThisGameObject = p_packetReceived->GetObjectId() == m_playersInfos[listenerId].GameObjectId;
+					if (listenerIsThisGameObject && !p_packetReceived->IsInit())
 						break;
 
 					// this client is eligible for the ObjectEnter packet
@@ -294,13 +309,13 @@ namespace DeusServer
 						&& IsObjectEnteringInnerArea(listenerId, p_packetReceived->GetLeftCellId(), p_packetReceived->GetEnteredCellId()))
 					{
 						// Send packet ObjectLeave in UDP
-						DeusCore::PacketUPtr p_packetLeaveCell = std::unique_ptr<PacketObjectLeave>(new PacketObjectLeave(p_packetReceived->GetObjectId()));
-						SendPacket(std::move(p_packetLeaveCell), listenerId, false);
+						DeusCore::PacketUPtr p_packetEnteredCell = std::unique_ptr<PacketObjectEnter>(new PacketObjectEnter(p_packetReceived->GetObjectId(), p_packetReceived->GetObjectType(), listenerIsThisGameObject));
+						SendPacket(std::move(p_packetEnteredCell), listenerId, SEND_UDP);
 					}
 				}
 			}
 			m_cellLocker[p_packetReceived->GetEnteredCellId() - 1].unlock(); // <------- UNLOCK
-		}
+		}*/
 	}
 
 	//---------------------------------------------------------------------------------
@@ -372,7 +387,7 @@ namespace DeusServer
 			m_cellLocker[cellEnteredId - 1].lock(); // <------- LOCK
 
 			m_cells[cellEnteredId].push_back(clientId);
-		
+
 			m_cellLocker[cellEnteredId - 1].unlock(); // <------- UNLOCK
 		}
 	}

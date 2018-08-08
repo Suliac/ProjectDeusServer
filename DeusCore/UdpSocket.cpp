@@ -1,6 +1,13 @@
 #include "UdpSocket.h"
 #include "DeusSocketException.h"
+#include "Logger.h"
 
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <stdio.h>
+
+// link with ws2_32.lib
+#pragma comment(lib, "Ws2_32.lib")
 #include <assert.h>
 namespace DeusCore
 {
@@ -38,6 +45,12 @@ namespace DeusCore
 
 		if (!CheckSocketStates(true, false)) // Check if socket is writable
 			return false;
+
+		char clienthost[NI_MAXHOST];  //The clienthost will hold the IP address.
+		char clientservice[NI_MAXSERV];
+		int theErrorCode = getnameinfo(m_distantInfos->ai_addr, sizeof(*m_distantInfos->ai_addr), clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST | NI_NUMERICSERV);
+
+		DeusCore::Logger::Instance()->Log(m_name, "sendto : "+ std::string(clienthost) + ":"+ std::string(clientservice));
 
 		byteSent = sendto(m_handler, data, size, 0, m_distantInfos->ai_addr, m_distantInfos->ai_addrlen);
 		if (byteSent == SOCKET_ERROR) {

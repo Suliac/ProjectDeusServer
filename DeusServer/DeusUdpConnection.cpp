@@ -58,6 +58,8 @@ namespace DeusServer
 		{
 			try
 			{
+
+				m_packetQueueLock.lock();
 				bool dataToRecv = m_clientUDPSocket->DataAvailable(0, TIMEOUT_US);
 				if (dataToRecv || !m_packetsToSend.empty())
 				{
@@ -69,12 +71,14 @@ namespace DeusServer
 					{
 						// reset buffer & counter
 						sentByteCount = 0;
+						DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Take packet");
 
 						// NB : we send packet per packet
 						if (p_toSendPacket)
 						{
 							// Send our serialized packet
-							DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Send message id: " + std::to_string(p_toSendPacket->GetId()));
+							if (p_toSendPacket->GetType() != DeusCore::Packet::Ack)
+								DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Send message id: " + std::to_string(p_toSendPacket->GetId()));
 
 							m_clientUDPSocket->Send(*(p_toSendPacket), sentByteCount);
 
@@ -83,21 +87,21 @@ namespace DeusServer
 							// and need to be resend. We don't requeue ACK
 							if (p_toSendPacket->GetType() != DeusCore::Packet::Ack)
 							{
-								m_packetQueueLock.lock();
+								//m_packetQueueLock.lock();
 								m_packetsToRequeue.push_back(std::make_pair(GetTickCount(), p_toSendPacket));
-								m_packetQueueLock.unlock();
+								//m_packetQueueLock.unlock();
 							}
 						}
 					}
 
-					m_packetQueueLock.lock();
+					//m_packetQueueLock.lock();
 					// Requeue the packet to resend
 					while (!m_packetsToRequeue.empty())
 					{
 						m_packetsToSend.push_back(m_packetsToRequeue.front());
 						m_packetsToRequeue.pop_front();
 					}
-					m_packetQueueLock.unlock();
+					//m_packetQueueLock.unlock();
 
 
 					///////////////////////////////////////////////////
@@ -117,7 +121,7 @@ namespace DeusServer
 							{
 								if (readedByteCount == 0)
 								{
-									//DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Want to stop communication");
+									DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Want to stop communication");
 									m_cancellationRequested = true;
 								}
 								else {
@@ -143,6 +147,7 @@ namespace DeusServer
 							assert(allByteReceivedBuffer.size() >= DeusCore::Packet::HEADER_SIZE); // headers need at least 3 bytes
 
 							DeusCore::PacketSPtr p_packetDeserialized = std::move(DeusCore::Packet::Deserialize(deserializeBuffer));
+
 							if (p_packetDeserialized)
 							{
 								// we can now delete the byte in our buffer corresponding to our packet serializedSize
@@ -158,7 +163,7 @@ namespace DeusServer
 									// we check that we don't already have this ack
 									if (std::find(m_idsAcknoledged.begin(), m_idsAcknoledged.end(), idAck) == m_idsAcknoledged.end())
 									{
-										m_packetQueueLock.lock(); // <--------- LOCK
+										//m_packetQueueLock.lock(); // <--------- LOCK
 										std::list<std::pair<long, DeusCore::PacketSPtr>>::iterator findIt;
 										for (findIt = m_packetsToSend.begin(); findIt != m_packetsToSend.end(); findIt++)
 										{
@@ -178,7 +183,7 @@ namespace DeusServer
 												break;
 											}
 										}
-										m_packetQueueLock.unlock(); // <--------- UNLOCK
+										//m_packetQueueLock.unlock(); // <--------- UNLOCK
 
 									}
 									// else, ack id already in our list, nothing to do
@@ -193,7 +198,7 @@ namespace DeusServer
 									}
 
 									// Finally enqueue our event
-									//DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Received Message id: " + std::to_string(p_packetDeserialized->GetId()));
+									DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Received Message id: " + std::to_string(p_packetDeserialized->GetId()));
 									DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, m_id, p_packetDeserialized);
 								}
 							}
@@ -202,18 +207,24 @@ namespace DeusServer
 
 						} // end while(allByteReceivedBuffer.size() > 0)
 					} // end if (dataToRecv)
+
+					m_packetQueueLock.unlock();
+					std::this_thread::sleep_for(std::chrono::microseconds(100));
 				} // end if (dataToRecv || !m_packetsToSend.empty())
 				else {
+					m_packetQueueLock.unlock();
 					// if there isn't any data to send or receive, just wait 
 					std::this_thread::sleep_for(std::chrono::microseconds(TIMEOUT_US));
 				}
 			}
 			catch (const DeusCore::DeusSerializationException& e)
 			{
+				m_packetQueueLock.unlock();
 				DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Not blocking error : " + e.GetErrorMessage());
 			}
 			catch (const DeusCore::DeusSocketException& e)
 			{
+				m_packetQueueLock.unlock();
 				DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Connection aborted. Error : " + e.GetErrorMessage());
 				m_cancellationRequested = true;
 			}
@@ -248,43 +259,43 @@ namespace DeusServer
 
 		// don't block the execution :
 		// add packet is more important than try to take them
-		if (m_packetQueueLock.try_lock())
+		//if (m_packetQueueLock.try_lock())
+		//{
+
+		while (!m_packetsToSend.empty() && !getPacket)
 		{
-
-			while (!m_packetsToSend.empty() && !getPacket)
+			// We check that the next isn't one we already sent and we need to verify
+			// if we recv an ack, if not we have to resend the packet
+			if (m_packetsToSend.front().first == 0
+				|| m_packetsToSend.front().first + PACKET_DELAY_CHECK_ACK_MS <= GetTickCount())
 			{
-				// We check that the next isn't one we already sent and we need to verify
-				// if we recv an ack, if not we have to resend the packet
-				if (m_packetsToSend.front().first == 0
-					|| m_packetsToSend.front().first + PACKET_DELAY_CHECK_ACK_MS <= GetTickCount())
+				// we need to know if there is already an ACK for this packet
+				if (std::find(m_idsAcknoledged.begin(), m_idsAcknoledged.end(), m_packetsToSend.front().second->GetId()) != m_idsAcknoledged.end())
 				{
-					// we need to know if there is already an ACK for this packet
-					if (std::find(m_idsAcknoledged.begin(), m_idsAcknoledged.end(), m_packetsToSend.front().second->GetId()) != m_idsAcknoledged.end())
-					{
-						// this packet is already acknowledged : just pop it 
-						DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Message Acked : " + std::to_string(m_packetsToSend.front().second->GetId()));
-						m_packetsToSend.pop_front();
+					// this packet is already acknowledged : just pop it 
+					DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Message Acked : " + std::to_string(m_packetsToSend.front().second->GetId()));
+					m_packetsToSend.pop_front();
 
-					}
-					else {
-						// This packet wasn't sent or didn't received ack
-						p_packet = std::move(m_packetsToSend.front().second);
-						m_packetsToSend.pop_front();
-						getPacket = true;
-					}
 				}
 				else {
-					// if this is too early to send back the packet, just requeue it
-					// at the end to not block potential new packets
-					DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Re-enqueue message : " + std::to_string(m_packetsToSend.front().second->GetId()));
-
-					m_packetsToRequeue.push_back(m_packetsToSend.front());
+					// This packet wasn't sent or didn't received ack
+					p_packet = std::move(m_packetsToSend.front().second);
 					m_packetsToSend.pop_front();
+					getPacket = true;
 				}
 			}
+			else {
+				// if this is too early to send back the packet, just requeue it
+				// at the end to not block potential new packets
+				//DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Re-enqueue message : " + std::to_string(m_packetsToSend.front().second->GetId()));
 
-			m_packetQueueLock.unlock();
+				m_packetsToRequeue.push_back(m_packetsToSend.front());
+				m_packetsToSend.pop_front();
+			}
 		}
+
+		//m_packetQueueLock.unlock();
+		//}
 
 		return getPacket;
 	}

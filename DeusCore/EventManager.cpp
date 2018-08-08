@@ -7,7 +7,7 @@ namespace DeusCore
 {
 	EventManager::EventManager()
 	{
-				
+
 	}
 
 	//---------------------------------------------------------------------------------
@@ -180,7 +180,7 @@ namespace DeusCore
 	void EventManager::Run()
 	{
 		while (!m_wantToStop)
-		{			
+		{
 			// Concurrent add occurs only in the active queue
 			std::unique_lock<std::mutex> locker(m_queueLock);
 			m_waitForPacket.wait(locker,
@@ -200,7 +200,6 @@ namespace DeusCore
 			m_activeQueue = (m_activeQueue + 1) % EVENTMANAGER_NUM_QUEUE;
 			m_queues[m_activeQueue].clear();
 
-			//Logger::Instance()->Log(m_name, "Unlock1");
 			locker.unlock(); // <---------- Unlock
 
 			// We don't need to lock here because the processed queue
@@ -211,7 +210,7 @@ namespace DeusCore
 				// pop event
 				DeusEventSPtr p_event = m_queues[queueToProcess].front();
 				m_queues[queueToProcess].pop_front();
-								
+
 				//Logger::Instance()->Log(m_name, "Packet of type :" + std::to_string(p_event->second->GetType())+" | ID sender : "+ std::to_string(p_event->first));
 				// We trigger the event
 				TriggerEvent(p_event);
@@ -222,27 +221,23 @@ namespace DeusCore
 					break;
 			}
 
+			m_queueLock.lock(); // <---------- Lock
 			// if we couldn't process all event, push the remaining ones
 			// to the new active queue.
 			if (!m_queues[queueToProcess].empty())
 			{
 				// Concurrent add occurs only in the active queue
-				m_queueLock.lock(); // <---------- Lock
 				while (!m_queues[queueToProcess].empty())
 				{
 					DeusEventSPtr p_event = m_queues[queueToProcess].back();
 					m_queues[queueToProcess].pop_back();
 					m_queues[m_activeQueue].push_front(p_event);
 				}
-				m_thereIsPacket = true;
-				m_queueLock.unlock(); // <---------- Unlock
 			}
-			else {
-				m_queueLock.lock(); // <---------- Lock
-				m_thereIsPacket = false;
 
-				m_queueLock.unlock(); // <---------- Unlock
-			}
+			m_thereIsPacket = !m_queues[m_activeQueue].empty();
+			m_queueLock.unlock(); // <---------- Unlock
+
 		}
 
 		Logger::Instance()->Log(m_name, "End run EventManager");

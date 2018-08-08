@@ -106,6 +106,9 @@ namespace DeusCore
 		std::string m_port;
 
 		bool m_isNonBlocking = false;
+
+		// Debug name
+		std::string m_name;
 	private:
 		// Data we need for winsocks
 		WSADATA m_wsaData;
@@ -114,9 +117,6 @@ namespace DeusCore
 		bool m_isWsaAlive = false;
 
 		bool m_freeInfos = false;
-
-		// Debug name
-		std::string m_name;
 	};
 }
 

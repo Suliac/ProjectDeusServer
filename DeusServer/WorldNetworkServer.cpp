@@ -6,6 +6,7 @@
 
 #include "DeusCore\Packets.h"
 #include "PacketNewPlayer.h"
+#include "PacketObjectEnter.h"
 #include <stdio.h>
 
 namespace DeusServer
@@ -249,7 +250,8 @@ namespace DeusServer
 		std::unique_ptr<DeusCore::PacketGetGamesAnswer> p_packet = std::unique_ptr<DeusCore::PacketGetGamesAnswer>(new DeusCore::PacketGetGamesAnswer());
 		p_packet->SetGames(gamesIds);
 		p_packet->SetSuccess(true);
-		SendPacket(std::move(p_packet), clientId, false);
+		SendPacket(std::move(p_packet), clientId, SEND_UDP);
+
 
 		DeusCore::Logger::Instance()->Log(m_name, "Client (id:" + std::to_string(clientId) + ") wants to get games");
 	}

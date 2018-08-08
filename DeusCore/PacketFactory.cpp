@@ -41,6 +41,12 @@ namespace DeusCore
 		case Packet::LeaveGameAnswer:
 			p_packet = std::make_unique<PacketLeaveGameAnswer>();
 			break;
+		case Packet::PlayerReady:
+			p_packet = std::make_unique<PacketPlayerReady>();
+			break;
+		case Packet::PlayerNotReady:
+			p_packet = std::make_unique<PacketPlayerNotReady>();
+			break;
 		default:
 			throw DeusSerializationException("Impossible to deserialize object : unknown message type");
 		}
