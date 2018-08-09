@@ -82,7 +82,7 @@ namespace DeusServer
 		unsigned int m_stopped;
 
 		CellsWithListenersIds m_cells;
-		std::mutex m_cellLocker[NUMBER_CELLS];
+		std::recursive_mutex m_cellLocker[NUMBER_CELLS];
 
 		PlayersInfos m_playersInfos;
 		std::mutex m_playersLocker;

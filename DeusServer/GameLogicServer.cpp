@@ -101,7 +101,7 @@ namespace DeusServer
 			StartNewGame(((DeusCore::PacketStartGame*)p_packet->second.get())->GetPlayerConnectionId());
 			break;
 		case DeusCore::Packet::EMessageType::Disconnect:
-			//PlayerDisconnected(p_packet->first);
+			PlayerDisconnected(p_packet->first);
 			break;
 		}
 	}

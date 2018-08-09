@@ -71,34 +71,10 @@ namespace DeusServer
 	//---------------------------------------------------------------------------------
 	void GameNetworkServer::OnDisconnectClient(Id clientId)
 	{
-		// Unsubscribe from cell
-		Id leftCell = 0;
-		for (const auto& cell : m_cells)
-		{
-			m_cellLocker[cell.first - 1].lock(); // <------- LOCK
-			auto listenerIdIt = std::find(cell.second.begin(), cell.second.end(), clientId);
-			if (listenerIdIt != cell.second.end())
-			{
-				leftCell = cell.first;
-				m_cellLocker[cell.first - 1].unlock(); // <------- UNLOCK
-				break;
-			}
-			m_cellLocker[cell.first - 1].unlock(); // <------- UNLOCK
-		}
-
-		UpdateCellSubscription(clientId, leftCell, 0);
-
-		// delete player infos
-		m_playersLocker.lock(); // <------------- LOCK
-		PlayersInfos::iterator playerIt = m_playersInfos.find(clientId);
-		if (playerIt != m_playersInfos.end())
-			m_playersInfos.erase(playerIt);
-		m_playersLocker.unlock(); // <------------- UNLOCK
-
-
 		// We echo back to the world server the disconnected client id
 		DeusCore::PacketSPtr p_disconnectedEvent = std::shared_ptr<DeusCore::PacketClientDisconnect>(new DeusCore::PacketClientDisconnect());
 		DeusCore::EventManagerHandler::Instance()->QueueEvent(0, clientId, p_disconnectedEvent);
+		DeusCore::Logger::Instance()->Log(m_name, "Yo disconnected ");
 
 
 		// we check if there is player left, otherwise we stop this game server
@@ -156,14 +132,7 @@ namespace DeusServer
 		{
 			matchingConnectionIt->second->SetConnectionGameId(0);
 			m_clientsConnections.erase(matchingConnectionIt);
-
-			// delete player infos
-			m_playersLocker.lock(); // <------------- LOCK
-			PlayersInfos::iterator playerIt = m_playersInfos.find(clientId);
-			if (playerIt != m_playersInfos.end())
-				m_playersInfos.erase(playerIt);
-			m_playersLocker.unlock(); // <------------- UNLOCK
-
+			
 			// we check if there is player left, otherwise we stop this game server
 			TryDeleteGame();
 			DeusCore::Logger::Instance()->Log(m_name, "Client (id:" + std::to_string(clientId) + ") Leaved the game");

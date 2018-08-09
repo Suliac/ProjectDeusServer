@@ -170,12 +170,12 @@ namespace DeusServer
 		if (findClientIt != m_clientsConnections.end())
 		{
 			findClientIt->second->SendPacket(std::move(p_packet), sendTcp);
-			m_lockClients.unlock(); // <------------ CLIENT UNLOCK
 
+			m_lockClients.unlock(); // <------------ CLIENT UNLOCK
 			return true;
 		}
-		m_lockClients.unlock(); // <------------ CLIENT UNLOCK
 
+		m_lockClients.unlock(); // <------------ CLIENT UNLOCK
 		return false;
 	}
 
