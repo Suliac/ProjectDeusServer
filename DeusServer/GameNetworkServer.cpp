@@ -193,6 +193,12 @@ namespace DeusServer
 		m_playersInfos[clientId] = DeusPlayerInfos();
 		m_playersLocker.unlock(); // <------------- UNLOCK
 
+		// send feedback to client
+		std::unique_ptr<DeusCore::PacketJoinGameAnswer> p_feedBackJoinPacket = std::unique_ptr<DeusCore::PacketJoinGameAnswer>(new DeusCore::PacketJoinGameAnswer());
+		p_feedBackJoinPacket->SetSuccess(true); 
+		p_feedBackJoinPacket->SetGame(clientId);
+		m_clientsConnections[clientId]->SendPacket(std::move(p_feedBackJoinPacket), true);
+		
 		m_lockClients.unlock();
 		return true;
 	}
