@@ -71,11 +71,25 @@ namespace DeusServer
 	//---------------------------------------------------------------------------------
 	void GameNetworkServer::OnDisconnectClient(Id clientId)
 	{
+		m_playersLocker.lock(); // <------------- LOCK
+		auto infoIt = m_playersInfos.find(clientId);
+		if (infoIt != m_playersInfos.end())
+			m_playersInfos.erase(infoIt);
+
+		for (const auto& player : m_playersInfos)
+		{
+			std::unique_ptr<DeusCore::PacketLeaveGameAnswer> p_playerLeavePacket = std::unique_ptr<DeusCore::PacketLeaveGameAnswer>(new DeusCore::PacketLeaveGameAnswer());
+			p_playerLeavePacket->SetSuccess(true);
+			p_playerLeavePacket->SetPlayerId(clientId);
+
+			m_clientsConnections[player.first]->SendPacket(std::move(p_playerLeavePacket), true);
+		}
+		m_playersLocker.unlock(); // <------------- UNLOCK
+
+
 		// We echo back to the world server the disconnected client id
 		DeusCore::PacketSPtr p_disconnectedEvent = std::shared_ptr<DeusCore::PacketClientDisconnect>(new DeusCore::PacketClientDisconnect());
 		DeusCore::EventManagerHandler::Instance()->QueueEvent(0, clientId, p_disconnectedEvent);
-		DeusCore::Logger::Instance()->Log(m_name, "Yo disconnected ");
-
 
 		// we check if there is player left, otherwise we stop this game server
 		TryDeleteGame();
@@ -126,6 +140,23 @@ namespace DeusServer
 	//---------------------------------------------------------------------------------
 	void GameNetworkServer::LeaveGame(Id clientId)
 	{
+		// Delete player infos
+		m_playersLocker.lock(); // <------------- LOCK
+		for (const auto& player : m_playersInfos)
+		{
+			std::unique_ptr<DeusCore::PacketLeaveGameAnswer> p_playerLeavePacket = std::unique_ptr<DeusCore::PacketLeaveGameAnswer>(new DeusCore::PacketLeaveGameAnswer());
+			p_playerLeavePacket->SetSuccess(true);
+			p_playerLeavePacket->SetPlayerId(clientId);
+
+			m_clientsConnections[player.first]->SendPacket(std::move(p_playerLeavePacket), true);
+		}
+
+		auto infoIt = m_playersInfos.find(clientId);
+		if (infoIt != m_playersInfos.end())
+			m_playersInfos.erase(infoIt);
+		m_playersLocker.unlock(); // <------------- UNLOCK
+
+		// Delete connection
 		m_lockClients.lock(); // <----------------- LOCK
 		DeusClientConnections::iterator matchingConnectionIt = m_clientsConnections.find(clientId);
 		if (matchingConnectionIt != m_clientsConnections.end())
@@ -143,7 +174,7 @@ namespace DeusServer
 	//---------------------------------------------------------------------------------
 	bool GameNetworkServer::NewPlayer(Id clientId, DeusClientSPtr clientConnection)
 	{
-		m_lockClients.lock();
+		m_lockClients.lock(); // <------------- LOCK
 		DeusClientConnections::iterator findClientId = m_clientsConnections.find(clientId);
 		if (findClientId != m_clientsConnections.end())
 		{
@@ -159,16 +190,33 @@ namespace DeusServer
 		// Init player datas
 
 		m_playersLocker.lock(); // <------------- LOCK
-		m_playersInfos[clientId] = DeusPlayerInfos();
-		m_playersLocker.unlock(); // <------------- UNLOCK
+		// send to the other player that a new one just joined
+		for (const auto& player : m_playersInfos)
+		{
+			std::unique_ptr<DeusCore::PacketNewPlayerJoinGame> p_newPlayerJoinPacket = std::unique_ptr<DeusCore::PacketNewPlayerJoinGame>(new DeusCore::PacketNewPlayerJoinGame());
+			p_newPlayerJoinPacket->SetNickname("Player " + std::to_string(clientId));
+			p_newPlayerJoinPacket->SetPlayerId(clientId);
+
+			m_clientsConnections[player.first]->SendPacket(std::move(p_newPlayerJoinPacket), true);
+		}
+
+		m_playersInfos[clientId] = DeusPlayerInfos("Player " + std::to_string(clientId));
 
 		// send feedback to client
 		std::unique_ptr<DeusCore::PacketJoinGameAnswer> p_feedBackJoinPacket = std::unique_ptr<DeusCore::PacketJoinGameAnswer>(new DeusCore::PacketJoinGameAnswer());
-		p_feedBackJoinPacket->SetSuccess(true); 
-		p_feedBackJoinPacket->SetGame(clientId);
+		p_feedBackJoinPacket->SetSuccess(true);
+		p_feedBackJoinPacket->SetGame(m_gameId);
+
+		std::map<uint32_t, std::string> playerInfos;
+		for (const auto& player : m_playersInfos)
+			playerInfos.insert(std::make_pair(player.first, player.second.Nickname));
+
+		p_feedBackJoinPacket->SetPlayersInfos(playerInfos);
+		m_playersLocker.unlock(); // <------------- UNLOCK
+
 		m_clientsConnections[clientId]->SendPacket(std::move(p_feedBackJoinPacket), true);
-		
-		m_lockClients.unlock();
+
+		m_lockClients.unlock();// <------------- UNLOCK
 		return true;
 	}
 
@@ -435,7 +483,7 @@ namespace DeusServer
 						ObjectEnter(listenerId, object);
 					}
 					//////////////////////////////////////////////////////////////
-					
+
 					m_playersLocker.unlock(); // <----------------- UNLOCK
 				}
 			}

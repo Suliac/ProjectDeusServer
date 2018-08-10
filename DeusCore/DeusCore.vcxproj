@@ -42,6 +42,7 @@
     <ClCompile Include="PacketJoinGameRequest.cpp" />
     <ClCompile Include="PacketLeaveGameAnswer.cpp" />
     <ClCompile Include="PacketLeaveGameRequest.cpp" />
+    <ClCompile Include="PacketNewPlayerJoinGame.cpp" />
     <ClCompile Include="PacketPlayerNotReady.cpp" />
     <ClCompile Include="PacketPlayerReady.cpp" />
     <ClCompile Include="PacketStartGame.cpp" />
@@ -77,6 +78,7 @@
     <ClInclude Include="PacketJoinGameRequest.h" />
     <ClInclude Include="PacketLeaveGameAnswer.h" />
     <ClInclude Include="PacketLeaveGameRequest.h" />
+    <ClInclude Include="PacketNewPlayerJoinGame.h" />
     <ClInclude Include="PacketPlayerNotReady.h" />
     <ClInclude Include="PacketPlayerReady.h" />
     <ClInclude Include="Packets.h" />

@@ -168,6 +168,9 @@
     <ClCompile Include="PacketConnectedUdpAnswer.cpp">
       <Filter>Network\Packets\Sources\General</Filter>
     </ClCompile>
+    <ClCompile Include="PacketNewPlayerJoinGame.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -271,6 +274,9 @@
     </ClInclude>
     <ClInclude Include="PacketConnectedUdpAnswer.h">
       <Filter>Network\Packets\Headers\General</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketNewPlayerJoinGame.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

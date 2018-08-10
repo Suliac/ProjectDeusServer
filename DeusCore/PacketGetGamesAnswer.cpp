@@ -29,7 +29,8 @@ namespace DeusCore
 
 	void PacketGetGamesAnswer::OnAnswerSerialize(Buffer512 & buffer) const
 	{
-		SerializeData(buffer, m_gamesIds.size());
+		uint32_t dataSize = m_gamesIds.size();
+		SerializeData(buffer, dataSize);
 
 		for (size_t i = 0; i < m_gamesIds.size(); i++)
 		{
@@ -39,6 +40,6 @@ namespace DeusCore
 
 	uint16_t PacketGetGamesAnswer::EstimateAnswerCurrentSerializedSize() const
 	{
-		return sizeof(size_t) + (m_gamesIds.size() * sizeof(unsigned int));
+		return sizeof(uint32_t) + (m_gamesIds.size() * sizeof(unsigned int));
 	}
 }

@@ -10,14 +10,19 @@ namespace DeusCore
 	PacketLeaveGameAnswer::~PacketLeaveGameAnswer()
 	{
 	}
+
 	void PacketLeaveGameAnswer::OnAnswerDeserialize(Buffer512 & buffer)
 	{
+		DeserializeData(buffer, m_playerId);
 	}
+
 	void PacketLeaveGameAnswer::OnAnswerSerialize(Buffer512 & buffer) const
 	{
+		SerializeData(buffer, m_playerId);
 	}
+
 	uint16_t PacketLeaveGameAnswer::EstimateAnswerCurrentSerializedSize() const
 	{
-		return 0x0;
+		return sizeof(m_playerId);
 	}
 }

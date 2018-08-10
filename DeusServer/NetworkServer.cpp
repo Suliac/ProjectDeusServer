@@ -14,7 +14,7 @@ namespace DeusServer
 	//---------------------------------------------------------------------------------
 	NetworkServer::~NetworkServer()
 	{
-		m_newDisconnectBlocker.notify_one(); 
+		m_newDisconnectBlocker.notify_one();
 		if (m_disconnectThread.joinable())
 			m_disconnectThread.join();
 
@@ -146,12 +146,15 @@ namespace DeusServer
 				{
 					// Delete connection
 					m_clientsConnections.erase(matchingConnectionIt);
+					m_lockClients.unlock(); // <------------ CLIENT UNLOCK
 					DeusCore::Logger::Instance()->Log(m_name, "Client " + std::to_string(idConnectionToDelete) + " successfully deleted. There are now : " + std::to_string(m_clientsConnections.size()) + "client(s) connected");
 
 					// Disconnect specific code
 					OnDisconnectClient(idConnectionToDelete); // we know that idConnectionToDelete exist
 				}
-				m_lockClients.unlock(); // <------------ CLIENT UNLOCK
+				else {
+					m_lockClients.unlock(); // <------------ CLIENT UNLOCK
+				}
 
 				if (currentMs > maxMs) // ran out of time
 					break;

@@ -18,3 +18,4 @@
 #include "PacketPlayerNotReady.h"
 #include "PacketStartGame.h"
 #include "PacketConnectedUdpAnswer.h"
+#include "PacketNewPlayerJoinGame.h"

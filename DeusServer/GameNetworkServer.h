@@ -20,9 +20,17 @@ namespace DeusServer
 		Id GameObjectId;
 		EPlayerState State;
 		std::vector<Id> ObjectsIdsFollowed;
+		std::string Nickname;
 
 		DeusPlayerInfos()
 		{
+			GameObjectId = 0;
+			State = EPlayerState::NotReady;
+		}
+
+		DeusPlayerInfos(std::string nickname)
+		{
+			Nickname = nickname;
 			GameObjectId = 0;
 			State = EPlayerState::NotReady;
 		}

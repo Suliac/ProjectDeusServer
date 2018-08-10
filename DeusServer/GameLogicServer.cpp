@@ -18,6 +18,7 @@ namespace DeusServer
 
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::StartGame);
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::Disconnect);
+		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::LeaveGameRequest);
 	}
 
 	GameLogicServer::~GameLogicServer()
@@ -101,6 +102,9 @@ namespace DeusServer
 			StartNewGame(((DeusCore::PacketStartGame*)p_packet->second.get())->GetPlayerConnectionId());
 			break;
 		case DeusCore::Packet::EMessageType::Disconnect:
+			PlayerDisconnected(p_packet->first);
+			break;
+		case DeusCore::Packet::EMessageType::LeaveGameRequest:
 			PlayerDisconnected(p_packet->first);
 			break;
 		}
