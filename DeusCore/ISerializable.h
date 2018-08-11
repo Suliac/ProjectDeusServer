@@ -1,75 +1,65 @@
 #pragma once
 #include "Buffer.h"
-#include <assert.h>
-
+#include "DeusSerializationException.h"
+#include <memory>
 namespace DeusCore
 {
 	class ISerializable
 	{
 	public:
 		// Update buffer index to 'offset' param then call OnSerialize method
-		void Serialize(Buffer512 &buffer, size_t offset = 0) const;
+		virtual void Deserialize(Buffer512 &buffer) = 0;
 		
 		// Update buffer index to 'offset' param then call OnDeserialize method
-		void Deserialize(Buffer512 &buffer, size_t offset = 0);
+		virtual void Serialize(Buffer512 &buffer) const = 0;
 
+		virtual uint16_t EstimateAnswerCurrentSerializedSize() const = 0;
 	protected:
-		// Define specific serialization method for each children
-		virtual void OnSerialize(Buffer512 &buffer) const = 0;
-
-		// Define specific deserialization method for each children
-		virtual void OnDeserialize(Buffer512 &buffer) = 0;
+		template<typename T>
+		static void SerializeData(Buffer512& buffer, const T& value);
 
 		template<typename T>
-		void SerializeData(Buffer512& buffer, const T& value) const;
-
-		template<typename T>
-		void DeserializeData(Buffer512& buffer, T& value) const;
+		static void DeserializeData(Buffer512& buffer, T& value);
 	};
 
 #pragma region Deserialization
 	template<typename T>
-	inline void ISerializable::DeserializeData(Buffer512& buffer, T& value) const
+	inline void ISerializable::DeserializeData(Buffer512& buffer, T& value)
 	{
 		static_assert(sizeof(T) <= 8, "Size higher than 8 bytes"); // only work for small types
+
 		unsigned char tmp[sizeof(T)];
 		buffer.Select(tmp, sizeof(T));
 
-#ifdef BIG_ENDIAN
-		value = bswap(*(tmp));
-#else // #ifdef BIG_ENDIAN
-		value = *(tmp);
-#endif // #ifdef BIG_ENDIAN
+		value = T();
+
+		// we decode the big endian
+		for (size_t i = 0; i < sizeof(T); i++)
+			value |= tmp[i] << (8 * ((sizeof(T) - 1) - i));
+
 	}
 
-	template<>
-	inline void ISerializable::DeserializeData(Buffer512& buffer, ISerializable& value) const
-	{
-		value.Deserialize(buffer);
-	}
 #pragma endregion
 
 
 #pragma region Serialization
 	template<typename T>
-	inline void ISerializable::SerializeData(Buffer512& buffer, const T& value) const {
+	inline void ISerializable::SerializeData(Buffer512& buffer, const T& value) {
 		static_assert(sizeof(T) <= 8, "Size higher than 8 bytes"); // only work for small types
 		unsigned char datas[sizeof(T)];
 
-#ifdef BIG_ENDIAN
-		*(datas) = bswap(value);
-#else // #ifdef BIG_ENDIAN
-		*(datas) = value;
-#endif // #ifdef BIG_ENDIAN
+		size_t size = sizeof(T);
+
+		// we encode a big endian value as shifting involve 'auto' convert to big endian
+		// then we take the strongest byte as first buffer byte, and so on
+		// src : https://stackoverflow.com/questions/7184789/does-bit-shift-depend-on-endianness
+		for (size_t i = 0; i < size; i++)
+			datas[i] = value >> (8 * ((size - 1) - i));
 
 		buffer.Insert(datas, sizeof(T));
 	}
 
-	template<>
-	inline void ISerializable::SerializeData(Buffer512& buffer, const ISerializable& value) const {
-		value.Serialize(buffer);
-	}
-
 #pragma endregion
 }
+
 

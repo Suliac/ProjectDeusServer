@@ -1,7 +1,7 @@
 #pragma once
-#include "DeusCore/Packet.h"
+#include "Packet.h"
 
-namespace DeusServer
+namespace DeusCore
 {
 	class PacketUpdateHealth : public DeusCore::Packet
 	{

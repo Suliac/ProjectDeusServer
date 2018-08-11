@@ -73,6 +73,12 @@
     <Filter Include="Network\Packets\Sources\General">
       <UniqueIdentifier>{d0828b81-9e67-47ed-9125-ec84c670686d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Network\Packets\Headers\Logic">
+      <UniqueIdentifier>{f841b1cd-eb9d-496f-9020-1468984a550b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Network\Packets\Sources\Logic">
+      <UniqueIdentifier>{05050694-7593-479a-9de1-a8e98b3c28f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Socket.cpp">
@@ -170,6 +176,16 @@
     </ClCompile>
     <ClCompile Include="PacketNewPlayerJoinGame.cpp">
       <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="DeusVector2.cpp" />
+    <ClCompile Include="PacketUpdateHealth.cpp">
+      <Filter>Network\Packets\Sources\Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketUpdateMovementAnswer.cpp">
+      <Filter>Network\Packets\Sources\Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketUpdateMovementRequest.cpp">
+      <Filter>Network\Packets\Sources\Logic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -277,6 +293,17 @@
     </ClInclude>
     <ClInclude Include="PacketNewPlayerJoinGame.h">
       <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="DeusVector2.h" />
+    <ClInclude Include="ISerializable.h" />
+    <ClInclude Include="PacketUpdateHealth.h">
+      <Filter>Network\Packets\Headers\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketUpdateMovementAnswer.h">
+      <Filter>Network\Packets\Headers\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketUpdateMovementRequest.h">
+      <Filter>Network\Packets\Headers\Logic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -50,6 +50,9 @@ namespace DeusCore
 		case Packet::ConnectedUdpAnswer:
 			p_packet = std::make_unique<PacketConnectedUdpAnswer>();
 			break;
+		case Packet::UpdateMovementRequest:
+			p_packet = std::make_unique<PacketUpdateMovementRequest>();
+			break;
 		default:
 			throw DeusSerializationException("Impossible to deserialize object : unknown message type");
 		}

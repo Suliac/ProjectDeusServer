@@ -19,3 +19,7 @@
 #include "PacketStartGame.h"
 #include "PacketConnectedUdpAnswer.h"
 #include "PacketNewPlayerJoinGame.h"
+#include "PacketUpdateHealth.h"
+#include "PacketUpdateMovementAnswer.h"
+#include "PacketUpdateMovementRequest.h"
+

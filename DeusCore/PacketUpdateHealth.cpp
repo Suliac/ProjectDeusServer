@@ -1,6 +1,6 @@
 #include "PacketUpdateHealth.h"
 
-namespace DeusServer
+namespace DeusCore
 {
 	PacketUpdateHealth::PacketUpdateHealth(uint32_t objectId, uint32_t componentId, int32_t newHealthAmount)
 		: DeusCore::Packet(Packet::EMessageType::UpdateHealth)

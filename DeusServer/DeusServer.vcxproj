@@ -167,7 +167,6 @@
     <ClCompile Include="PacketObjectChangeCell.cpp" />
     <ClCompile Include="PacketObjectEnter.cpp" />
     <ClCompile Include="PacketObjectLeave.cpp" />
-    <ClCompile Include="PacketUpdateHealth.cpp" />
     <ClCompile Include="WorldNetworkServer.cpp" />
     <ClCompile Include="DeusTcpConnection.cpp" />
     <ClCompile Include="main.cpp" />
@@ -194,8 +193,6 @@
     <ClInclude Include="PacketNewPlayer.h" />
     <ClInclude Include="PacketObjectChangeCell.h" />
     <ClInclude Include="PacketObjectEnter.h" />
-    <ClInclude Include="PacketObjectLeave.h" />
-    <ClInclude Include="PacketUpdateHealth.h" />
     <ClInclude Include="TimeLineComponent.h" />
     <ClInclude Include="WorldNetworkServer.h" />
     <ClInclude Include="DeusTcpConnection.h" />

@@ -1,6 +1,5 @@
 #pragma once
-#include "Buffer.h"
-#include "DeusSerializationException.h"
+#include "ISerializable.h"
 
 #include <memory>
 #include <mutex>
@@ -45,6 +44,8 @@ namespace DeusCore
 			ObjectLeave				= 51,
 			ObjectChangeCell		= 52,
 			UpdateHealth			= 53,
+			UpdateMovementRequest	= 54,
+			UpdateMovementAnswer	= 55,
 
 			// /!\ Game view  : 100-150 /!\ 
 		};
@@ -114,6 +115,12 @@ namespace DeusCore
 
 	}
 
+	template<>
+	inline void Packet::DeserializeData<ISerializable>(Buffer512& buffer, ISerializable& value)
+	{
+		value.Deserialize(buffer);
+	}
+
 #pragma endregion
 
 
@@ -132,6 +139,11 @@ namespace DeusCore
 			datas[i] = value >> (8 * ((size - 1) - i));
 
 		buffer.Insert(datas, sizeof(T));
+	}
+
+	template<>
+	inline void Packet::SerializeData<ISerializable>(Buffer512& buffer, const ISerializable& value) {
+		value.Serialize(buffer);
 	}
 
 #pragma endregion

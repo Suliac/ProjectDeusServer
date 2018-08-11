@@ -23,6 +23,7 @@
     <ClCompile Include="DeusException.cpp" />
     <ClCompile Include="DeusSerializationException.cpp" />
     <ClCompile Include="DeusSocketException.cpp" />
+    <ClCompile Include="DeusVector2.cpp" />
     <ClCompile Include="EventManager.cpp" />
     <ClCompile Include="EventManagerHandler.cpp" />
     <ClCompile Include="Logger.cpp" />
@@ -47,6 +48,9 @@
     <ClCompile Include="PacketPlayerReady.cpp" />
     <ClCompile Include="PacketStartGame.cpp" />
     <ClCompile Include="PacketTest.cpp" />
+    <ClCompile Include="PacketUpdateHealth.cpp" />
+    <ClCompile Include="PacketUpdateMovementAnswer.cpp" />
+    <ClCompile Include="PacketUpdateMovementRequest.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="TcpListener.cpp" />
     <ClCompile Include="TcpSocket.cpp" />
@@ -57,9 +61,11 @@
     <ClInclude Include="DeusException.h" />
     <ClInclude Include="DeusSerializationException.h" />
     <ClInclude Include="DeusSocketException.h" />
+    <ClInclude Include="DeusVector2.h" />
     <ClInclude Include="EventManager.h" />
     <ClInclude Include="EventManagerHandler.h" />
     <ClInclude Include="FastDelegate.h" />
+    <ClInclude Include="ISerializable.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Packet.h" />
@@ -84,6 +90,9 @@
     <ClInclude Include="Packets.h" />
     <ClInclude Include="PacketStartGame.h" />
     <ClInclude Include="PacketTest.h" />
+    <ClInclude Include="PacketUpdateHealth.h" />
+    <ClInclude Include="PacketUpdateMovementAnswer.h" />
+    <ClInclude Include="PacketUpdateMovementRequest.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="TcpListener.h" />
     <ClInclude Include="TcpSocket.h" />
