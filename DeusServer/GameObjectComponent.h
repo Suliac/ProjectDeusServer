@@ -9,6 +9,7 @@ namespace DeusServer
 	class GameObjectComponent : public IExecutable, public IIdentifiable
 	{
 	public:
+		
 		GameObjectComponent();
 		~GameObjectComponent();
 

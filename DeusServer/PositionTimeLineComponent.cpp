@@ -12,7 +12,12 @@ namespace DeusServer
 	{
 	}
 
-	std::shared_ptr<DeusCore::DeusVector2> PositionTimeLineComponent::Interpolate(const DeusCore::DeusVector2& beforeValue, unsigned long beforeValueTimestamp, const DeusCore::DeusVector2& afterValue, unsigned long afterValueTimestamp, unsigned long currentMs) const
+	void PositionTimeLineComponent::OnStart()
+	{
+		InsertData(std::make_shared<const DeusCore::DeusVector2>(DeusCore::DeusVector2::Zero()), 0);
+	}
+
+	std::shared_ptr<DeusCore::DeusVector2> PositionTimeLineComponent::Interpolate(const DeusCore::DeusVector2& beforeValue, uint64_t beforeValueTimestamp, const DeusCore::DeusVector2& afterValue, uint64_t afterValueTimestamp, uint64_t currentMs) const
 	{
 		DeusCore::DeusVector2 value = DeusCore::DeusVector2::Zero();
 
@@ -22,8 +27,8 @@ namespace DeusServer
 		return std::make_shared<DeusCore::DeusVector2>(value);
 	}
 
-	std::shared_ptr<DeusCore::DeusVector2> PositionTimeLineComponent::Extrapolate(const DeusCore::DeusVector2 & beforeValue, unsigned long beforeValueTimestamp, unsigned long currentMs) const
+	std::shared_ptr<DeusCore::DeusVector2> PositionTimeLineComponent::Extrapolate(const DeusCore::DeusVector2 & beforeValue, uint64_t beforeValueTimestamp, uint64_t currentMs) const
 	{
-		return std::shared_ptr<DeusCore::DeusVector2>();
+		return std::make_shared<DeusCore::DeusVector2>(beforeValue);
 	}
 }

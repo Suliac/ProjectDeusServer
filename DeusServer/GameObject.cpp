@@ -11,13 +11,13 @@ namespace DeusServer
 		NextId++;
 	}
 
-	GameObject::GameObject(std::vector<GameObjectComponent>& components, EObjectType typeObject)
+	GameObject::GameObject(std::vector<std::shared_ptr<GameObjectComponent>>& components, EObjectType typeObject)
 	{
 		for (const auto& component : components) {
-			if (m_components.find(component.GetId()) != m_components.end())
+			if (m_components.find(component->GetId()) != m_components.end())
 				throw DeusCore::DeusException("try to insert two components with same id");
 
-			m_components.insert(std::make_pair(component.GetId(), std::make_shared<GameObjectComponent>(component)));
+			m_components.insert(std::make_pair(component->GetId(), component));
 		}
 
 		m_type = typeObject;

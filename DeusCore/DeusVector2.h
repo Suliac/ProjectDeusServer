@@ -60,8 +60,8 @@ namespace DeusCore
 		virtual uint16_t EstimateAnswerCurrentSerializedSize() const override;
 
 	private:
-		int m_x = 0;
-		int m_y = 0;
+		int32_t m_x = 0;
+		int32_t m_y = 0;
 		float m_precision = 100000.f; // precision 5
 
 	};

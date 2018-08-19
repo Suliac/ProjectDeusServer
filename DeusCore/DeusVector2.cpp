@@ -36,7 +36,7 @@ namespace DeusCore
 		DeserializeData(buffer, m_x);
 		DeserializeData(buffer, m_y);
 
-		long tmpPrecision = 0;
+		uint64_t tmpPrecision = 0;
 		DeserializeData(buffer, tmpPrecision);
 		m_precision = tmpPrecision;
 	}
@@ -44,11 +44,11 @@ namespace DeusCore
 	{
 		SerializeData(buffer, m_x);
 		SerializeData(buffer, m_y);
-		SerializeData(buffer, (long)m_precision);
+		SerializeData(buffer, (uint64_t)m_precision);
 	}
 
 	uint16_t DeusVector2::EstimateAnswerCurrentSerializedSize() const
 	{
-		return sizeof(m_x) + sizeof(m_y) + sizeof(m_precision);
+		return sizeof(m_x) + sizeof(m_y) + sizeof(uint64_t);
 	}
 }

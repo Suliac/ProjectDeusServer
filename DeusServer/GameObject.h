@@ -14,7 +14,7 @@ namespace DeusServer
 		};
 
 		GameObject();
-		GameObject(std::vector<GameObjectComponent>& components, EObjectType typeObject);
+		GameObject(std::vector<std::shared_ptr<GameObjectComponent>>& components, EObjectType typeObject);
 		~GameObject();
 
 		std::shared_ptr<GameObjectComponent> GetComponent(uint32_t identifier);

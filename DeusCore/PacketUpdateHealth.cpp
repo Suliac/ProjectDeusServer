@@ -2,7 +2,7 @@
 
 namespace DeusCore
 {
-	PacketUpdateHealth::PacketUpdateHealth(uint32_t objectId, uint32_t componentId, int32_t newHealthAmount, unsigned long timestamp)
+	PacketUpdateHealth::PacketUpdateHealth(uint32_t objectId, uint32_t componentId, int32_t newHealthAmount, uint64_t timestamp)
 		: DeusCore::Packet(Packet::EMessageType::UpdateHealth)
 	{
 		m_objectId = objectId;

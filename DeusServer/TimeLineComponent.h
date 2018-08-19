@@ -13,16 +13,16 @@ namespace DeusServer
 #define WANT_DATA_AFTER_TIMESTAMP false
 
 	public:
-		virtual std::shared_ptr<const T> GetValue(unsigned long timeWantedMs = 0) const;
+		virtual std::shared_ptr<const T> GetValue(uint64_t timeWantedMs = 0) const;
 		void InsertData(std::shared_ptr<const T> data);
-		void InsertData(std::shared_ptr<const T> data, unsigned long ms);
+		void InsertData(std::shared_ptr<const T> data, uint64_t ms);
 	protected:
-		inline std::shared_ptr<const T> GetValueAtTime(unsigned long wantedTimeStampMS, unsigned long& timeStampOfData, bool wantDataBeforeTimestamp) const;
+		inline std::shared_ptr<const T> GetValueAtTime(uint64_t wantedTimeStampMS, uint64_t& timeStampOfData, bool wantDataBeforeTimestamp) const;
 
-		virtual std::shared_ptr<T> Interpolate(const T& beforeValue, unsigned long beforeValueTimestamp, const T& afterValue, unsigned long afterValueTimestamp, unsigned long currentMs) const = 0;
-		virtual std::shared_ptr<T> Extrapolate(const T& beforeValue, unsigned long beforeValueTimestamp, unsigned long currentMs) const = 0;
+		virtual std::shared_ptr<T> Interpolate(const T& beforeValue, uint64_t beforeValueTimestamp, const T& afterValue, uint64_t afterValueTimestamp, uint64_t currentMs) const = 0;
+		virtual std::shared_ptr<T> Extrapolate(const T& beforeValue, uint64_t beforeValueTimestamp, uint64_t currentMs) const = 0;
 
-		std::map<unsigned long, std::shared_ptr<const T>> m_dataWithTime;
+		std::map<uint64_t, std::shared_ptr<const T>> m_dataWithTime;
 		const uint32_t MAX_DATAS_SAVED = 10000;
 
 	private:
@@ -32,12 +32,12 @@ namespace DeusServer
 	template<typename T>
 	inline void TimeLineComponent<T>::InsertData(std::shared_ptr<const T> data)
 	{
-		unsigned long ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+		uint64_t ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 		InsertData(data, ms);
 	}
 
 	template<typename T>
-	inline void TimeLineComponent<T>::InsertData(std::shared_ptr<const T> data, unsigned long ms)
+	inline void TimeLineComponent<T>::InsertData(std::shared_ptr<const T> data, uint64_t ms)
 	{
 		m_componentLocker.lock(); // <---------------- LOCK
 		// We delete all the futur datas that arn't valid anymore
@@ -55,14 +55,14 @@ namespace DeusServer
 	}
 
 	template<typename T>
-	inline std::shared_ptr<const T> TimeLineComponent<T>::GetValue(unsigned long timeWantedMs) const
+	inline std::shared_ptr<const T> TimeLineComponent<T>::GetValue(uint64_t timeWantedMs) const
 	{
-		unsigned long currentMs = timeWantedMs == 0 ? std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() : timeWantedMs;
+		uint64_t currentMs = timeWantedMs == 0 ? std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() : timeWantedMs;
 
-		unsigned long timeStampBeforeDataFound = 0;
+		uint64_t timeStampBeforeDataFound = 0;
 		std::shared_ptr<const T> p_objectInTimeLineBefore = GetValueAtTime(currentMs, timeStampBeforeDataFound, WANT_DATA_BEFORE_TIMESTAMP);
 
-		unsigned long timeStampAfterDataFound = 0;
+		uint64_t timeStampAfterDataFound = 0;
 		std::shared_ptr<const T> p_objectInTimeLineAfter = GetValueAtTime(currentMs, timeStampAfterDataFound, WANT_DATA_AFTER_TIMESTAMP);
 
 		std::shared_ptr<const T> p_value = nullptr;
@@ -78,7 +78,7 @@ namespace DeusServer
 	}
 
 	template<typename T>
-	inline std::shared_ptr<const T> TimeLineComponent<T>::GetValueAtTime(unsigned long wantedTimeStampMS, unsigned long & timeStampOfData, bool wantDataBeforeTimestamp) const
+	inline std::shared_ptr<const T> TimeLineComponent<T>::GetValueAtTime(uint64_t wantedTimeStampMS, uint64_t & timeStampOfData, bool wantDataBeforeTimestamp) const
 	{
 		m_componentLocker.lock(); // <---------------- LOCK
 		if (m_dataWithTime.size() <= 0)
@@ -90,7 +90,7 @@ namespace DeusServer
 		if (wantDataBeforeTimestamp)
 		{
 			// start from the end
-			for (auto it = m_dataWithTime.end(); it != m_dataWithTime.begin(); --it)
+			for (auto it = m_dataWithTime.rbegin(); it != m_dataWithTime.rend(); ++it)
 			{
 				if (it->first < wantedTimeStampMS)
 				{

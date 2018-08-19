@@ -8,11 +8,11 @@ namespace DeusServer
 		HealthTimeLineComponent();
 		~HealthTimeLineComponent();
 
-		virtual void OnStart() override;
 
 	protected:
-		virtual std::shared_ptr<int> Interpolate(const int & beforeValue, unsigned long beforeValueTimestamp, const int & afterValue, unsigned long afterValueTimestamp, unsigned long currentMs) const override;
-		virtual std::shared_ptr<int> Extrapolate(const int & beforeValue, unsigned long beforeValueTimestamp, unsigned long currentMs) const override;
+		virtual void OnStart() override;
+		virtual std::shared_ptr<int> Interpolate(const int & beforeValue, uint64_t beforeValueTimestamp, const int & afterValue, uint64_t afterValueTimestamp, uint64_t currentMs) const override;
+		virtual std::shared_ptr<int> Extrapolate(const int & beforeValue, uint64_t beforeValueTimestamp, uint64_t currentMs) const override;
 	};
 }
 

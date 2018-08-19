@@ -8,7 +8,7 @@ namespace DeusServer
 		static std::unique_ptr<GameObject> Create(GameObject::EObjectType objectType);
 
 	private:
-		static void GetPlayerComponents(std::vector<GameObjectComponent>& components);
+		static void GetPlayerComponents(std::vector<std::shared_ptr<GameObjectComponent>>& components);
 	};
 }
 

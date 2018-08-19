@@ -27,10 +27,10 @@ namespace DeusServer
 	public:
 		PositionTimeLineComponent();
 		~PositionTimeLineComponent();
-		
 	protected:
-		virtual std::shared_ptr<DeusCore::DeusVector2> Interpolate(const DeusCore::DeusVector2& beforeValue, unsigned long beforeValueTimestamp, const DeusCore::DeusVector2& afterValue, unsigned long afterValueTimestamp, unsigned long currentMs) const override;
-		virtual std::shared_ptr<DeusCore::DeusVector2> Extrapolate(const DeusCore::DeusVector2& beforeValue, unsigned long beforeValueTimestamp, unsigned long currentMs) const override;
+		virtual void OnStart() override;
+		virtual std::shared_ptr<DeusCore::DeusVector2> Interpolate(const DeusCore::DeusVector2& beforeValue, uint64_t beforeValueTimestamp, const DeusCore::DeusVector2& afterValue, uint64_t afterValueTimestamp, uint64_t currentMs) const override;
+		virtual std::shared_ptr<DeusCore::DeusVector2> Extrapolate(const DeusCore::DeusVector2& beforeValue, uint64_t beforeValueTimestamp, uint64_t currentMs) const override;
 
 	};
 }
