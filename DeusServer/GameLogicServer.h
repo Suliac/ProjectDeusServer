@@ -3,6 +3,7 @@
 
 #include "DeusCore/EventManager.h"
 #include "DeusCore/Packets.h"
+#include "DeusCore/DeusVector2.h"
 
 #include "GameObject.h"
 
@@ -47,10 +48,14 @@ namespace DeusServer
 		void InterpretPacket(DeusCore::DeusEventSPtr p_packet);
 		void StartNewGame(const std::vector<uint32_t>& playerIds);
 		void PlayerDisconnected(Id clientId);
+		void UpdatePlayerDirection(Id clientId, Id componentId, DeusCore::DeusVector2 newDir);
 	private:
+		const float SPEED_SEC = 1;
+		const float SPEED_MS = SPEED_SEC / 1000.f;
+
 		Id GetCellIdOfGameObject(Id objectId);
 		void GetGameObjectOnChangeCells(Id playerId, Id cellLeavedId, Id cellEnteredId, std::vector<std::shared_ptr<const GameObject>>& objectInCellsLeft, std::vector<std::shared_ptr<const GameObject>>& objectInCellsEntered);
-
+		
 		ServerCells m_cellsGameObjects;
 		PlayerInfos m_playerWithGameObject;
 

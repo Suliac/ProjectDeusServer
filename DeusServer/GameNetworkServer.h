@@ -1,6 +1,7 @@
 #pragma once
 #include "NetworkServer.h"
 #include "PacketObjectChangeCell.h"
+#include "PacketCellFirePacket.h"
 #include "PacketObjectEnter.h"
 #include "PacketObjectLeave.h"
 #include "GameLogicServer.h"
@@ -64,6 +65,7 @@ namespace DeusServer
 		void PlayerNotReady(Id clientId);
 		bool NewPlayer(Id clientId, DeusClientSPtr clientConnection);
 		void ObjectChangedCell(std::shared_ptr<PacketObjectChangeCell> p_packetReceived);
+		void ManageCellFirePacket(std::shared_ptr<CellFirePacket> p_packetReceived);
 	private:
 		bool CanStartGame();
 

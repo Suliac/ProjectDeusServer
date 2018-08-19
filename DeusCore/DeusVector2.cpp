@@ -15,9 +15,20 @@ namespace DeusCore
 		m_y = y * m_precision;
 	}
 
-
 	DeusVector2::~DeusVector2()
 	{
+	}
+
+	float DeusVector2::Magnitude(const DeusVector2& lhs, const DeusVector2& rhs)
+	{
+		return sqrt(SqrMagnitude(lhs, rhs));
+	}
+
+	float DeusVector2::SqrMagnitude(const DeusVector2& lhs, const DeusVector2& rhs)
+	{
+		float precision = fmin(lhs.m_precision, rhs.m_precision);
+		return pow((rhs.m_x - lhs.m_x) / precision, 2) +
+			pow((rhs.m_y - lhs.m_y) / precision, 2);
 	}
 
 	void DeusVector2::Deserialize(Buffer512 & buffer)
@@ -29,7 +40,7 @@ namespace DeusCore
 		DeserializeData(buffer, tmpPrecision);
 		m_precision = tmpPrecision;
 	}
-	void DeusVector2::Serialize(Buffer512 & buffer) const 
+	void DeusVector2::Serialize(Buffer512 & buffer) const
 	{
 		SerializeData(buffer, m_x);
 		SerializeData(buffer, m_y);

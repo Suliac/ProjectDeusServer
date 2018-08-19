@@ -50,6 +50,7 @@ namespace DeusServer
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::PlayerReady);
 
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::ObjectChangeCell);
+		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::CellFirePacket);
 	}
 
 	//---------------------------------------------------------------------------------
@@ -65,6 +66,7 @@ namespace DeusServer
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::PlayerReady);
 
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::ObjectChangeCell);
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::CellFirePacket);
 		m_stopped = true;
 	}
 
@@ -131,6 +133,10 @@ namespace DeusServer
 			ObjectChangedCell(std::dynamic_pointer_cast<PacketObjectChangeCell>(p_packet->second));
 			break;
 
+		case DeusCore::Packet::EMessageType::CellFirePacket:
+			ManageCellFirePacket(std::dynamic_pointer_cast<CellFirePacket>(p_packet->second));
+			break;
+
 			//NB : Disconnect event already managed in NetworkServer
 		default:
 			break;
@@ -163,7 +169,7 @@ namespace DeusServer
 		{
 			matchingConnectionIt->second->SetConnectionGameId(0);
 			m_clientsConnections.erase(matchingConnectionIt);
-			
+
 			// we check if there is player left, otherwise we stop this game server
 			TryDeleteGame();
 			DeusCore::Logger::Instance()->Log(m_name, "Client (id:" + std::to_string(clientId) + ") Leaved the game");
@@ -296,6 +302,31 @@ namespace DeusServer
 		// 4 - Send ObjectEnter packet to other player
 		ManageEnteredCell(p_packetReceived->GetLeftCellId(), p_packetReceived->GetEnteredCellId(), p_packetReceived->GetGameObject(), p_packetReceived->GetObjectInEnteringCells(), p_packetReceived->IsInit());
 
+	}
+
+	void GameNetworkServer::ManageCellFirePacket(std::shared_ptr<CellFirePacket> p_packetReceived)
+	{
+		if (p_packetReceived->GetCellId() > 0)
+		{
+			m_cellLocker[p_packetReceived->GetCellId() - 1].lock(); // <------- LOCK
+			// check if there is listener on that cell
+			if (m_cells[p_packetReceived->GetCellId()].size() > 0)
+			{
+				for (int listenerId : m_cells[p_packetReceived->GetCellId()])
+				{
+					m_playersLocker.lock(); // <----------------- LOCK
+
+					// this client is eligible for the packet if :
+					// - player already know this object (entered once in inner area)
+					if (IsPlayerFollowingObject(listenerId, p_packetReceived->GetObjectId()))
+						SendPacket(std::move(p_packetReceived->ExtractPacket()), listenerId, SEND_UDP);
+
+					m_playersLocker.unlock(); // <----------------- UNLOCK
+
+				}
+			}
+			m_cellLocker[p_packetReceived->GetCellId() - 1].unlock(); // <------- UNLOCK
+		}
 	}
 
 	//---------------------------------------------------------------------------------

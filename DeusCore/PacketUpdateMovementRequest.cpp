@@ -2,33 +2,29 @@
 
 namespace DeusCore
 {
-	PacketUpdateMovementRequest::PacketUpdateMovementRequest(DeusVector2 newDir)
-		: Packet(Packet::EMessageType::UpdateHealth)
+	PacketUpdateMovementRequest::PacketUpdateMovementRequest()
+		: Packet(Packet::EMessageType::UpdateMovementRequest)
 	{
-		m_newDir = newDir;
 	}
 
-	PacketUpdateMovementRequest::PacketUpdateMovementRequest()
-		: Packet(Packet::EMessageType::UpdateHealth)
-	{
-	}
-	
 	PacketUpdateMovementRequest::~PacketUpdateMovementRequest()
 	{
 	}
 
 	void PacketUpdateMovementRequest::OnDeserialize(Buffer512 & buffer)
 	{
-		DeserializeData<ISerializable>(buffer, m_newDir);
+		DeserializeData(buffer, m_componentId);
+		DeserializeData<ISerializable>(buffer, m_newPos);
 	}
 
 	void PacketUpdateMovementRequest::OnSerialize(Buffer512 & buffer) const
 	{
-		SerializeData<ISerializable>(buffer, m_newDir);
+		SerializeData(buffer, m_componentId);
+		SerializeData<ISerializable>(buffer, m_newPos);
 	}
 
 	uint16_t PacketUpdateMovementRequest::EstimateCurrentSerializedSize() const
 	{
-		return m_newDir.EstimateAnswerCurrentSerializedSize();
+		return sizeof(m_componentId) + m_newPos.EstimateAnswerCurrentSerializedSize();
 	}
 }

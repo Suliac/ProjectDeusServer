@@ -46,6 +46,7 @@ namespace DeusCore
 			UpdateHealth			= 53,
 			UpdateMovementRequest	= 54,
 			UpdateMovementAnswer	= 55,
+			CellFirePacket			= 56,
 
 			// /!\ Game view  : 100-150 /!\ 
 		};

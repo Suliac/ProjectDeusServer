@@ -177,7 +177,6 @@
     <ClCompile Include="PacketNewPlayerJoinGame.cpp">
       <Filter>Network\Packets\Sources\Games</Filter>
     </ClCompile>
-    <ClCompile Include="DeusVector2.cpp" />
     <ClCompile Include="PacketUpdateHealth.cpp">
       <Filter>Network\Packets\Sources\Logic</Filter>
     </ClCompile>
@@ -186,6 +185,9 @@
     </ClCompile>
     <ClCompile Include="PacketUpdateMovementRequest.cpp">
       <Filter>Network\Packets\Sources\Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="DeusVector2.cpp">
+      <Filter>Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -294,7 +296,6 @@
     <ClInclude Include="PacketNewPlayerJoinGame.h">
       <Filter>Network\Packets\Headers\Games</Filter>
     </ClInclude>
-    <ClInclude Include="DeusVector2.h" />
     <ClInclude Include="ISerializable.h" />
     <ClInclude Include="PacketUpdateHealth.h">
       <Filter>Network\Packets\Headers\Logic</Filter>
@@ -304,6 +305,9 @@
     </ClInclude>
     <ClInclude Include="PacketUpdateMovementRequest.h">
       <Filter>Network\Packets\Headers\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="DeusVector2.h">
+      <Filter>Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

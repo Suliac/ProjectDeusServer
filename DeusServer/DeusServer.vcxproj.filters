@@ -43,6 +43,12 @@
     <Filter Include="Packets">
       <UniqueIdentifier>{cca85cc0-6c70-45db-bf29-258e4c71294b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Packets\Headers">
+      <UniqueIdentifier>{64192448-908e-47c9-a344-f154b62d7c77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Packets\Sources">
+      <UniqueIdentifier>{e8f191fb-96e7-48bb-beff-f0ede2009e49}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -88,17 +94,23 @@
     <ClCompile Include="HealthTimeLineComponent.cpp">
       <Filter>Logic\Sources\Components</Filter>
     </ClCompile>
+    <ClCompile Include="PositionTimeLineComponent.cpp">
+      <Filter>Logic\Sources\Components</Filter>
+    </ClCompile>
     <ClCompile Include="PacketNewPlayer.cpp">
-      <Filter>Packets</Filter>
+      <Filter>Packets\Sources</Filter>
     </ClCompile>
     <ClCompile Include="PacketObjectChangeCell.cpp">
-      <Filter>Packets</Filter>
+      <Filter>Packets\Sources</Filter>
     </ClCompile>
     <ClCompile Include="PacketObjectEnter.cpp">
-      <Filter>Packets</Filter>
+      <Filter>Packets\Sources</Filter>
     </ClCompile>
     <ClCompile Include="PacketObjectLeave.cpp">
-      <Filter>Packets</Filter>
+      <Filter>Packets\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketCellFirePacket.cpp">
+      <Filter>Packets\Sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -150,14 +162,20 @@
     <ClInclude Include="TimeLineComponent.h">
       <Filter>Logic\Headers\Components</Filter>
     </ClInclude>
+    <ClInclude Include="PositionTimeLineComponent.h">
+      <Filter>Logic\Headers\Components</Filter>
+    </ClInclude>
     <ClInclude Include="PacketNewPlayer.h">
-      <Filter>Packets</Filter>
+      <Filter>Packets\Headers</Filter>
     </ClInclude>
     <ClInclude Include="PacketObjectChangeCell.h">
-      <Filter>Packets</Filter>
+      <Filter>Packets\Headers</Filter>
     </ClInclude>
     <ClInclude Include="PacketObjectEnter.h">
-      <Filter>Packets</Filter>
+      <Filter>Packets\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketCellFirePacket.h">
+      <Filter>Packets\Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,12 +1,15 @@
 #pragma once
 #include "PacketAnswer.h"
-
+#include "DeusVector2.h"
 namespace DeusCore
 {
 	class PacketUpdateMovementAnswer: public DeusCore::PacketAnswer
 	{
 	public:
-		PacketUpdateMovementAnswer(uint32_t objectId, uint32_t componentId, int32_t newHealthAmount);
+		PacketUpdateMovementAnswer(Id objectId, Id componentId,
+			DeusVector2 origin, long originMs, DeusVector2 dest, long destMs);
+		
+		PacketUpdateMovementAnswer();
 		~PacketUpdateMovementAnswer();
 
 	protected:
@@ -15,9 +18,14 @@ namespace DeusCore
 		virtual uint16_t EstimateAnswerCurrentSerializedSize() const override;
 
 	private:
-		uint32_t m_objectId;
-		uint32_t m_componentId;
-		
+		Id m_objectId;
+		Id m_componentId;
+
+		DeusVector2 m_originPos;
+		long m_originPosMs;
+
+		DeusVector2 m_destPos;
+		long m_destPosMs;
 	};
 }
 

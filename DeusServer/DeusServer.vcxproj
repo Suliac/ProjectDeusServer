@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="PacketCellFirePacket.cpp" />
     <ClCompile Include="DeusClient.cpp" />
     <ClCompile Include="DeusConnection.cpp" />
     <ClCompile Include="DeusUdpConnection.cpp" />
@@ -167,6 +168,7 @@
     <ClCompile Include="PacketObjectChangeCell.cpp" />
     <ClCompile Include="PacketObjectEnter.cpp" />
     <ClCompile Include="PacketObjectLeave.cpp" />
+    <ClCompile Include="PositionTimeLineComponent.cpp" />
     <ClCompile Include="WorldNetworkServer.cpp" />
     <ClCompile Include="DeusTcpConnection.cpp" />
     <ClCompile Include="main.cpp" />
@@ -177,6 +179,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="PacketCellFirePacket.h" />
     <ClInclude Include="DeusClient.h" />
     <ClInclude Include="DeusConnection.h" />
     <ClInclude Include="DeusUdpConnection.h" />
@@ -193,6 +196,7 @@
     <ClInclude Include="PacketNewPlayer.h" />
     <ClInclude Include="PacketObjectChangeCell.h" />
     <ClInclude Include="PacketObjectEnter.h" />
+    <ClInclude Include="PositionTimeLineComponent.h" />
     <ClInclude Include="TimeLineComponent.h" />
     <ClInclude Include="WorldNetworkServer.h" />
     <ClInclude Include="DeusTcpConnection.h" />

@@ -8,11 +8,10 @@ namespace DeusCore
 	{
 	public:
 		PacketUpdateMovementRequest();
-		PacketUpdateMovementRequest(DeusVector2 newDir);
-
 		~PacketUpdateMovementRequest();
 
-		const DeusVector2& GetNewDir() const { return m_newDir; }
+		const DeusVector2& GetNewPosition() const { return m_newPos; }
+		Id GetComponentId() const { return m_componentId; }
 
 	protected:
 		virtual void OnDeserialize(Buffer512 & buffer) override;
@@ -20,7 +19,8 @@ namespace DeusCore
 		virtual uint16_t EstimateCurrentSerializedSize() const override;
 
 	private:
-		DeusVector2 m_newDir;
+		DeusVector2 m_newPos;
+		Id m_componentId;
 	};
 }
 

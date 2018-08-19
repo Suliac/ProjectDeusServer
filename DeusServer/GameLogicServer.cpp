@@ -1,9 +1,11 @@
 #include "GameLogicServer.h"
 #include "GameObjectFactory.h"
 #include "PacketObjectChangeCell.h"
+#include "PacketCellFirePacket.h"
+#include "PositionTimeLineComponent.h"
 
 #include "DeusCore/Logger.h"
-#include "DeusCore/Packet.h"
+#include "DeusCore/Packets.h"
 #include "DeusCore/EventManagerHandler.h"
 
 namespace DeusServer
@@ -19,6 +21,8 @@ namespace DeusServer
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::StartGame);
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::Disconnect);
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::LeaveGameRequest);
+
+		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::UpdateMovementRequest);
 	}
 
 	GameLogicServer::~GameLogicServer()
@@ -50,6 +54,10 @@ namespace DeusServer
 		DeusCore::DeusEventDeleguate messageInterpretDeleguate = fastdelegate::MakeDelegate(this, &GameLogicServer::InterpretPacket);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::StartGame);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::Disconnect);
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::LeaveGameRequest);
+
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::UpdateMovementRequest);
+
 
 		m_cellsGameObjects.clear();
 		m_playerWithGameObject.clear();
@@ -107,6 +115,9 @@ namespace DeusServer
 		case DeusCore::Packet::EMessageType::LeaveGameRequest:
 			PlayerDisconnected(p_packet->first);
 			break;
+		case DeusCore::Packet::EMessageType::UpdateMovementRequest:
+			UpdatePlayerDirection(p_packet->first, std::dynamic_pointer_cast<DeusCore::PacketUpdateMovementRequest>(p_packet->second)->GetComponentId(), std::dynamic_pointer_cast<DeusCore::PacketUpdateMovementRequest>(p_packet->second)->GetNewPosition());
+			break;
 		}
 	}
 
@@ -119,7 +130,7 @@ namespace DeusServer
 			// We start Cells id at 1
 			m_cellsGameObjects.insert(std::make_pair(i + 1, ServerGameObjects()));
 		}
-		
+
 		// 2 - Create a GameObject for each player
 		for (const auto id : playerIds)
 		{
@@ -135,7 +146,7 @@ namespace DeusServer
 			std::vector<std::shared_ptr<const GameObject>> objectInCellsLeft;
 			std::vector<std::shared_ptr<const GameObject>> objectInCellsEntered;
 			GetGameObjectOnChangeCells(id, 0, DEFAULT_CELL_ID, objectInCellsLeft, objectInCellsEntered);
-						
+
 
 			DeusCore::PacketSPtr p_packet = std::shared_ptr<PacketObjectChangeCell>(new PacketObjectChangeCell(id, p_gameObj, 0, DEFAULT_CELL_ID, objectInCellsLeft, objectInCellsEntered, true));
 			DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, 0, p_packet);
@@ -189,6 +200,59 @@ namespace DeusServer
 					m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
 					break;
 				}
+				m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
+			}
+		}
+	}
+
+	void GameLogicServer::UpdatePlayerDirection(Id clientId, Id componentId, DeusCore::DeusVector2 destination)
+	{
+		GameObjectId objectId = 0;
+
+		m_playersLocker.lock(); // <----------- LOCK
+		// Find object
+		if (m_playerWithGameObject.find(clientId) != m_playerWithGameObject.end())
+		{
+			objectId = m_playerWithGameObject[clientId];
+		}
+		m_playersLocker.unlock(); // <----------- UNLOCK
+
+		if (objectId > 0)
+		{
+			for (auto& cellGameObjects : m_cellsGameObjects)
+			{
+				m_gameObjLocker[cellGameObjects.first - 1].lock(); // <-----------LOCK
+
+				// Search for object
+				const auto& gameObjIt = cellGameObjects.second.find(objectId);
+				if (gameObjIt != cellGameObjects.second.end())
+				{
+					// Search for PositionComponent
+					std::shared_ptr<GameObjectComponent> compo = gameObjIt->second->GetComponent(componentId);
+					if (compo != nullptr)
+					{
+
+						// 1 - Validate current position : position of the object in DELAY ms
+						long currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() + DELAY_MS;
+						std::shared_ptr<const DeusCore::DeusVector2> p_posAtUpdate = std::dynamic_pointer_cast<PositionTimeLineComponent>(compo)->GetValue(currentMs);
+
+						std::dynamic_pointer_cast<PositionTimeLineComponent>(compo)->InsertData(p_posAtUpdate, currentMs);
+
+						// 2 - Extrapolate time to go to destination and insert futur data
+						float sqrtDist = DeusCore::DeusVector2::SqrMagnitude(*p_posAtUpdate, destination);
+						long dtReachDestinationMs = sqrtDist / pow(SPEED_MS, 2); // t = d / s
+
+						std::dynamic_pointer_cast<PositionTimeLineComponent>(compo)->InsertData(std::make_shared<const DeusCore::DeusVector2>(destination), currentMs + dtReachDestinationMs);
+
+						// 3 - Send messages to clients
+						std::unique_ptr<DeusCore::PacketUpdateMovementAnswer> movementFeedback = std::unique_ptr<DeusCore::PacketUpdateMovementAnswer>(new DeusCore::PacketUpdateMovementAnswer(objectId, componentId, *p_posAtUpdate, currentMs, destination, currentMs + dtReachDestinationMs));
+						DeusCore::PacketSPtr p_cellFirePacket = std::shared_ptr<CellFirePacket>(new CellFirePacket(cellGameObjects.first, objectId, std::move(movementFeedback)));
+						DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, 0, p_cellFirePacket);
+
+						break;
+					}
+				}
+
 				m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
 			}
 		}

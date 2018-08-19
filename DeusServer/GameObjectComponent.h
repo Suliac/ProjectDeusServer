@@ -5,6 +5,7 @@
 #include <mutex>
 namespace DeusServer
 {
+	const uint32_t DELAY_MS = 200;
 	class GameObjectComponent : public IExecutable, public IIdentifiable
 	{
 	public:
