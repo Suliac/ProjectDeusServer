@@ -11,8 +11,8 @@ namespace DeusServer
 		virtual void OnStart() override;
 
 	protected:
-		virtual std::shared_ptr<int> Interpolate(const int & beforeValue, long beforeValueTimestamp, const int & afterValue, long afterValueTimestamp, long currentMs) const override;
-		virtual std::shared_ptr<int> Extrapolate(const int & beforeValue, long beforeValueTimestamp, long currentMs) const override;
+		virtual std::shared_ptr<int> Interpolate(const int & beforeValue, unsigned long beforeValueTimestamp, const int & afterValue, unsigned long afterValueTimestamp, unsigned long currentMs) const override;
+		virtual std::shared_ptr<int> Extrapolate(const int & beforeValue, unsigned long beforeValueTimestamp, unsigned long currentMs) const override;
 	};
 }
 

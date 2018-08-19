@@ -1,12 +1,11 @@
 #pragma once
-#include <unordered_map>
+#include <map>
 #include <chrono>
 #include <mutex>
 
 #include "GameObjectComponent.h"
 namespace DeusServer
 {
-
 	template<typename T>
 	class TimeLineComponent : public GameObjectComponent
 	{
@@ -14,16 +13,16 @@ namespace DeusServer
 #define WANT_DATA_AFTER_TIMESTAMP false
 
 	public:
-		virtual std::shared_ptr<const T> GetValue(long timeWantedMs = -1) const;
+		virtual std::shared_ptr<const T> GetValue(unsigned long timeWantedMs = -1) const;
 		void InsertData(std::shared_ptr<const T> data);
-		void InsertData(std::shared_ptr<const T> data, long ms);
+		void InsertData(std::shared_ptr<const T> data, unsigned long ms);
 	protected:
-		inline std::shared_ptr<const T> GetValueAtTime(long wantedTimeStampMS, long& timeStampOfData, bool wantDataBeforeTimestamp) const;
+		inline std::shared_ptr<const T> GetValueAtTime(unsigned long wantedTimeStampMS, unsigned long& timeStampOfData, bool wantDataBeforeTimestamp) const;
 
-		virtual std::shared_ptr<T> Interpolate(const T& beforeValue, long beforeValueTimestamp, const T& afterValue, long afterValueTimestamp, long currentMs) const = 0;
-		virtual std::shared_ptr<T> Extrapolate(const T& beforeValue, long beforeValueTimestamp, long currentMs) const = 0;
+		virtual std::shared_ptr<T> Interpolate(const T& beforeValue, unsigned long beforeValueTimestamp, const T& afterValue, unsigned long afterValueTimestamp, unsigned long currentMs) const = 0;
+		virtual std::shared_ptr<T> Extrapolate(const T& beforeValue, unsigned long beforeValueTimestamp, unsigned long currentMs) const = 0;
 
-		std::unordered_map<std::shared_ptr<const T>, long> m_dataWithTime;
+		std::map<unsigned long, std::shared_ptr<const T>> m_dataWithTime;
 		const uint32_t MAX_DATAS_SAVED = 10000;
 
 	private:
@@ -33,27 +32,37 @@ namespace DeusServer
 	template<typename T>
 	inline void TimeLineComponent<T>::InsertData(std::shared_ptr<const T> data)
 	{
-		long ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+		unsigned long ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 		InsertData(data, ms);
 	}
 
 	template<typename T>
-	inline void TimeLineComponent<T>::InsertData(std::shared_ptr<const T> data, long ms)
+	inline void TimeLineComponent<T>::InsertData(std::shared_ptr<const T> data, unsigned long ms)
 	{
 		m_componentLocker.lock(); // <---------------- LOCK
-		m_dataWithTime.insert(std::make_pair(data, ms + DELAY_MS));
+		// We delete all the futur datas that arn't valid anymore
+		auto it = m_dataWithTime.begin();
+		while (it != m_dataWithTime.end()) {
+			if (it->first > ms + DELAY_MS)
+				it = m_dataWithTime.erase(it);
+			else
+				++it;
+		}
+
+		// insert data
+		m_dataWithTime.insert(std::make_pair(ms + DELAY_MS, data));
 		m_componentLocker.unlock(); // <---------------- UNLOCK
 	}
 
 	template<typename T>
-	inline std::shared_ptr<const T> TimeLineComponent<T>::GetValue(long timeWantedMs) const
+	inline std::shared_ptr<const T> TimeLineComponent<T>::GetValue(unsigned long timeWantedMs) const
 	{
-		long currentMs = timeWantedMs == -1 ? std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() : timeWantedMs;
+		unsigned long currentMs = timeWantedMs == -1 ? std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() : timeWantedMs;
 
-		long timeStampBeforeDataFound = -1;
+		unsigned long timeStampBeforeDataFound = -1;
 		std::shared_ptr<const T> p_objectInTimeLineBefore = GetValueAtTime(currentMs, timeStampBeforeDataFound, WANT_DATA_BEFORE_TIMESTAMP);
 
-		long timeStampAfterDataFound = -1;
+		unsigned long timeStampAfterDataFound = -1;
 		std::shared_ptr<const T> p_objectInTimeLineAfter = GetValueAtTime(currentMs, timeStampAfterDataFound, WANT_DATA_AFTER_TIMESTAMP);
 
 		std::shared_ptr<const T> p_value = nullptr;
@@ -69,7 +78,7 @@ namespace DeusServer
 	}
 
 	template<typename T>
-	inline std::shared_ptr<const T> TimeLineComponent<T>::GetValueAtTime(long wantedTimeStampMS, long & timeStampOfData, bool wantDataBeforeTimestamp) const
+	inline std::shared_ptr<const T> TimeLineComponent<T>::GetValueAtTime(unsigned long wantedTimeStampMS, unsigned long & timeStampOfData, bool wantDataBeforeTimestamp) const
 	{
 		m_componentLocker.lock(); // <---------------- LOCK
 		if (m_dataWithTime.size() <= 0)
@@ -77,17 +86,17 @@ namespace DeusServer
 			m_componentLocker.unlock(); // <---------------- UNLOCK
 			return nullptr;
 		}
-		
+
 		if (wantDataBeforeTimestamp)
 		{
 			// start from the end
 			for (auto it = m_dataWithTime.end(); it != m_dataWithTime.begin(); --it)
 			{
-				if (it->second < wantedTimeStampMS)
+				if (it->first < wantedTimeStampMS)
 				{
-					timeStampOfData = it->second;
+					timeStampOfData = it->first;
 					m_componentLocker.unlock(); // <---------------- UNLOCK
-					return it->first;
+					return it->second;
 				}
 			}
 		}
@@ -95,11 +104,11 @@ namespace DeusServer
 			// start from the begining
 			for (auto it = m_dataWithTime.begin(); it != m_dataWithTime.end(); --it)
 			{
-				if (it->second > wantedTimeStampMS)
+				if (it->first > wantedTimeStampMS)
 				{
-					timeStampOfData = it->second;
+					timeStampOfData = it->first;
 					m_componentLocker.unlock(); // <---------------- UNLOCK
-					return it->first;
+					return it->second;
 				}
 			}
 		}
@@ -107,48 +116,6 @@ namespace DeusServer
 		m_componentLocker.unlock(); // <---------------- UNLOCK
 		return nullptr;
 	}
-
-	//template<typename T>
-	//inline std::shared_ptr<T> TimeLineComponent<T>::GetValueAtTime(long wantedTimeStampMS, long& timeStampOfData, bool wantDataBeforeTimestamp) const
-	//{
-	//	m_componentLocker.lock(); // <---------------- LOCK
-	//	if (m_dataWithTime.size() <= 0)
-	//	{
-	//		m_componentLocker.unlock(); // <---------------- UNLOCK
-	//		return nullptr;
-	//	}
-
-	//	typename std::unordered_map<std::shared_ptr<T>, long>::iterator it;
-
-	//	if (wantDataBeforeTimestamp)
-	//	{
-	//		// start from the end
-	//		for (it = m_dataWithTime.end(); it != m_dataWithTime.begin(); --it)
-	//		{
-	//			if (it->second < wantedTimeStampMS)
-	//			{
-	//				timeStampOfData = it->second;
-	//				m_componentLocker.unlock(); // <---------------- UNLOCK
-	//				return it->first;
-	//			}
-	//		}
-	//	}
-	//	else {
-	//		// start from the begining
-	//		for (it = m_dataWithTime.begin(); it != m_dataWithTime.end(); --it)
-	//		{
-	//			if (it->second > wantedTimeStampMS)
-	//			{
-	//				timeStampOfData = it->second;
-	//				m_componentLocker.unlock(); // <---------------- UNLOCK
-	//				return it->first;
-	//			}
-	//		}
-	//	}
-
-	//	m_componentLocker.unlock(); // <---------------- UNLOCK
-	//	return nullptr;
-	//}	
 
 }
 

@@ -6,7 +6,7 @@ namespace DeusCore
 	class PacketUpdateHealth : public DeusCore::Packet
 	{
 	public:
-		PacketUpdateHealth(uint32_t objectId, uint32_t componentId, int32_t newHealthAmount);
+		PacketUpdateHealth(uint32_t objectId, uint32_t componentId, int32_t newHealthAmount, unsigned long timestamp);
 		~PacketUpdateHealth();
 
 	protected:
@@ -18,6 +18,7 @@ namespace DeusCore
 		uint32_t m_objectId;
 		uint32_t m_componentId;
 		int32_t m_newHealthAmount;
+		unsigned long m_newHealthTimestamp;
 	};
 }
 

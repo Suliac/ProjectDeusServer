@@ -7,7 +7,7 @@ namespace DeusCore
 	{
 	public:
 		PacketUpdateMovementAnswer(Id objectId, Id componentId,
-			DeusVector2 origin, long originMs, DeusVector2 dest, long destMs);
+			DeusVector2 origin, unsigned long originMs, DeusVector2 dest, unsigned long destMs);
 		
 		PacketUpdateMovementAnswer();
 		~PacketUpdateMovementAnswer();
@@ -22,10 +22,10 @@ namespace DeusCore
 		Id m_componentId;
 
 		DeusVector2 m_originPos;
-		long m_originPosMs;
+		unsigned long m_originPosMs;
 
 		DeusVector2 m_destPos;
-		long m_destPosMs;
+		unsigned long m_destPosMs;
 	};
 }
 
