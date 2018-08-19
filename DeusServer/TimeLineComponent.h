@@ -13,7 +13,7 @@ namespace DeusServer
 #define WANT_DATA_AFTER_TIMESTAMP false
 
 	public:
-		virtual std::shared_ptr<const T> GetValue(unsigned long timeWantedMs = -1) const;
+		virtual std::shared_ptr<const T> GetValue(unsigned long timeWantedMs = 0) const;
 		void InsertData(std::shared_ptr<const T> data);
 		void InsertData(std::shared_ptr<const T> data, unsigned long ms);
 	protected:
@@ -57,19 +57,19 @@ namespace DeusServer
 	template<typename T>
 	inline std::shared_ptr<const T> TimeLineComponent<T>::GetValue(unsigned long timeWantedMs) const
 	{
-		unsigned long currentMs = timeWantedMs == -1 ? std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() : timeWantedMs;
+		unsigned long currentMs = timeWantedMs == 0 ? std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() : timeWantedMs;
 
-		unsigned long timeStampBeforeDataFound = -1;
+		unsigned long timeStampBeforeDataFound = 0;
 		std::shared_ptr<const T> p_objectInTimeLineBefore = GetValueAtTime(currentMs, timeStampBeforeDataFound, WANT_DATA_BEFORE_TIMESTAMP);
 
-		unsigned long timeStampAfterDataFound = -1;
+		unsigned long timeStampAfterDataFound = 0;
 		std::shared_ptr<const T> p_objectInTimeLineAfter = GetValueAtTime(currentMs, timeStampAfterDataFound, WANT_DATA_AFTER_TIMESTAMP);
 
 		std::shared_ptr<const T> p_value = nullptr;
 
-		if (timeStampBeforeDataFound = !- 1 && timeStampAfterDataFound != -1) // we are between 2 value -> interpolate
+		if (timeStampBeforeDataFound > 0 && timeStampAfterDataFound > 0) // we are between 2 value -> interpolate
 			p_value = Interpolate(*p_objectInTimeLineBefore, timeStampBeforeDataFound, *p_objectInTimeLineAfter, timeStampAfterDataFound, currentMs);
-		else if (timeStampBeforeDataFound = !- 1) // we have value only before the timestamp requested but not after
+		else if (timeStampBeforeDataFound > 0) // we have value only before the timestamp requested but not after
 			p_value = Extrapolate(*p_objectInTimeLineBefore, timeStampBeforeDataFound, currentMs);
 		else // no data found or only after the timestamp
 			p_value = nullptr;
