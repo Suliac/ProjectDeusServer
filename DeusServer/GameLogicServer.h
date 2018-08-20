@@ -62,7 +62,8 @@ namespace DeusServer
 		std::string m_name;
 		Id m_gameId;
 
-		std::mutex m_gameObjLocker[NUMBER_CELLS];
+		std::mutex m_cellLock;
+		//std::mutex m_gameObjLocker[NUMBER_CELLS];
 		std::mutex m_playersLocker;
 	};
 }

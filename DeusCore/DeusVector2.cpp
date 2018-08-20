@@ -19,12 +19,12 @@ namespace DeusCore
 	{
 	}
 
-	float DeusVector2::Magnitude(const DeusVector2& lhs, const DeusVector2& rhs)
+	float DeusVector2::SqrtMagnitude(const DeusVector2& lhs, const DeusVector2& rhs)
 	{
-		return sqrt(SqrMagnitude(lhs, rhs));
+		return sqrt(Magnitude(lhs, rhs));
 	}
 
-	float DeusVector2::SqrMagnitude(const DeusVector2& lhs, const DeusVector2& rhs)
+	float DeusVector2::Magnitude(const DeusVector2& lhs, const DeusVector2& rhs)
 	{
 		float precision = fmin(lhs.m_precision, rhs.m_precision);
 		return pow((rhs.m_x - lhs.m_x) / precision, 2) +

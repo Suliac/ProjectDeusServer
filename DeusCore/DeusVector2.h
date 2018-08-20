@@ -25,7 +25,7 @@ namespace DeusCore
 
 		static float Magnitude(const DeusVector2& lhs, const DeusVector2& rhs);
 
-		static float SqrMagnitude(const DeusVector2& lhs, const DeusVector2& rhs);
+		static float SqrtMagnitude(const DeusVector2& lhs, const DeusVector2& rhs);
 
 		bool operator==(const DeusVector2& other) const {
 			return m_x == other.m_x &&

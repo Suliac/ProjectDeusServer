@@ -2,7 +2,7 @@
 
 namespace DeusCore
 {	
-	PacketUpdateMovementAnswer::PacketUpdateMovementAnswer(Id objectId, Id componentId, DeusVector2 origin, uint64_t originMs, DeusVector2 dest, uint64_t destMs)
+	PacketUpdateMovementAnswer::PacketUpdateMovementAnswer(Id objectId, Id componentId, DeusVector2 origin, uint32_t originMs, DeusVector2 dest, uint32_t destMs)
 		: DeusCore::PacketAnswer(Packet::EMessageType::UpdateMovementAnswer)
 	{
 		m_objectId = objectId;
