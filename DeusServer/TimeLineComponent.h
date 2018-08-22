@@ -44,7 +44,7 @@ namespace DeusServer
 		// We delete all the futur datas that arn't valid anymore
 		auto it = m_dataWithTime.begin();
 		while (it != m_dataWithTime.end()) {
-			if (it->first > ms + DELAY_MS)
+			if (it->first > ms)
 			{
 				it = m_dataWithTime.erase(it);
 			}
@@ -53,7 +53,7 @@ namespace DeusServer
 		}
 
 		// insert data
-		m_dataWithTime.insert(std::make_pair(ms + DELAY_MS, data));
+		m_dataWithTime.insert(std::make_pair(ms, data));
 		m_componentLocker.unlock(); // <---------------- UNLOCK
 	}
 

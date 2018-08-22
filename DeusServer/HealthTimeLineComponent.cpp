@@ -14,7 +14,7 @@ namespace DeusServer
 	void HealthTimeLineComponent::OnStart()
 	{
 		// init with default value
-		InsertData(std::make_shared<int>(0), 0);
+		InsertData(std::make_shared<int>(0));
 	}
 	std::shared_ptr<int> HealthTimeLineComponent::Interpolate(const int & beforeValue, uint32_t beforeValueTimestamp, const int & afterValue, uint32_t afterValueTimestamp, uint32_t currentMs) const
 	{
