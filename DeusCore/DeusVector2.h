@@ -28,28 +28,28 @@ namespace DeusCore
 		static float SqrtMagnitude(const DeusVector2& lhs, const DeusVector2& rhs);
 
 		bool operator==(const DeusVector2& other) const {
-			return m_x == other.m_x &&
-				m_y == other.m_y;
+			return this->m_x == other.m_x &&
+				this->m_y == other.m_y;
 		}
 		inline bool operator!=(const DeusVector2& other) const {
 			return !(*this == other);
 		}
 		inline DeusVector2 operator+(const DeusVector2& other) const {
 			DeusVector2 result;
-			result.m_x = result.m_x + other.m_x;
-			result.m_y = result.m_y + other.m_y;
+			result.m_x = this->m_x + other.m_x;
+			result.m_y = this->m_y + other.m_y;
 			return result;
 		}
 		inline DeusVector2 operator-(const DeusVector2& other) const {
 			DeusVector2 result;
-			result.m_x = m_x - other.m_x;
-			result.m_y = m_y - other.m_y;
+			result.m_x = this->m_x - other.m_x;
+			result.m_y = this->m_y - other.m_y;
 			return result;
 		}
 		inline DeusVector2 operator*(float scalar) const {
 			DeusVector2 result;
-			result.m_x = m_x * scalar;
-			result.m_y = m_y * scalar;
+			result.m_x = this->m_x * scalar;
+			result.m_y = this->m_y * scalar;
 			return result;
 		}
 

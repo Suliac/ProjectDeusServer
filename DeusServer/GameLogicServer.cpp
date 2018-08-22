@@ -231,8 +231,8 @@ namespace DeusServer
 
 	void GameLogicServer::UpdatePlayerDirection(Id clientId, Id componentId, DeusCore::DeusVector2 destination)
 	{
-		//DeusCore::Logger::Instance()->Log(m_name, "Yo");
-
+		DeusCore::Logger::Instance()->Log(m_name, "|----------------------------------------------------------------- |");
+		
 		GameObjectId objectId = 0;
 
 		m_playersLocker.lock(); // <----------- LOCK
@@ -256,6 +256,8 @@ namespace DeusServer
 					const auto& gameObjIt = cellGameObjects.second.find(objectId);
 					if (gameObjIt != cellGameObjects.second.end())
 					{
+						DeusCore::Logger::Instance()->Log(m_name, "Update client : " + std::to_string(clientId) + " with componentId : " + std::to_string(componentId));
+
 						// Search for PositionComponent
 						std::shared_ptr<GameObjectComponent> compo = gameObjIt->second->GetComponent(componentId);
 						if (compo != nullptr)
@@ -293,6 +295,9 @@ namespace DeusServer
 			{
 				DeusCore::Logger::Instance()->Log(m_name, e.what());
 			}
+
+			DeusCore::Logger::Instance()->Log(m_name, "|----------------------------------------------------------------- |");
+
 		}
 	}
 
