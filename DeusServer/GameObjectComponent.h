@@ -1,6 +1,9 @@
 #pragma once
 #include "IExecutable.h"
 #include "IIdentifiable.h"
+
+#include "DeusCore/ISerializable.h"
+
 #include <memory>
 #include <mutex>
 namespace DeusServer
@@ -9,18 +12,25 @@ namespace DeusServer
 	class GameObjectComponent : public IExecutable, public IIdentifiable
 	{
 	public:
-		
-		GameObjectComponent();
+		enum EComponentType : uint8_t
+		{
+			Error				= 0,
+			HealthComponent		= 1,
+			PositionComponent	= 2,
+		};
+
+		GameObjectComponent(EComponentType type);
 		~GameObjectComponent();
 
+		EComponentType GetType() const { return m_type; }
 	protected:
 		virtual void OnUpdate(double deltatimeMs) override;
 		virtual void OnStart() override;
 		virtual void OnStop() override;
-
+		
 	private:
 		static Id NextId;
-
+		EComponentType m_type;
 	};
 }
 

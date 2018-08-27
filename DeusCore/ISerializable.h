@@ -39,6 +39,12 @@ namespace DeusCore
 
 	}
 
+	template<>
+	inline void ISerializable::DeserializeData<ISerializable>(Buffer512& buffer, ISerializable& value)
+	{
+		value.Deserialize(buffer);
+	}
+
 #pragma endregion
 
 
@@ -59,6 +65,10 @@ namespace DeusCore
 		buffer.Insert(datas, sizeof(T));
 	}
 
+	template<>
+	inline void ISerializable::SerializeData<ISerializable>(Buffer512& buffer, const ISerializable& value) {
+		value.Serialize(buffer);
+	}
 #pragma endregion
 }
 

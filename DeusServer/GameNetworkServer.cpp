@@ -528,7 +528,11 @@ namespace DeusServer
 		m_playersInfos[clientId].ObjectsIdsFollowed.push_back(gameObject->GetId());
 
 		// Send packet ObjectEnter in UDP
-		DeusCore::PacketUPtr p_packetEnteredCell = std::unique_ptr<PacketObjectEnter>(new PacketObjectEnter(gameObject->GetId(), gameObject->GetType(), gameObject->GetId() == m_playersInfos[clientId].GameObjectId));
+		std::vector<std::shared_ptr<ISerializableComponent>> objectsComponents;
+		gameObject->GetSerializableComponents(objectsComponents);
+
+
+		DeusCore::PacketUPtr p_packetEnteredCell = std::unique_ptr<PacketObjectEnter>(new PacketObjectEnter(gameObject->GetId(), gameObject->GetType(), gameObject->GetId() == m_playersInfos[clientId].GameObjectId, objectsComponents));
 		SendPacket(std::move(p_packetEnteredCell), clientId, SEND_UDP);
 	}
 

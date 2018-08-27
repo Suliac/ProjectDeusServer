@@ -1,11 +1,16 @@
 #include "GameObject.h"
-#include "DeusCore/DeusException.h"
+#include "HealthTimeLineComponent.h"
+#include "PositionTimeLineComponent.h"
+#include "SerializablePositionComponent.h"
+#include "SerializableHealthComponent.h"
 
+#include "DeusCore/DeusException.h"
+#include "DeusCore/DeusVector2.h"
 namespace DeusServer
 {
 	Id GameObject::NextId = 1;
-	
-	GameObject::GameObject() 
+
+	GameObject::GameObject()
 	{
 		m_uniqueIdentifier = NextId;
 		NextId++;
@@ -25,9 +30,53 @@ namespace DeusServer
 		m_uniqueIdentifier = NextId;
 		NextId++;
 	}
-	
+
 	GameObject::~GameObject()
 	{
+	}
+
+
+
+	void GameObject::GetSerializableComponents(std::vector<std::shared_ptr<ISerializableComponent>>& components) const
+	{
+		for (const auto& component : m_components)
+		{
+			uint32_t originMs = 0;
+			uint32_t destMs = 0;
+
+			std::shared_ptr<ISerializableComponent> serializableCompo = nullptr;
+			uint32_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+			switch (component.second->GetType())
+			{
+			case GameObjectComponent::EComponentType::HealthComponent:
+			{
+				std::shared_ptr<const int>originValue = std::dynamic_pointer_cast<HealthTimeLineComponent>(component.second)->GetValueAtTime(currentMs, originMs, true);
+				std::shared_ptr<const int>destValue = std::dynamic_pointer_cast<HealthTimeLineComponent>(component.second)->GetValueAtTime(currentMs, destMs, false);
+
+				serializableCompo = std::make_shared<SerializableHealthComponent>(component.second->GetId(),
+					component.second->GetType(),
+					*originValue, originMs,
+					*destValue, destMs);
+
+				break;
+			}
+			case GameObjectComponent::EComponentType::PositionComponent:
+			{
+				std::shared_ptr<const DeusCore::DeusVector2> originValue = std::dynamic_pointer_cast<PositionTimeLineComponent>(component.second)->GetValueAtTime(currentMs, originMs, true);
+				std::shared_ptr<const DeusCore::DeusVector2> destValue = std::dynamic_pointer_cast<PositionTimeLineComponent>(component.second)->GetValueAtTime(currentMs, destMs, false);
+
+				serializableCompo = std::make_shared<SerializablePositionComponent>(component.second->GetId(),
+					component.second->GetType(),
+					*originValue, originMs,
+					*destValue, destMs);
+				break;
+			}
+			default:
+				break;
+			}
+			components.push_back(serializableCompo);
+		}
 	}
 
 	std::shared_ptr<GameObjectComponent> GameObject::GetComponent(uint32_t identifier)

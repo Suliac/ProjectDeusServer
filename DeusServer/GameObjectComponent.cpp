@@ -5,10 +5,12 @@ namespace DeusServer
 {
 	Id GameObjectComponent::NextId = 1;
 
-	GameObjectComponent::GameObjectComponent()
+	GameObjectComponent::GameObjectComponent(EComponentType type)
 	{
+
 		m_uniqueIdentifier = NextId;
 		NextId++;
+		m_type = type;
 	}
 
 	GameObjectComponent::~GameObjectComponent()
@@ -26,4 +28,5 @@ namespace DeusServer
 	void GameObjectComponent::OnStop()
 	{
 	}
+	
 }

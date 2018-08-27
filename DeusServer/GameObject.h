@@ -1,6 +1,6 @@
 #pragma once
 #include "GameObjectComponent.h"
-
+#include "ISerializableComponent.h"
 #include <memory>
 #include <unordered_map>
 namespace DeusServer
@@ -17,6 +17,7 @@ namespace DeusServer
 		GameObject(std::vector<std::shared_ptr<GameObjectComponent>>& components, EObjectType typeObject);
 		~GameObject();
 
+		void GetSerializableComponents(std::vector<std::shared_ptr<ISerializableComponent>>& components) const;
 		std::shared_ptr<GameObjectComponent> GetComponent(uint32_t identifier);
 		EObjectType GetType() const { return m_type; }
 	protected:

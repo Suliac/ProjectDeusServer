@@ -2,7 +2,7 @@
 
 namespace DeusServer
 {
-	PacketObjectChangeCell::PacketObjectChangeCell(Id clientId, const std::shared_ptr<const GameObject > object, Id leftCellId, Id enteredCellId, std::vector<std::shared_ptr<const GameObject>>& objectInCellsLeft, std::vector<std::shared_ptr<const GameObject>>& objectInCellsEntered, bool isInit)
+	PacketObjectChangeCell::PacketObjectChangeCell(Id clientId, const std::shared_ptr<const GameObject> object, Id leftCellId, Id enteredCellId, std::vector<std::shared_ptr<const GameObject>>& objectInCellsLeft, std::vector<std::shared_ptr<const GameObject>>& objectInCellsEntered, bool isInit)
 		: DeusCore::Packet(Packet::EMessageType::ObjectChangeCell)
 	{
 		m_playerConnectionId = clientId;

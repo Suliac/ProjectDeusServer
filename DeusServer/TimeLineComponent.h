@@ -14,11 +14,13 @@ namespace DeusServer
 #define WANT_DATA_AFTER_TIMESTAMP false
 
 	public:
+		TimeLineComponent(EComponentType type);
+
 		virtual std::shared_ptr<const T> GetValue(uint32_t timeWantedMs = 0) const;
 		void InsertData(std::shared_ptr<const T> data);
 		void InsertData(std::shared_ptr<const T> data, uint32_t ms);
-	protected:
 		inline std::shared_ptr<const T> GetValueAtTime(uint32_t wantedTimeStampMS, uint32_t& timeStampOfData, bool wantDataBeforeTimestamp) const;
+	protected:
 
 		virtual std::shared_ptr<T> Interpolate(const T& beforeValue, uint32_t beforeValueTimestamp, const T& afterValue, uint32_t afterValueTimestamp, uint32_t currentMs) const = 0;
 		virtual std::shared_ptr<T> Extrapolate(const T& beforeValue, uint32_t beforeValueTimestamp, uint32_t currentMs) const = 0;
@@ -55,6 +57,12 @@ namespace DeusServer
 		// insert data
 		m_dataWithTime.insert(std::make_pair(ms, data));
 		m_componentLocker.unlock(); // <---------------- UNLOCK
+	}
+
+	template<typename T>
+	inline TimeLineComponent<T>::TimeLineComponent(EComponentType type)
+		: GameObjectComponent(type)
+	{
 	}
 
 	template<typename T>

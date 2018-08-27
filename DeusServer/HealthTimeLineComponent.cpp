@@ -2,7 +2,7 @@
 
 namespace DeusServer
 {
-	HealthTimeLineComponent::HealthTimeLineComponent()
+	HealthTimeLineComponent::HealthTimeLineComponent() : TimeLineComponent(EComponentType::HealthComponent)
 	{
 	}
 

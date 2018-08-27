@@ -5,6 +5,7 @@
 namespace DeusServer
 {
 	PositionTimeLineComponent::PositionTimeLineComponent()
+		: TimeLineComponent(EComponentType::PositionComponent)
 	{
 	}
 

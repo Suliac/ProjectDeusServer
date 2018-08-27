@@ -49,6 +49,15 @@
     <Filter Include="Packets\Sources">
       <UniqueIdentifier>{e8f191fb-96e7-48bb-beff-f0ede2009e49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Serialization">
+      <UniqueIdentifier>{7ba48ad9-43b7-4ff5-9785-2765d16df35f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Serialization\Sources">
+      <UniqueIdentifier>{52198616-b4ce-41a0-9df8-121c30cee08c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Serialization\Headers">
+      <UniqueIdentifier>{11ed7b96-3c79-4d7b-b934-e03134b7e28a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -112,6 +121,10 @@
     <ClCompile Include="PacketCellFirePacket.cpp">
       <Filter>Packets\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="SerializablePositionComponent.cpp">
+      <Filter>Serialization\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="SerializableHealthComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeusClient.h">
@@ -177,5 +190,15 @@
     <ClInclude Include="PacketCellFirePacket.h">
       <Filter>Packets\Headers</Filter>
     </ClInclude>
+    <ClInclude Include="ISerializableComponent.h">
+      <Filter>Serialization\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SerializablePositionComponent.h">
+      <Filter>Serialization\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SerializableTimelineComponent.h">
+      <Filter>Serialization\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SerializableHealthComponent.h" />
   </ItemGroup>
 </Project>
