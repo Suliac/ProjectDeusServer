@@ -7,6 +7,7 @@ namespace DeusServer
 	PositionTimeLineComponent::PositionTimeLineComponent()
 		: TimeLineComponent(EComponentType::PositionComponent)
 	{
+		InsertData(std::make_shared<const DeusCore::DeusVector2>(DeusCore::DeusVector2::Zero()));
 	}
 
 
@@ -14,10 +15,10 @@ namespace DeusServer
 	{
 	}
 
-	void PositionTimeLineComponent::OnStart()
+	/*void PositionTimeLineComponent::OnStart()
 	{
-		InsertData(std::make_shared<const DeusCore::DeusVector2>(DeusCore::DeusVector2::Zero()));
-	}
+		
+	}*/
 
 	std::shared_ptr<DeusCore::DeusVector2> PositionTimeLineComponent::Interpolate(const DeusCore::DeusVector2& beforeValue, uint32_t beforeValueTimestamp, const DeusCore::DeusVector2& afterValue, uint32_t afterValueTimestamp, uint32_t currentMs) const
 	{

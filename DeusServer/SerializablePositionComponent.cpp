@@ -2,7 +2,7 @@
 
 namespace DeusServer
 {
-	SerializablePositionComponent::SerializablePositionComponent(Id componentId, GameObjectComponent::EComponentType componentType, DeusCore::DeusVector2 originValue, uint32_t originMs, DeusCore::DeusVector2 destinationValue, uint32_t destinationMs)
+	SerializablePositionComponent::SerializablePositionComponent(Id componentId, GameObjectComponent::EComponentType componentType, const std::shared_ptr<const DeusCore::DeusVector2> originValue, uint32_t originMs, const std::shared_ptr<const DeusCore::DeusVector2> destinationValue, uint32_t destinationMs)
 		: SerializableTimelineComponent<DeusCore::DeusVector2>(componentId, componentType, originValue, originMs, destinationValue, destinationMs)
 	{
 	}
@@ -21,11 +21,16 @@ namespace DeusServer
 		DeserializeData(buffer, componentType);
 		m_componentType = (GameObjectComponent::EComponentType)componentType;
 		
-		DeserializeData<DeusCore::ISerializable>(buffer, m_originValue);
+		DeserializeData<DeusCore::ISerializable>(buffer, *m_originValue);
 		DeserializeData(buffer, m_originMs);
-		
-		DeserializeData<DeusCore::ISerializable>(buffer, m_destinationValue);
-		DeserializeData(buffer, m_destinationMs);
+
+		bool isThereDestination = false;
+		DeserializeData(buffer, isThereDestination);
+		if (isThereDestination)
+		{
+			DeserializeData<DeusCore::ISerializable>(buffer, *m_destinationValue);
+			DeserializeData(buffer, m_destinationMs);
+		}
 	}
 
 	void SerializablePositionComponent::Serialize(DeusCore::Buffer512 & buffer) const
@@ -35,17 +40,26 @@ namespace DeusServer
 		uint8_t componentType = m_componentType;
 		SerializeData(buffer, componentType);
 
-		SerializeData<DeusCore::ISerializable>(buffer, m_originValue);
+		SerializeData<DeusCore::ISerializable>(buffer, *m_originValue);
 		SerializeData(buffer, m_originMs);
 
-		SerializeData<DeusCore::ISerializable>(buffer, m_destinationValue);
-		SerializeData(buffer, m_destinationMs);
+		bool isThereDestination = false;
+		SerializeData(buffer, isThereDestination);
+		if (m_destinationValue != nullptr)
+		{
+			SerializeData<DeusCore::ISerializable>(buffer, *m_destinationValue);
+			SerializeData(buffer, m_destinationMs);
+		}
 	}
 
 	uint16_t SerializablePositionComponent::EstimateAnswerCurrentSerializedSize() const
 	{
-		return uint16_t(sizeof(m_componentId) + sizeof(m_componentType) 
-			+ m_originValue.EstimateAnswerCurrentSerializedSize() + sizeof(m_originMs)
-			+ m_destinationValue.EstimateAnswerCurrentSerializedSize() + sizeof(m_destinationMs));
+		uint16_t originDataSize = m_originValue != nullptr ? m_originValue->EstimateAnswerCurrentSerializedSize() + sizeof(m_originMs) : 0;
+		uint16_t destinationDataSize = m_destinationValue != nullptr ? m_destinationValue->EstimateAnswerCurrentSerializedSize() + sizeof(m_destinationMs) : 0;
+
+		return uint16_t(sizeof(m_componentId) + sizeof(m_componentType)
+			+ originDataSize 
+			+ sizeof(bool) // bool isThereDestination
+			+ destinationDataSize);
 	}
 }

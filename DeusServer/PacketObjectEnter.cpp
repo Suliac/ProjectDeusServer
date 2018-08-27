@@ -1,5 +1,5 @@
 #include "PacketObjectEnter.h"
-
+#include "DeusCore/Logger.h"
 namespace DeusServer
 {
 	PacketObjectEnter::PacketObjectEnter(Id objectId, GameObject::EObjectType objectType, bool isLocalPlayer, std::vector<std::shared_ptr<ISerializableComponent>>& components)
@@ -44,6 +44,16 @@ namespace DeusServer
 		SerializeData(buffer, objectType);
 
 		SerializeData(buffer, m_isLocalPlayer);
+
+		uint8_t componentsNumber = (uint8_t)m_components.size();
+		SerializeData(buffer, componentsNumber);
+
+		for (int i = 0; i < componentsNumber; i++)
+		{
+			SerializeData<DeusCore::ISerializable>(buffer, *m_components[i]);
+		}
+
+		//DeusCore::Logger::Instance()->Log("DEBUG", "Serializez ObjectEnter");
 	}
 
 	uint16_t PacketObjectEnter::EstimateCurrentSerializedSize() const

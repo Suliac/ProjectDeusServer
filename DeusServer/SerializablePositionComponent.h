@@ -6,7 +6,7 @@ namespace DeusServer
 	class SerializablePositionComponent:  public SerializableTimelineComponent<DeusCore::DeusVector2>
 	{
 	public:
-		SerializablePositionComponent(Id componentId, GameObjectComponent::EComponentType componentType, DeusCore::DeusVector2 originValue, uint32_t originMs, DeusCore::DeusVector2 destinationValue, uint32_t destinationMs);
+		SerializablePositionComponent(Id componentId, GameObjectComponent::EComponentType componentType, const std::shared_ptr<const DeusCore::DeusVector2> originValue, uint32_t originMs, const std::shared_ptr<const DeusCore::DeusVector2> destinationValue, uint32_t destinationMs);
 		~SerializablePositionComponent();
 
 		virtual void Deserialize(DeusCore::Buffer512 & buffer) override;

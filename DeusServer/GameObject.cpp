@@ -51,25 +51,25 @@ namespace DeusServer
 			{
 			case GameObjectComponent::EComponentType::HealthComponent:
 			{
-				std::shared_ptr<const int>originValue = std::dynamic_pointer_cast<HealthTimeLineComponent>(component.second)->GetValueAtTime(currentMs, originMs, true);
-				std::shared_ptr<const int>destValue = std::dynamic_pointer_cast<HealthTimeLineComponent>(component.second)->GetValueAtTime(currentMs, destMs, false);
+				const std::shared_ptr<const int>originValue = std::dynamic_pointer_cast<HealthTimeLineComponent>(component.second)->GetValueAtTime(currentMs, originMs, true);
+				const std::shared_ptr<const int>destValue = std::dynamic_pointer_cast<HealthTimeLineComponent>(component.second)->GetValueAtTime(currentMs, destMs, false);
 
 				serializableCompo = std::make_shared<SerializableHealthComponent>(component.second->GetId(),
 					component.second->GetType(),
-					*originValue, originMs,
-					*destValue, destMs);
+					originValue, originMs,
+					destValue, destMs);
 
 				break;
 			}
 			case GameObjectComponent::EComponentType::PositionComponent:
 			{
-				std::shared_ptr<const DeusCore::DeusVector2> originValue = std::dynamic_pointer_cast<PositionTimeLineComponent>(component.second)->GetValueAtTime(currentMs, originMs, true);
-				std::shared_ptr<const DeusCore::DeusVector2> destValue = std::dynamic_pointer_cast<PositionTimeLineComponent>(component.second)->GetValueAtTime(currentMs, destMs, false);
+				const std::shared_ptr<const DeusCore::DeusVector2> originValue = std::dynamic_pointer_cast<PositionTimeLineComponent>(component.second)->GetValueAtTime(currentMs, originMs, true);
+				const std::shared_ptr<const DeusCore::DeusVector2> destValue = std::dynamic_pointer_cast<PositionTimeLineComponent>(component.second)->GetValueAtTime(currentMs, destMs, false);
 
 				serializableCompo = std::make_shared<SerializablePositionComponent>(component.second->GetId(),
 					component.second->GetType(),
-					*originValue, originMs,
-					*destValue, destMs);
+					originValue, originMs,
+					destValue, destMs);
 				break;
 			}
 			default:
