@@ -234,11 +234,15 @@ namespace DeusServer
 			break;
 
 		case DeusCore::Packet::EMessageType::ConnectedUdpAnswer:
+		{
 			m_connectionsLocker.lock();
-			m_clientsConnections[p_packet->first]->SetUdpConnectionInitialized();
-			DeusCore::Logger::Instance()->Log(m_name, "ConnectedUdpAnswer client :" + std::to_string(p_packet->first));
+			std::string playerName = std::dynamic_pointer_cast<DeusCore::PacketConnectedUdpAnswer>(p_packet->second)->GetNickname();
+			m_clientsConnections[p_packet->first]->SetUdpConnectionInitialized(playerName);
+
+			DeusCore::Logger::Instance()->Log(m_name, "New client : " + playerName);
 			m_connectionsLocker.unlock();
 			break;
+		}
 			//NB : Disconnect event already managed in NetworkServer
 		default:
 			break;

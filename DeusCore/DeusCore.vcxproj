@@ -37,6 +37,7 @@
     <ClCompile Include="PacketCreateGameRequest.cpp" />
     <ClCompile Include="PacketDeleteGameRequest.cpp" />
     <ClCompile Include="PacketFactory.cpp" />
+    <ClCompile Include="PacketGameStarted.cpp" />
     <ClCompile Include="PacketGetGamesAnswer.cpp" />
     <ClCompile Include="PacketGetGamesRequest.cpp" />
     <ClCompile Include="PacketJoinGameAnswer.cpp" />
@@ -78,6 +79,7 @@
     <ClInclude Include="PacketCreateGameRequest.h" />
     <ClInclude Include="PacketDeleteGameRequest.h" />
     <ClInclude Include="PacketFactory.h" />
+    <ClInclude Include="PacketGameStarted.h" />
     <ClInclude Include="PacketGetGamesAnswer.h" />
     <ClInclude Include="PacketGetGamesRequest.h" />
     <ClInclude Include="PacketJoinGameAnswer.h" />

@@ -48,6 +48,7 @@ namespace DeusServer
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::LeaveGameRequest);
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::NewPlayer);
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::PlayerReady);
+		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::GameStarted);
 
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::ObjectChangeCell);
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::CellFirePacket);
@@ -64,6 +65,7 @@ namespace DeusServer
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::LeaveGameRequest);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::NewPlayer);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::PlayerReady);
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::GameStarted);
 
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::ObjectChangeCell);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::CellFirePacket);
@@ -136,7 +138,9 @@ namespace DeusServer
 		case DeusCore::Packet::EMessageType::CellFirePacket:
 			ManageCellFirePacket(std::dynamic_pointer_cast<CellFirePacket>(p_packet->second));
 			break;
-
+		case DeusCore::Packet::EMessageType::GameStarted:
+			ManageGameStarted(std::dynamic_pointer_cast<DeusCore::PacketGameStarted>(p_packet->second));
+			break;
 			//NB : Disconnect event already managed in NetworkServer
 		default:
 			break;
@@ -197,16 +201,19 @@ namespace DeusServer
 
 		m_playersLocker.lock(); // <------------- LOCK
 		// send to the other player that a new one just joined
+
+		std::string playerName = m_clientsConnections[clientId]->GetPlayerName();
 		for (const auto& player : m_playersInfos)
 		{
 			std::unique_ptr<DeusCore::PacketNewPlayerJoinGame> p_newPlayerJoinPacket = std::unique_ptr<DeusCore::PacketNewPlayerJoinGame>(new DeusCore::PacketNewPlayerJoinGame());
-			p_newPlayerJoinPacket->SetNickname("Player " + std::to_string(clientId));
+			
+			p_newPlayerJoinPacket->SetNickname(playerName);
 			p_newPlayerJoinPacket->SetPlayerId(clientId);
 
 			m_clientsConnections[player.first]->SendPacket(std::move(p_newPlayerJoinPacket), true);
 		}
 
-		m_playersInfos[clientId] = DeusPlayerInfos("Player " + std::to_string(clientId));
+		m_playersInfos[clientId] = DeusPlayerInfos(playerName);
 
 		// send feedback to client
 		std::unique_ptr<DeusCore::PacketJoinGameAnswer> p_feedBackJoinPacket = std::unique_ptr<DeusCore::PacketJoinGameAnswer>(new DeusCore::PacketJoinGameAnswer());
@@ -312,6 +319,7 @@ namespace DeusServer
 			// check if there is listener on that cell
 			if (m_cells[p_packetReceived->GetCellId()].size() > 0)
 			{
+				DeusCore::PacketSPtr p_packet = p_packetReceived->GetPacket();
 				for (int listenerId : m_cells[p_packetReceived->GetCellId()])
 				{
 					m_playersLocker.lock(); // <----------------- LOCK
@@ -319,7 +327,9 @@ namespace DeusServer
 					// this client is eligible for the packet if :
 					// - player already know this object (entered once in inner area)
 					if (IsPlayerFollowingObject(listenerId, p_packetReceived->GetObjectId()))
-						SendPacket(std::move(p_packetReceived->ExtractPacket()), listenerId, SEND_UDP);
+					{
+						SendPacket(p_packet, listenerId, SEND_UDP);
+					}
 
 					m_playersLocker.unlock(); // <----------------- UNLOCK
 
@@ -329,14 +339,24 @@ namespace DeusServer
 		}
 	}
 
+	void GameNetworkServer::ManageGameStarted(std::shared_ptr<DeusCore::PacketGameStarted> p_packet)
+	{
+		m_playersLocker.lock(); // <------------- LOCK
+		for (const auto& playerInfo : m_playersInfos)
+		{
+			SendPacket(p_packet, playerInfo.first, false);
+		}
+		m_playersLocker.unlock(); // <------------- UNLOCK
+	}
+
 	//---------------------------------------------------------------------------------
 	bool GameNetworkServer::CanStartGame()
 	{
 		m_lockClients.lock(); // <----------------- LOCK
-		unsigned int nbrClients = m_clientsConnections.size();
+		uint16_t nbrClients = m_clientsConnections.size();
 		m_lockClients.unlock();// <----------------- UNLOCK
 
-		unsigned int nbrPlayerReady = 0;
+		uint16_t nbrPlayerReady = 0;
 
 		for (const auto& playerIt : m_playersInfos)
 		{

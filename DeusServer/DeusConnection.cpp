@@ -10,15 +10,14 @@ namespace DeusServer
 	}
 
 	//---------------------------------------------------------------------------------
-	void DeusConnection::AddPacketToQueue(DeusCore::PacketUPtr p_packet)
+	void DeusConnection::AddPacketToQueue(DeusCore::PacketSPtr p_packet)
 	{
 		if (!p_packet)
 			return;
-		DeusCore::PacketSPtr p_sPacket = std::move(p_packet);
 
 		m_packetQueueLock.lock();
 		//DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Push packet");
-		m_packetsToSend.push_back(std::make_pair(0, p_sPacket));
+		m_packetsToSend.push_back(std::make_pair(0, p_packet));
 		m_packetQueueLock.unlock();
 
 		p_packet.reset(); // we don't have packet ownership anymore
@@ -32,26 +31,5 @@ namespace DeusServer
 		m_gameIdLock.unlock();
 	}
 
-	//---------------------------------------------------------------------------------
-	/*bool DeusConnection::TryTakePacket(DeusCore::PacketSPtr & p_packet)
-	{
-		bool popedElement = false;
-
-		// don't block the execution :
-		// add packet is more important than try to take them
-		if (m_packetQueueLock.try_lock()) 
-		{
-			if (m_packetsToSend.size() > 0)
-			{
-				p_packet = std::move(m_packetsToSend.front().second);
-				m_packetsToSend.pop();
-
-				popedElement = true;
-			}
-			m_packetQueueLock.unlock();
-		}
-
-		return popedElement;
-	}*/
 }
 

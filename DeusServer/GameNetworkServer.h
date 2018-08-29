@@ -66,6 +66,7 @@ namespace DeusServer
 		bool NewPlayer(Id clientId, DeusClientSPtr clientConnection);
 		void ObjectChangedCell(std::shared_ptr<PacketObjectChangeCell> p_packetReceived);
 		void ManageCellFirePacket(std::shared_ptr<CellFirePacket> p_packetReceived);
+		void ManageGameStarted(std::shared_ptr<DeusCore::PacketGameStarted> p_packet);
 	private:
 		bool CanStartGame();
 

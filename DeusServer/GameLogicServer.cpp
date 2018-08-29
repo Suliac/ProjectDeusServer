@@ -180,7 +180,9 @@ namespace DeusServer
 		// 3 - Start the game logic
 		Start();
 
-
+		// 4 - notify players
+		DeusCore::PacketSPtr p_packetGameStarted = std::shared_ptr<DeusCore::PacketGameStarted>(new DeusCore::PacketGameStarted());
+		DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, 0, p_packetGameStarted);
 	}
 
 	void GameLogicServer::PlayerDisconnected(Id clientId)
@@ -231,7 +233,7 @@ namespace DeusServer
 
 	void GameLogicServer::UpdatePlayerDirection(Id clientId, Id componentId, DeusCore::DeusVector2 destination)
 	{
-		DeusCore::Logger::Instance()->Log(m_name, "|----------------------------------------------------------------- |");
+		//DeusCore::Logger::Instance()->Log(m_name, "|----------------------------------------------------------------- |");
 		
 		GameObjectId objectId = 0;
 
@@ -256,7 +258,7 @@ namespace DeusServer
 					const auto& gameObjIt = cellGameObjects.second.find(objectId);
 					if (gameObjIt != cellGameObjects.second.end())
 					{
-						DeusCore::Logger::Instance()->Log(m_name, "Update client : " + std::to_string(clientId) + " with componentId : " + std::to_string(componentId));
+						//DeusCore::Logger::Instance()->Log(m_name, "Update client : " + std::to_string(clientId) + " with componentId : " + std::to_string(componentId));
 
 						// Search for PositionComponent
 						std::shared_ptr<GameObjectComponent> compo = gameObjIt->second->GetComponent(componentId);
@@ -273,7 +275,7 @@ namespace DeusServer
 							float sqrtDist = DeusCore::DeusVector2::SqrtMagnitude(*p_posAtUpdate, destination);
 							uint32_t dtReachDestinationMs = sqrtDist / SPEED_MS; // t = d / s
 							
-							DeusCore::Logger::Instance()->Log(m_name, "reach destination in : "+std::to_string(dtReachDestinationMs)+"ms at : "+std::to_string(currentMs + dtReachDestinationMs));
+							//DeusCore::Logger::Instance()->Log(m_name, "reach destination in : "+std::to_string(dtReachDestinationMs)+"ms at : "+std::to_string(currentMs + dtReachDestinationMs));
 
 							std::dynamic_pointer_cast<PositionTimeLineComponent>(compo)->InsertData(std::make_shared<const DeusCore::DeusVector2>(destination), currentMs + dtReachDestinationMs);
 
@@ -296,7 +298,7 @@ namespace DeusServer
 				DeusCore::Logger::Instance()->Log(m_name, e.what());
 			}
 
-			DeusCore::Logger::Instance()->Log(m_name, "|----------------------------------------------------------------- |");
+			//DeusCore::Logger::Instance()->Log(m_name, "|----------------------------------------------------------------- |");
 
 		}
 	}

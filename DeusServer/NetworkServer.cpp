@@ -166,13 +166,13 @@ namespace DeusServer
 	}
 
 	//---------------------------------------------------------------------------------
-	bool NetworkServer::SendPacket(DeusCore::PacketUPtr&& p_packet, Id clientId, bool sendTcp)
+	bool NetworkServer::SendPacket(DeusCore::PacketSPtr p_packet, Id clientId, bool sendTcp)
 	{
 		m_lockClients.lock();// <------------ CLIENT LOCK
 		DeusClientConnections::iterator findClientIt = m_clientsConnections.find(clientId);
 		if (findClientIt != m_clientsConnections.end())
 		{
-			findClientIt->second->SendPacket(std::move(p_packet), sendTcp);
+			findClientIt->second->SendPacket(p_packet, sendTcp);
 
 			m_lockClients.unlock(); // <------------ CLIENT UNLOCK
 			return true;

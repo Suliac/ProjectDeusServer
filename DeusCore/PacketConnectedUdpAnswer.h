@@ -14,7 +14,7 @@ namespace DeusCore
 		PacketConnectedUdpAnswer();
 		~PacketConnectedUdpAnswer();
 
-		const std::string& GetNickname() const { return m_playerNickname; }
+		std::string GetNickname() const { return m_playerNickname; }
 		void SetNickname(const std::string& value) { m_playerNickname = value; }
 		
 	protected:

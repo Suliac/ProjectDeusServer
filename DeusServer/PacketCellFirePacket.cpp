@@ -2,7 +2,7 @@
 
 namespace DeusServer
 {
-	CellFirePacket::CellFirePacket(Id cellId, Id objectId, std::unique_ptr<DeusCore::Packet>&& packetFired)
+	CellFirePacket::CellFirePacket(Id cellId, Id objectId, std::shared_ptr<DeusCore::Packet>&& packetFired)
 		: DeusCore::Packet(DeusCore::Packet::EMessageType::CellFirePacket)
 	{
 		m_cellId = cellId;

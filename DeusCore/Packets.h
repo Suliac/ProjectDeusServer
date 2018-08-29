@@ -22,4 +22,5 @@
 #include "PacketUpdateHealth.h"
 #include "PacketUpdateMovementAnswer.h"
 #include "PacketUpdateMovementRequest.h"
+#include "PacketGameStarted.h"
 

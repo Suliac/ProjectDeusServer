@@ -189,6 +189,7 @@
     <ClCompile Include="DeusVector2.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="PacketGameStarted.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -309,5 +310,6 @@
     <ClInclude Include="DeusVector2.h">
       <Filter>Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="PacketGameStarted.h" />
   </ItemGroup>
 </Project>

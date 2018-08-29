@@ -11,7 +11,9 @@ namespace DeusServer
 		~DeusUdpConnection();
 
 		void Init(const std::string& ipAddr, const std::string& port);
-		void SetUdpConnectionInitialized() { m_udpConnectionInitialized = true; }
+		void SetUdpConnectionInitialized() {
+			m_udpConnectionInitialized = true; 
+		}
 	protected:
 		virtual void ThreadSendAndReceive() override;
 

@@ -42,7 +42,7 @@ namespace DeusServer
 		void DisconnectDeleguate(DeusCore::DeusEventSPtr p_packet);
 
 		// Send Packet to a client
-		bool SendPacket(DeusCore::PacketUPtr&& p_packet, Id clientId, bool sendTcp);
+		bool SendPacket(DeusCore::PacketSPtr p_packet, Id clientId, bool sendTcp);
 
 		bool GetWantToStop() const { return m_wantToStop; };
 

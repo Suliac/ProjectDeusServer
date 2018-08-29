@@ -5,13 +5,13 @@ namespace DeusServer
 	class CellFirePacket : public DeusCore::Packet
 	{
 	public:
-		CellFirePacket(Id cellId, Id objectId, std::unique_ptr<DeusCore::Packet>&& packetFired);
+		CellFirePacket(Id cellId, Id objectId, std::shared_ptr<DeusCore::Packet>&& packetFired);
 		CellFirePacket();
 		~CellFirePacket();
 
 		Id GetCellId() const { return m_cellId; }
 		Id GetObjectId() const { return m_objectId; }
-		std::unique_ptr<DeusCore::Packet> ExtractPacket() { return std::move(m_packet); }
+		std::shared_ptr<DeusCore::Packet> GetPacket() { return m_packet; }
 
 	protected:
 		virtual void OnDeserialize(DeusCore::Buffer512 & buffer) override;
@@ -19,7 +19,7 @@ namespace DeusServer
 		virtual uint16_t EstimateCurrentSerializedSize() const override;
 
 	private:
-		std::unique_ptr<DeusCore::Packet> m_packet;
+		std::shared_ptr<DeusCore::Packet> m_packet;
 		Id m_cellId;
 		Id m_objectId;
 	};

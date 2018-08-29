@@ -38,6 +38,7 @@ namespace DeusCore
 			PlayerNotReady			= 21,
 			StartGame				= 22,
 			NewPlayerJoin			= 23,
+			GameStarted				= 24,
 
 			// Game Logic
 			ObjectEnter				= 50,

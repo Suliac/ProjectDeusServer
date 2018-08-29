@@ -73,7 +73,7 @@ namespace DeusServer
 						// NB : we send packet per packet
 						if (p_toSendPacket)
 						{
-							DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Something to get or deliver");
+							//DeusCore::Logger::Instance()->Log("Client " + std::to_string(m_id), "Something to get or deliver");
 							// Send our serialized packet
 							m_clientTCPSocket->Send(*(p_toSendPacket), sentByteCount);
 						}

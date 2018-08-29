@@ -21,14 +21,13 @@ namespace DeusServer
 	{
 	}
 
-	void DeusClient::SendPacket(DeusCore::PacketUPtr p_packet, bool isTcp)
+	void DeusClient::SendPacket(DeusCore::PacketSPtr p_packet, bool isTcp)
 	{
 		if (isTcp)
-			m_tcpConnection.AddPacketToQueue(std::move(p_packet));
+			m_tcpConnection.AddPacketToQueue(p_packet);
 		else
-			m_udpConnection.AddPacketToQueue(std::move(p_packet));
+			m_udpConnection.AddPacketToQueue(p_packet);
 	}
-
 	void DeusClient::SetConnectionGameId(Id gameId)
 	{
 		m_tcpConnection.SetGameId(gameId);
