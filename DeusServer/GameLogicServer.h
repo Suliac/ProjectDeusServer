@@ -50,7 +50,7 @@ namespace DeusServer
 		void PlayerDisconnected(Id clientId);
 		void UpdatePlayerDirection(Id clientId, Id componentId, DeusCore::DeusVector2 newDir);
 	private:
-		const float SPEED_SEC = 1;
+		const float SPEED_SEC = 5;
 		const float SPEED_MS = SPEED_SEC / 1000.f;
 
 		Id GetCellIdOfGameObject(Id objectId);
