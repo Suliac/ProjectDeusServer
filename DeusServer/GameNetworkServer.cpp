@@ -196,12 +196,10 @@ namespace DeusServer
 		m_clientsConnections.insert(std::make_pair(clientId, clientConnection));
 		clientConnection->SetConnectionGameId(m_gameId);
 		DeusCore::Logger::Instance()->Log(m_name, "Client (id:" + std::to_string(clientId) + ") Joined the game");
-
-		// Init player datas
-
+		
 		m_playersLocker.lock(); // <------------- LOCK
-		// send to the other player that a new one just joined
 
+		// send to the other player that a new one just joined
 		std::string playerName = m_clientsConnections[clientId]->GetPlayerName();
 		for (const auto& player : m_playersInfos)
 		{
@@ -307,7 +305,7 @@ namespace DeusServer
 		ManageLeftCell(p_packetReceived->GetLeftCellId(), p_packetReceived->GetEnteredCellId(), p_packetReceived->GetGameObject()->GetId(), p_packetReceived->GetObjectInLeavingCells());
 
 		// 4 - Send ObjectEnter packet to other player
-		ManageEnteredCell(p_packetReceived->GetLeftCellId(), p_packetReceived->GetEnteredCellId(), p_packetReceived->GetGameObject(), p_packetReceived->GetObjectInEnteringCells(), p_packetReceived->IsInit());
+		ManageEnteredCell(p_packetReceived->GetLeftCellId(), p_packetReceived->GetEnteredCellId(), p_packetReceived->GetGameObject(), p_packetReceived->GetObjectInEnteringCells(), p_packetReceived->IsInit(), p_packetReceived->GetClientId());
 
 	}
 
@@ -489,7 +487,7 @@ namespace DeusServer
 		}
 	}
 
-	void GameNetworkServer::ManageEnteredCell(CellId cellLeftId, CellId cellEnteredId, std::shared_ptr<const GameObject> object, const std::vector<std::shared_ptr<const GameObject>>& objectInCellsEntered, bool notifyAllPlayer)
+	void GameNetworkServer::ManageEnteredCell(CellId cellLeftId, CellId cellEnteredId, std::shared_ptr<const GameObject> object, const std::vector<std::shared_ptr<const GameObject>>& objectInCellsEntered, bool notifyAllPlayer, Id playerLinkedToGameObject)
 	{
 		if (cellEnteredId > 0)
 		{
@@ -511,8 +509,18 @@ namespace DeusServer
 						{
 							for (const auto& gameObjectAlreadyHere : objectInCellsEntered)
 							{
+								Id linkedPlayer = 0;
+								for (const auto& playerInfo : m_playersInfos)
+								{
+									if (playerInfo.second.GameObjectId == gameObjectAlreadyHere->GetId())
+									{
+										linkedPlayer = playerInfo.first;
+										break;
+									}
+								}
+
 								assert(gameObjectAlreadyHere->GetId() != m_playersInfos[listenerId].GameObjectId);
-								ObjectEnter(listenerId, gameObjectAlreadyHere);
+								ObjectEnter(listenerId, gameObjectAlreadyHere, linkedPlayer);
 							}
 						}
 						//////////////////////////////////////////////////////////////
@@ -531,7 +539,7 @@ namespace DeusServer
 					if (!IsPlayerFollowingObject(listenerId, object->GetId())
 						&& IsObjectEnteringInnerArea(listenerId, cellLeftId, cellEnteredId))
 					{
-						ObjectEnter(listenerId, object);
+						ObjectEnter(listenerId, object, playerLinkedToGameObject);
 					}
 					//////////////////////////////////////////////////////////////
 
@@ -542,7 +550,7 @@ namespace DeusServer
 		}
 	}
 
-	void GameNetworkServer::ObjectEnter(Id clientId, std::shared_ptr<const GameObject> gameObject)
+	void GameNetworkServer::ObjectEnter(Id clientId, std::shared_ptr<const GameObject> gameObject, Id playerLinked)
 	{
 		//update id we follow
 		m_playersInfos[clientId].ObjectsIdsFollowed.push_back(gameObject->GetId());
@@ -551,8 +559,7 @@ namespace DeusServer
 		std::vector<std::shared_ptr<ISerializableComponent>> objectsComponents;
 		gameObject->GetSerializableComponents(objectsComponents);
 
-
-		DeusCore::PacketUPtr p_packetEnteredCell = std::unique_ptr<PacketObjectEnter>(new PacketObjectEnter(gameObject->GetId(), gameObject->GetType(), gameObject->GetId() == m_playersInfos[clientId].GameObjectId, objectsComponents));
+		DeusCore::PacketUPtr p_packetEnteredCell = std::unique_ptr<PacketObjectEnter>(new PacketObjectEnter(gameObject->GetId(), gameObject->GetType(), gameObject->GetId() == m_playersInfos[clientId].GameObjectId, objectsComponents, playerLinked));
 		SendPacket(std::move(p_packetEnteredCell), clientId, SEND_UDP);
 	}
 

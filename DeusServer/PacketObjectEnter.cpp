@@ -2,12 +2,13 @@
 #include "DeusCore/Logger.h"
 namespace DeusServer
 {
-	PacketObjectEnter::PacketObjectEnter(Id objectId, GameObject::EObjectType objectType, bool isLocalPlayer, std::vector<std::shared_ptr<ISerializableComponent>>& components)
+	PacketObjectEnter::PacketObjectEnter(Id objectId, GameObject::EObjectType objectType, bool isLocalPlayer, std::vector<std::shared_ptr<ISerializableComponent>>& components, Id playerConnectedId)
 		: DeusCore::Packet(Packet::EMessageType::ObjectEnter)
 	{
 		m_objectId = objectId;
 		m_objectType = objectType;
 		m_isLocalPlayer = isLocalPlayer;
+		m_playerId = playerConnectedId;
 
 		m_components.swap(components);
 	}
@@ -44,6 +45,7 @@ namespace DeusServer
 		SerializeData(buffer, objectType);
 
 		SerializeData(buffer, m_isLocalPlayer);
+		SerializeData(buffer, m_playerId);
 
 		uint8_t componentsNumber = (uint8_t)m_components.size();
 		SerializeData(buffer, componentsNumber);
@@ -62,6 +64,6 @@ namespace DeusServer
 		for (size_t i = 0; i < m_components.size(); i++)
 			sizeComponents += m_components[i]->EstimateAnswerCurrentSerializedSize();
 
-		return uint16_t(sizeof(m_objectId) + sizeof(m_objectType) + sizeof(m_isLocalPlayer) + sizeComponents);
+		return uint16_t(sizeof(m_objectId) + sizeof(m_objectType) + sizeof(m_isLocalPlayer) +sizeof(m_playerId) + sizeComponents);
 	}
 }

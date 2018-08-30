@@ -9,7 +9,7 @@ namespace DeusServer
 	class PacketObjectEnter : public DeusCore::Packet
 	{
 	public:
-		PacketObjectEnter(Id objectId, GameObject::EObjectType objectType, bool isLocalPlayer, std::vector<std::shared_ptr<ISerializableComponent>>& components);
+		PacketObjectEnter(Id objectId, GameObject::EObjectType objectType, bool isLocalPlayer, std::vector<std::shared_ptr<ISerializableComponent>>& components, Id playerConnectedId);
 		~PacketObjectEnter();
 
 	protected:
@@ -21,6 +21,7 @@ namespace DeusServer
 		Id m_objectId;
 		GameObject::EObjectType m_objectType;
 		bool m_isLocalPlayer;
+		Id m_playerId;
 
 		SerializableComponents m_components;
 	};

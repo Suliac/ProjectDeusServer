@@ -82,9 +82,9 @@ namespace DeusServer
 		void UpdateCellSubscription(Id clientId, CellId cellLeavedId, CellId cellEnteredId);
 		void UpdateGameObjectIdForPlayer(Id clientId, Id objectId);
 		void ManageLeftCell(CellId cellLeftId, CellId cellEnteredId, Id objectId, const std::vector<std::shared_ptr<const GameObject>>& objectInCellsLeft);
-		void ManageEnteredCell(CellId cellLeftId, CellId cellEnteredId, std::shared_ptr<const GameObject> object, const std::vector<std::shared_ptr<const GameObject>>& objectInCellsEntered, bool notifyAllPlayer);
+		void ManageEnteredCell(CellId cellLeftId, CellId cellEnteredId, std::shared_ptr<const GameObject> object, const std::vector<std::shared_ptr<const GameObject>>& objectInCellsEntered, bool notifyAllPlayer, Id playerLinkedToGameObject);
 
-		void ObjectEnter(Id clientId, std::shared_ptr<const GameObject> gameObject);
+		void ObjectEnter(Id clientId, std::shared_ptr<const GameObject> gameObject, Id playerLinkedToGameObject);
 		void ObjectLeft(Id objectId, Id clientId);
 
 		//////////////////////////////////////////////////////
