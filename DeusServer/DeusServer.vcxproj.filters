@@ -124,7 +124,9 @@
     <ClCompile Include="SerializablePositionComponent.cpp">
       <Filter>Serialization\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="SerializableHealthComponent.cpp" />
+    <ClCompile Include="SerializableHealthComponent.cpp">
+      <Filter>Serialization\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeusClient.h">
@@ -199,6 +201,8 @@
     <ClInclude Include="SerializableTimelineComponent.h">
       <Filter>Serialization\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="SerializableHealthComponent.h" />
+    <ClInclude Include="SerializableHealthComponent.h">
+      <Filter>Serialization\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
