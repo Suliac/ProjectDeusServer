@@ -13,15 +13,6 @@
     <Filter Include="Network\Sockets\Headers">
       <UniqueIdentifier>{bf1eb49f-8d84-427b-9460-52273885fae5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Network\Exceptions">
-      <UniqueIdentifier>{3625f0c0-fea6-4311-937a-96f92a80733a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Network\Exceptions\Headers">
-      <UniqueIdentifier>{09052e09-1dd4-4e5d-8a18-67b24137f6e3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Network\Exceptions\Sources">
-      <UniqueIdentifier>{89ca66ca-bb8b-4f70-850f-eed8be91469c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Network\Packets">
       <UniqueIdentifier>{9f69e74b-523b-475e-a46e-d417d3856424}</UniqueIdentifier>
     </Filter>
@@ -79,6 +70,15 @@
     <Filter Include="Network\Packets\Sources\Logic">
       <UniqueIdentifier>{05050694-7593-479a-9de1-a8e98b3c28f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Exceptions">
+      <UniqueIdentifier>{3625f0c0-fea6-4311-937a-96f92a80733a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Exceptions\Headers">
+      <UniqueIdentifier>{09052e09-1dd4-4e5d-8a18-67b24137f6e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Exceptions\Sources">
+      <UniqueIdentifier>{89ca66ca-bb8b-4f70-850f-eed8be91469c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Socket.cpp">
@@ -91,13 +91,13 @@
       <Filter>Network\Sockets\Sources</Filter>
     </ClCompile>
     <ClCompile Include="DeusSocketException.cpp">
-      <Filter>Network\Exceptions\Sources</Filter>
+      <Filter>Exceptions\Sources</Filter>
     </ClCompile>
     <ClCompile Include="DeusSerializationException.cpp">
-      <Filter>Network\Exceptions\Sources</Filter>
+      <Filter>Exceptions\Sources</Filter>
     </ClCompile>
     <ClCompile Include="DeusException.cpp">
-      <Filter>Network\Exceptions\Sources</Filter>
+      <Filter>Exceptions\Sources</Filter>
     </ClCompile>
     <ClCompile Include="Logger.cpp">
       <Filter>Log\Sources</Filter>
@@ -189,7 +189,10 @@
     <ClCompile Include="DeusVector2.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="PacketGameStarted.cpp" />
+    <ClCompile Include="PacketGameStarted.cpp">
+      <Filter>Network\Packets\Sources\Games</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketSendUDP.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -202,13 +205,13 @@
       <Filter>Network\Sockets\Headers</Filter>
     </ClInclude>
     <ClInclude Include="DeusSocketException.h">
-      <Filter>Network\Exceptions\Headers</Filter>
+      <Filter>Exceptions\Headers</Filter>
     </ClInclude>
     <ClInclude Include="DeusSerializationException.h">
-      <Filter>Network\Exceptions\Headers</Filter>
+      <Filter>Exceptions\Headers</Filter>
     </ClInclude>
     <ClInclude Include="DeusException.h">
-      <Filter>Network\Exceptions\Headers</Filter>
+      <Filter>Exceptions\Headers</Filter>
     </ClInclude>
     <ClInclude Include="FastDelegate.h">
       <Filter>Delegate</Filter>
@@ -297,7 +300,6 @@
     <ClInclude Include="PacketNewPlayerJoinGame.h">
       <Filter>Network\Packets\Headers\Games</Filter>
     </ClInclude>
-    <ClInclude Include="ISerializable.h" />
     <ClInclude Include="PacketUpdateHealth.h">
       <Filter>Network\Packets\Headers\Logic</Filter>
     </ClInclude>
@@ -310,6 +312,12 @@
     <ClInclude Include="DeusVector2.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="PacketGameStarted.h" />
+    <ClInclude Include="PacketGameStarted.h">
+      <Filter>Network\Packets\Headers\Games</Filter>
+    </ClInclude>
+    <ClInclude Include="ISerializable.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketSendUDP.h" />
   </ItemGroup>
 </Project>

@@ -151,6 +151,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DeusListeningUdpConnection.cpp" />
+    <ClCompile Include="DeusUdpListener.cpp" />
     <ClCompile Include="PacketCellFirePacket.cpp" />
     <ClCompile Include="DeusClient.cpp" />
     <ClCompile Include="DeusConnection.cpp" />
@@ -181,6 +183,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DeusListeningUdpConnection.h" />
+    <ClInclude Include="DeusUdpListener.h" />
     <ClInclude Include="ISerializableComponent.h" />
     <ClInclude Include="PacketCellFirePacket.h" />
     <ClInclude Include="DeusClient.h" />

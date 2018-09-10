@@ -63,6 +63,36 @@ namespace DeusCore
 		return true;
 	}
 
+	bool UdpSocket::SendTo(const PacketSendUDP& packet, int & byteSent)
+	{
+		Buffer512 buffer;
+		Packet::Serialize(buffer, *(packet.PacketToSend));
+
+		return SendTo(buffer, byteSent, packet.AddrInfos);
+	}
+
+	bool UdpSocket::SendTo(const Buffer512 & buffer, int & byteSent, std::shared_ptr<const addrinfo> addr)
+	{
+		return SendDatasTo((const char*)buffer.Data(), buffer.GetIndex(), byteSent, addr);
+	}
+
+	bool UdpSocket::SendDatasTo(const char * data, size_t size, int & byteSent, std::shared_ptr<const addrinfo> addr)
+	{
+		assert(addr != nullptr);
+
+		if (!CheckSocketStates(true, false)) // Check if socket is writable
+			return false;
+
+		byteSent = sendto(m_handler, data, size, 0, addr->ai_addr, addr->ai_addrlen);
+		if (byteSent == SOCKET_ERROR) {
+			std::string message = "UDP send failed with error: " + std::to_string(WSAGetLastError());
+			SocketClose();
+			throw DeusSocketException(message);
+		}
+
+		return true;
+	}
+
 	//---------------------------------------------------------------------------------
 	// Receive char* buffer of datas 
 	//---------------------------------------------------------------------------------
@@ -81,6 +111,35 @@ namespace DeusCore
 
 		int slen = (int)m_clientConnectedInfos->ai_addrlen;
 		byteRecv = recvfrom(m_handler, data, size, 0, m_clientConnectedInfos->ai_addr, &slen); // read socket's datas
+		if (byteRecv < 0) // if there error, throw a DeusSocketException
+		{
+			std::string message = "recv failed with error: " + std::to_string(WSAGetLastError());
+			SocketClose();
+			throw DeusSocketException(message);
+		}
+
+		return true;
+	}
+
+
+	bool UdpSocket::RecvFrom(Buffer512 & buffer, int & byteRecv, std::shared_ptr<addrinfo> addr)
+	{
+		char tmpBuffer[SIZE_BUFFER];
+
+		if (!RecvDatasFrom(tmpBuffer, SIZE_BUFFER, byteRecv, addr))
+			return false; // nothing to read ! 
+
+		buffer.Set((const unsigned char*)tmpBuffer, byteRecv);
+		return true;
+	}
+
+	bool UdpSocket::RecvDatasFrom(char * data, size_t size, int & byteRecv, std::shared_ptr<addrinfo> addr)
+	{		
+		if (!CheckSocketStates(false, true)) // Check if socket is readable
+			return false;
+
+		int slen = (int)addr->ai_addrlen;
+		byteRecv = recvfrom(m_handler, data, size, 0, addr->ai_addr, &slen); // read socket's datas
 		if (byteRecv < 0) // if there error, throw a DeusSocketException
 		{
 			std::string message = "recv failed with error: " + std::to_string(WSAGetLastError());

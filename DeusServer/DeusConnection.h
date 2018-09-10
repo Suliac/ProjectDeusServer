@@ -14,6 +14,10 @@ namespace DeusServer
 	using DeusClientEventDeleguate = fastdelegate::FastDelegate2<int, DeusCore::PacketSPtr>;
 	using DeusClientEventDeleguateVector = std::vector<DeusClientEventDeleguate>;
 
+	// Timout before retry send or receive
+	const unsigned int TIMEOUT_US = 5000;
+	const unsigned int PACKET_DELAY_CHECK_ACK_MS = 100;
+	const unsigned int DECAL_PORT_UDP = 10000;
 
 #define DEFAULT_DEUSCLIENT_BUFFER_SIZE 2048
 	class DeusConnection
@@ -69,13 +73,7 @@ namespace DeusServer
 
 		// Counter 
 		int sentByteCount, readedByteCount;
-
-		// Timout before retry send or receive
-		const unsigned int TIMEOUT_US = 5000;
-		const unsigned int PACKET_DELAY_CHECK_ACK_MS = 100;
-		const unsigned int DECAL_PORT_UDP = 10000;
-
-
+		
 		// Do we want to stop the connection ?
 		bool m_cancellationRequested = false;
 

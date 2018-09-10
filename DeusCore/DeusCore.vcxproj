@@ -47,6 +47,7 @@
     <ClCompile Include="PacketNewPlayerJoinGame.cpp" />
     <ClCompile Include="PacketPlayerNotReady.cpp" />
     <ClCompile Include="PacketPlayerReady.cpp" />
+    <ClCompile Include="PacketSendUDP.cpp" />
     <ClCompile Include="PacketStartGame.cpp" />
     <ClCompile Include="PacketTest.cpp" />
     <ClCompile Include="PacketUpdateHealth.cpp" />
@@ -90,6 +91,7 @@
     <ClInclude Include="PacketPlayerNotReady.h" />
     <ClInclude Include="PacketPlayerReady.h" />
     <ClInclude Include="Packets.h" />
+    <ClInclude Include="PacketSendUDP.h" />
     <ClInclude Include="PacketStartGame.h" />
     <ClInclude Include="PacketTest.h" />
     <ClInclude Include="PacketUpdateHealth.h" />
