@@ -193,6 +193,8 @@
       <Filter>Network\Packets\Sources\Games</Filter>
     </ClCompile>
     <ClCompile Include="PacketSendUDP.cpp" />
+    <ClCompile Include="PacketPingRequest.cpp" />
+    <ClCompile Include="PacketPingAnswer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -319,5 +321,7 @@
       <Filter>Utilities</Filter>
     </ClInclude>
     <ClInclude Include="PacketSendUDP.h" />
+    <ClInclude Include="PacketPingRequest.h" />
+    <ClInclude Include="PacketPingAnswer.h" />
   </ItemGroup>
 </Project>

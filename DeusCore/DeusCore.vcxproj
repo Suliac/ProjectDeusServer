@@ -45,8 +45,10 @@
     <ClCompile Include="PacketLeaveGameAnswer.cpp" />
     <ClCompile Include="PacketLeaveGameRequest.cpp" />
     <ClCompile Include="PacketNewPlayerJoinGame.cpp" />
+    <ClCompile Include="PacketPingAnswer.cpp" />
     <ClCompile Include="PacketPlayerNotReady.cpp" />
     <ClCompile Include="PacketPlayerReady.cpp" />
+    <ClCompile Include="PacketPingRequest.cpp" />
     <ClCompile Include="PacketSendUDP.cpp" />
     <ClCompile Include="PacketStartGame.cpp" />
     <ClCompile Include="PacketTest.cpp" />
@@ -88,8 +90,10 @@
     <ClInclude Include="PacketLeaveGameAnswer.h" />
     <ClInclude Include="PacketLeaveGameRequest.h" />
     <ClInclude Include="PacketNewPlayerJoinGame.h" />
+    <ClInclude Include="PacketPingAnswer.h" />
     <ClInclude Include="PacketPlayerNotReady.h" />
     <ClInclude Include="PacketPlayerReady.h" />
+    <ClInclude Include="PacketPingRequest.h" />
     <ClInclude Include="Packets.h" />
     <ClInclude Include="PacketSendUDP.h" />
     <ClInclude Include="PacketStartGame.h" />

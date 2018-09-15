@@ -11,7 +11,7 @@ namespace DeusServer
 	DeusUdpListener* DeusUdpListener::p_instance = nullptr;
 	std::mutex DeusUdpListener::m_instanceLock;
 
-	void DeleteAddr(addrinfo* addr) {
+	void DeleteAddrNfo(addrinfo* addr) {
 		if (addr != nullptr)
 			freeaddrinfo(addr);
 	}
@@ -187,7 +187,7 @@ namespace DeusServer
 					///////////////////////////////////////////////////
 					if (dataToRecv)
 					{
-						std::shared_ptr<addrinfo> p_addrReceiver = std::shared_ptr<addrinfo>(nullptr, DeleteAddr);
+						std::shared_ptr<addrinfo> p_addrReceiver = std::shared_ptr<addrinfo>(nullptr, DeleteAddrNfo);
 						///////////////////////////////////////////////////////////
 						// 2.1 Get datas from the socket and put them into a buffer
 						do {
