@@ -19,7 +19,7 @@ namespace DeusServer
 	{
 	}
 
-	/*void DeusListeningUdpConnection::Init(const std::string & addr, const std::string & port)
+	/*void DeusListeningUdpConnection::Init(const std::string& addr, const std::string& port)
 	{
 		// 1 - Save client informations
 		addrinfo hints;
@@ -38,7 +38,13 @@ namespace DeusServer
 			throw DeusCore::DeusSocketException("Error when retreiving informations for [" + addr + "@" + port + "]. Error " + std::to_string(iResult));
 		}
 		p_clientInfo.reset(temp);
+
 	}*/
+
+	void DeusListeningUdpConnection::AddPacketToQueue(DeusCore::PacketSPtr p_packet)
+	{
+
+	}
 
 	void DeusListeningUdpConnection::RecvPacket(DeusCore::PacketSPtr p_packet)
 	{
@@ -48,6 +54,7 @@ namespace DeusServer
 	void DeusListeningUdpConnection::ThreadSendAndReceive()
 	{
 	}
+
 	bool DeusListeningUdpConnection::TryTakePacket(DeusCore::PacketSPtr & p_packet)
 	{
 		return false;

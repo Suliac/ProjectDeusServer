@@ -10,7 +10,8 @@ namespace DeusServer
 		DeusListeningUdpConnection(Id identifier);
 		~DeusListeningUdpConnection();
 
-		void Init(const std::string& addr, const std::string& port);
+		/*void Init(const std::string& addr, const std::string& port);*/
+		void AddPacketToQueue(DeusCore::PacketSPtr p_packet) override;
 		void RecvPacket(DeusCore::PacketSPtr p_packet);
 	private:
 		virtual void ThreadSendAndReceive() override;

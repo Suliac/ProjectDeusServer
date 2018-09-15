@@ -26,7 +26,7 @@ namespace DeusServer
 
 		DeusConnection(int id);
 
-		void AddPacketToQueue(DeusCore::PacketSPtr p_packet);
+		virtual void AddPacketToQueue(DeusCore::PacketSPtr p_packet);
 
 		void SetGameId(unsigned int value);
 
