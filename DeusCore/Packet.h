@@ -22,6 +22,8 @@ namespace DeusCore
 			Ack						= 3,
 			Connected				= 4,
 			ConnectedUdpAnswer		= 5,
+			PingRequest				= 6,
+			PingAnswer				= 7,
 
 			// Game management
 			CreateGameRequest		= 10,
