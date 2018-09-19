@@ -2,7 +2,7 @@
 #include "DeusSerializationException.h"
 namespace DeusCore
 {
-	/*PacketSyncClockAnswer::PacketSyncClockAnswer()
+	PacketSyncClockAnswer::PacketSyncClockAnswer()
 		: Packet(EMessageType::ClockSyncAnswer)
 	{
 	}
@@ -18,11 +18,11 @@ namespace DeusCore
 
 	void PacketSyncClockAnswer::OnSerialize(Buffer512 & buffer) const
 	{
-		DeserializeData(buffer, m_currentServerTimeStamp);
+		SerializeData(buffer, m_currentServerTimeStamp);
 	}
 
 	uint16_t PacketSyncClockAnswer::EstimateCurrentSerializedSize() const
 	{
 		return uint16_t(m_currentServerTimeStamp);
-	}*/
+	}
 }

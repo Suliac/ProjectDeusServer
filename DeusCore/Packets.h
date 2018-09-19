@@ -25,5 +25,7 @@
 #include "PacketGameStarted.h"
 #include "PacketPingAnswer.h"
 #include "PacketPingRequest.h"
+#include "PacketSyncClockRequest.h"
+#include "PacketSyncClockAnswer.h"
 
 

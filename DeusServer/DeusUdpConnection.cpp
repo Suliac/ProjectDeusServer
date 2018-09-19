@@ -172,15 +172,15 @@ namespace DeusServer
 									//AddPacketToQueue(p_answerPing);
 									m_clientUDPSocket->Send(*(p_answerPing), sentByteCount);
 								}
-								//else if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::ClockSyncRequest)
-								//{
-									//uint32_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-									//
-									//std::shared_ptr<DeusCore::PacketSyncClockAnswer> p_answerSync = std::shared_ptr<DeusCore::PacketSyncClockAnswer>(new DeusCore::PacketSyncClockAnswer());
-									//p_answerSync->SetServerTimeStamp(currentMs);
-									//
-									//m_clientUDPSocket->Send(*(p_answerSync), sentByteCount);
-								//}
+								else if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::ClockSyncRequest)
+								{
+									uint32_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+									
+									std::shared_ptr<DeusCore::PacketSyncClockAnswer> p_answerSync = std::shared_ptr<DeusCore::PacketSyncClockAnswer>(new DeusCore::PacketSyncClockAnswer());
+									p_answerSync->SetServerTimeStamp(currentMs);
+									
+									m_clientUDPSocket->Send(*(p_answerSync), sentByteCount);
+								}
 								else if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::Ack)
 								{
 									// if the message is an ACK, add the id ACKed to our vector

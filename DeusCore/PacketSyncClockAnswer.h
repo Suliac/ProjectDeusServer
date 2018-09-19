@@ -2,7 +2,7 @@
 #include "Packet.h"
 namespace DeusCore
 {
-	/*class PacketSyncClockAnswer : public Packet
+	class PacketSyncClockAnswer : public Packet
 	{
 	public:
 		PacketSyncClockAnswer();
@@ -17,6 +17,6 @@ namespace DeusCore
 
 	private:
 		uint32_t m_currentServerTimeStamp;
-	};*/
+	};
 }
 
