@@ -91,7 +91,9 @@ namespace DeusServer
 							// then re-put our packet into packet to send queue
 							// in case of the packet isn't received by the client
 							// and need to be resend. We don't requeue ACK
-							if (p_toSendPacket->GetType() != DeusCore::Packet::Ack)
+							if (p_toSendPacket->GetType() != DeusCore::Packet::Ack &&
+								p_toSendPacket->GetType() != DeusCore::Packet::PingRequest &&
+								p_toSendPacket->GetType() != DeusCore::Packet::PingAnswer)
 							{
 								//m_packetQueueLock.lock();
 								m_packetsToRequeue.push_back(std::make_pair(GetTickCount(), p_toSendPacket));
@@ -159,10 +161,27 @@ namespace DeusServer
 							{
 								// we can now delete the byte in our buffer corresponding to our packet serializedSize
 								allByteReceivedBuffer.erase(allByteReceivedBuffer.begin(), allByteReceivedBuffer.begin() + p_packetDeserialized->GetSerializedSize());
-
+								
 								// the only case where a packet isn't added to the event queue is for 
-								// our custom mini ACK system, which is reliable but unordered
-								if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::Ack)
+								// our custom mini ACK system or ping answer, which is reliable but unordered
+								if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::PingRequest)
+								{
+									uint32_t idPing = ((DeusCore::PacketPingRequest*)p_packetDeserialized.get())->GetId();
+									std::shared_ptr<DeusCore::PacketPingAnswer> p_answerPing = std::shared_ptr<DeusCore::PacketPingAnswer>(new DeusCore::PacketPingAnswer());
+									p_answerPing->SetPacketRecvId(idPing);
+									//AddPacketToQueue(p_answerPing);
+									m_clientUDPSocket->Send(*(p_answerPing), sentByteCount);
+								}
+								//else if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::ClockSyncRequest)
+								//{
+									//uint32_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+									//
+									//std::shared_ptr<DeusCore::PacketSyncClockAnswer> p_answerSync = std::shared_ptr<DeusCore::PacketSyncClockAnswer>(new DeusCore::PacketSyncClockAnswer());
+									//p_answerSync->SetServerTimeStamp(currentMs);
+									//
+									//m_clientUDPSocket->Send(*(p_answerSync), sentByteCount);
+								//}
+								else if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::Ack)
 								{
 									// if the message is an ACK, add the id ACKed to our vector
 									uint32_t idAck = ((DeusCore::PacketAck*)p_packetDeserialized.get())->GetPacketToAck();

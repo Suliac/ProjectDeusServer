@@ -192,9 +192,17 @@
     <ClCompile Include="PacketGameStarted.cpp">
       <Filter>Network\Packets\Sources\Games</Filter>
     </ClCompile>
-    <ClCompile Include="PacketSendUDP.cpp" />
-    <ClCompile Include="PacketPingRequest.cpp" />
-    <ClCompile Include="PacketPingAnswer.cpp" />
+    <ClCompile Include="PacketPingAnswer.cpp">
+      <Filter>Network\Packets\Sources\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketPingRequest.cpp">
+      <Filter>Network\Packets\Sources\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketSendUDP.cpp">
+      <Filter>Network\Packets\Sources\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketSyncClockRequest.cpp" />
+    <ClCompile Include="PacketSyncClockAnswer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -269,9 +277,6 @@
     <ClInclude Include="PacketAnswer.h">
       <Filter>Network\Packets\Headers\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Packets.h">
-      <Filter>Network\Packets\Headers\Base</Filter>
-    </ClInclude>
     <ClInclude Include="PacketTest.h">
       <Filter>Network\Packets\Headers\General</Filter>
     </ClInclude>
@@ -320,8 +325,19 @@
     <ClInclude Include="ISerializable.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="PacketSendUDP.h" />
-    <ClInclude Include="PacketPingRequest.h" />
-    <ClInclude Include="PacketPingAnswer.h" />
+    <ClInclude Include="PacketPingAnswer.h">
+      <Filter>Network\Packets\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketPingRequest.h">
+      <Filter>Network\Packets\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketSendUDP.h">
+      <Filter>Network\Packets\Headers\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketSyncClockRequest.h" />
+    <ClInclude Include="PacketSyncClockAnswer.h" />
+    <ClInclude Include="Packets.h">
+      <Filter>Network\Packets</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -51,6 +51,8 @@
     <ClCompile Include="PacketPingRequest.cpp" />
     <ClCompile Include="PacketSendUDP.cpp" />
     <ClCompile Include="PacketStartGame.cpp" />
+    <ClCompile Include="PacketSyncClockAnswer.cpp" />
+    <ClCompile Include="PacketSyncClockRequest.cpp" />
     <ClCompile Include="PacketTest.cpp" />
     <ClCompile Include="PacketUpdateHealth.cpp" />
     <ClCompile Include="PacketUpdateMovementAnswer.cpp" />
@@ -97,6 +99,8 @@
     <ClInclude Include="Packets.h" />
     <ClInclude Include="PacketSendUDP.h" />
     <ClInclude Include="PacketStartGame.h" />
+    <ClInclude Include="PacketSyncClockAnswer.h" />
+    <ClInclude Include="PacketSyncClockRequest.h" />
     <ClInclude Include="PacketTest.h" />
     <ClInclude Include="PacketUpdateHealth.h" />
     <ClInclude Include="PacketUpdateMovementAnswer.h" />

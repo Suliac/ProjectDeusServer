@@ -8,13 +8,15 @@ namespace DeusCore
 		PacketPingAnswer();
 		~PacketPingAnswer();
 
+		void SetPacketRecvId(uint32_t value) { m_responseToPacketId = value; }
+
 	protected:
 		virtual void OnDeserialize(Buffer512 & buffer) override;
 		virtual void OnSerialize(Buffer512 & buffer) const override;
 		virtual uint16_t EstimateCurrentSerializedSize() const override;
 
 	private:
-		uint32_t m_localTimestamp;
+		uint32_t m_responseToPacketId;
 	};
 }
 

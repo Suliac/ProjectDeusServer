@@ -23,4 +23,7 @@
 #include "PacketUpdateMovementAnswer.h"
 #include "PacketUpdateMovementRequest.h"
 #include "PacketGameStarted.h"
+#include "PacketPingAnswer.h"
+#include "PacketPingRequest.h"
+
 

@@ -127,8 +127,12 @@
     <ClCompile Include="SerializableHealthComponent.cpp">
       <Filter>Serialization\Sources</Filter>
     </ClCompile>
-    <ClCompile Include="DeusUdpListener.cpp" />
-    <ClCompile Include="DeusListeningUdpConnection.cpp" />
+    <ClCompile Include="DeusListeningUdpConnection.cpp">
+      <Filter>ClientCommunication\Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="DeusUdpListener.cpp">
+      <Filter>ClientCommunication\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeusClient.h">
@@ -206,7 +210,11 @@
     <ClInclude Include="SerializableHealthComponent.h">
       <Filter>Serialization\Headers</Filter>
     </ClInclude>
-    <ClInclude Include="DeusUdpListener.h" />
-    <ClInclude Include="DeusListeningUdpConnection.h" />
+    <ClInclude Include="DeusUdpListener.h">
+      <Filter>ClientCommunication\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="DeusListeningUdpConnection.h">
+      <Filter>ClientCommunication\Headers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

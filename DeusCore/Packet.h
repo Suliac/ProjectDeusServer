@@ -24,6 +24,8 @@ namespace DeusCore
 			ConnectedUdpAnswer		= 5,
 			PingRequest				= 6,
 			PingAnswer				= 7,
+			ClockSyncRequest		= 8,
+			ClockSyncAnswer			= 9,
 
 			// Game management
 			CreateGameRequest		= 10,
