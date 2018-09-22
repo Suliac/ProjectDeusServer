@@ -118,6 +118,7 @@ namespace DeusServer
 					///////////////////////////////////////////////////
 					if (dataToRecv)
 					{
+						uint32_t recvTimeStamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 						///////////////////////////////////////////////////////////
 						// 2.1 Get datas from the socket and put them into a buffer
 						do {
@@ -161,27 +162,10 @@ namespace DeusServer
 							{
 								// we can now delete the byte in our buffer corresponding to our packet serializedSize
 								allByteReceivedBuffer.erase(allByteReceivedBuffer.begin(), allByteReceivedBuffer.begin() + p_packetDeserialized->GetSerializedSize());
-								
+
 								// the only case where a packet isn't added to the event queue is for 
 								// our custom mini ACK system or ping answer, which is reliable but unordered
-								if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::PingRequest)
-								{
-									uint32_t idPing = ((DeusCore::PacketPingRequest*)p_packetDeserialized.get())->GetId();
-									std::shared_ptr<DeusCore::PacketPingAnswer> p_answerPing = std::shared_ptr<DeusCore::PacketPingAnswer>(new DeusCore::PacketPingAnswer());
-									p_answerPing->SetPacketRecvId(idPing);
-									//AddPacketToQueue(p_answerPing);
-									m_clientUDPSocket->Send(*(p_answerPing), sentByteCount);
-								}
-								else if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::ClockSyncRequest)
-								{
-									uint32_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-									
-									std::shared_ptr<DeusCore::PacketSyncClockAnswer> p_answerSync = std::shared_ptr<DeusCore::PacketSyncClockAnswer>(new DeusCore::PacketSyncClockAnswer());
-									p_answerSync->SetServerTimeStamp(currentMs);
-									
-									m_clientUDPSocket->Send(*(p_answerSync), sentByteCount);
-								}
-								else if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::Ack)
+								if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::Ack)
 								{
 									// if the message is an ACK, add the id ACKed to our vector
 									uint32_t idAck = ((DeusCore::PacketAck*)p_packetDeserialized.get())->GetPacketToAck();
@@ -223,9 +207,27 @@ namespace DeusServer
 										AddPacketToQueue(std::move(p_ackPacket));
 									}
 
-									// Finally enqueue our event
-									//DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Received Message id: " + std::to_string(p_packetDeserialized->GetId()));
-									DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, m_id, p_packetDeserialized);
+									if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::PingRequest)
+									{
+										uint32_t idPing = ((DeusCore::PacketPingRequest*)p_packetDeserialized.get())->GetId();
+										std::shared_ptr<DeusCore::PacketPingAnswer> p_answerPing = std::shared_ptr<DeusCore::PacketPingAnswer>(new DeusCore::PacketPingAnswer());
+										p_answerPing->SetPacketRecvId(idPing);
+										//AddPacketToQueue(p_answerPing);
+										m_clientUDPSocket->Send(*(p_answerPing), sentByteCount);
+									}
+									else if (p_packetDeserialized->GetType() == DeusCore::Packet::EMessageType::ClockSyncRequest)
+									{
+										std::shared_ptr<DeusCore::PacketSyncClockAnswer> p_answerSync = std::shared_ptr<DeusCore::PacketSyncClockAnswer>(new DeusCore::PacketSyncClockAnswer());
+										p_answerSync->SetServerTimeStamp(recvTimeStamp);
+
+										m_clientUDPSocket->Send(*(p_answerSync), sentByteCount);
+									}
+									else
+									{
+										// Finally enqueue our event
+										//DeusCore::Logger::Instance()->Log("UDP Client " + std::to_string(m_id), "Received Message id: " + std::to_string(p_packetDeserialized->GetId()));
+										DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, m_id, p_packetDeserialized);
+									}
 								}
 							}
 							else
