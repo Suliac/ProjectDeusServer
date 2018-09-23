@@ -86,7 +86,7 @@ namespace DeusServer
 			p_playerLeavePacket->SetSuccess(true);
 			p_playerLeavePacket->SetPlayerId(clientId);
 
-			m_clientsConnections[player.first]->SendPacket(std::move(p_playerLeavePacket), true);
+			m_clientsConnections[player.first]->SendPacket(std::move(p_playerLeavePacket), SEND_TCP);
 		}
 		m_playersLocker.unlock(); // <------------- UNLOCK
 
@@ -158,7 +158,7 @@ namespace DeusServer
 			p_playerLeavePacket->SetSuccess(true);
 			p_playerLeavePacket->SetPlayerId(clientId);
 
-			m_clientsConnections[player.first]->SendPacket(std::move(p_playerLeavePacket), true);
+			m_clientsConnections[player.first]->SendPacket(std::move(p_playerLeavePacket), SEND_TCP);
 		}
 
 		auto infoIt = m_playersInfos.find(clientId);
@@ -208,7 +208,7 @@ namespace DeusServer
 			p_newPlayerJoinPacket->SetNickname(playerName);
 			p_newPlayerJoinPacket->SetPlayerId(clientId);
 
-			m_clientsConnections[player.first]->SendPacket(std::move(p_newPlayerJoinPacket), true);
+			m_clientsConnections[player.first]->SendPacket(std::move(p_newPlayerJoinPacket), SEND_TCP);
 		}
 
 		m_playersInfos[clientId] = DeusPlayerInfos(playerName);
@@ -225,7 +225,7 @@ namespace DeusServer
 		p_feedBackJoinPacket->SetPlayersInfos(playerInfos);
 		m_playersLocker.unlock(); // <------------- UNLOCK
 
-		m_clientsConnections[clientId]->SendPacket(std::move(p_feedBackJoinPacket), true);
+		m_clientsConnections[clientId]->SendPacket(std::move(p_feedBackJoinPacket), SEND_TCP);
 
 		m_lockClients.unlock();// <------------- UNLOCK
 		return true;
@@ -326,7 +326,7 @@ namespace DeusServer
 					// - player already know this object (entered once in inner area)
 					if (IsPlayerFollowingObject(listenerId, p_packetReceived->GetObjectId()))
 					{
-						SendPacket(p_packet, listenerId, SEND_UDP);
+						SendPacket(p_packet, listenerId, SEND_TCP);
 					}
 
 					m_playersLocker.unlock(); // <----------------- UNLOCK
@@ -342,7 +342,7 @@ namespace DeusServer
 		m_playersLocker.lock(); // <------------- LOCK
 		for (const auto& playerInfo : m_playersInfos)
 		{
-			SendPacket(p_packet, playerInfo.first, false);
+			SendPacket(p_packet, playerInfo.first, SEND_TCP);
 		}
 		m_playersLocker.unlock(); // <------------- UNLOCK
 	}
@@ -560,7 +560,7 @@ namespace DeusServer
 		gameObject->GetSerializableComponents(objectsComponents);
 
 		DeusCore::PacketUPtr p_packetEnteredCell = std::unique_ptr<PacketObjectEnter>(new PacketObjectEnter(gameObject->GetId(), gameObject->GetType(), gameObject->GetId() == m_playersInfos[clientId].GameObjectId, objectsComponents, playerLinked));
-		SendPacket(std::move(p_packetEnteredCell), clientId, SEND_UDP);
+		SendPacket(std::move(p_packetEnteredCell), clientId, SEND_TCP);
 	}
 
 	void GameNetworkServer::ObjectLeft(Id objectId, Id clientId)
@@ -572,7 +572,7 @@ namespace DeusServer
 
 		// Send packet ObjectLeave in UDP
 		DeusCore::PacketUPtr p_packetLeaveCell = std::unique_ptr<PacketObjectLeave>(new PacketObjectLeave(objectId));
-		SendPacket(std::move(p_packetLeaveCell), clientId, SEND_UDP);
+		SendPacket(std::move(p_packetLeaveCell), clientId, SEND_TCP);
 	}
 
 }

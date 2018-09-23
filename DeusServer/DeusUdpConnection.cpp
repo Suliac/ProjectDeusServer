@@ -90,10 +90,11 @@ namespace DeusServer
 							}
 							// then re-put our packet into packet to send queue
 							// in case of the packet isn't received by the client
-							// and need to be resend. We don't requeue ACK
+							// and need to be resend. We don't requeue ACK, ping or sync packets
 							if (p_toSendPacket->GetType() != DeusCore::Packet::Ack &&
 								p_toSendPacket->GetType() != DeusCore::Packet::PingRequest &&
-								p_toSendPacket->GetType() != DeusCore::Packet::PingAnswer)
+								p_toSendPacket->GetType() != DeusCore::Packet::PingAnswer && 
+								p_toSendPacket->GetType() != DeusCore::Packet::ClockSyncAnswer)
 							{
 								//m_packetQueueLock.lock();
 								m_packetsToRequeue.push_back(std::make_pair(GetTickCount(), p_toSendPacket));

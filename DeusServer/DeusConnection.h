@@ -16,7 +16,7 @@ namespace DeusServer
 
 	// Timout before retry send or receive
 	const unsigned int TIMEOUT_US = 1000;
-	const unsigned int PACKET_DELAY_CHECK_ACK_MS = 100;
+	const unsigned int PACKET_DELAY_CHECK_ACK_MS = 200;
 	const unsigned int DECAL_PORT_UDP = 10000;
 
 #define DEFAULT_DEUSCLIENT_BUFFER_SIZE 2048
