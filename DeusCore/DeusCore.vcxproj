@@ -57,9 +57,13 @@
     <ClCompile Include="PacketUpdateHealth.cpp" />
     <ClCompile Include="PacketUpdateMovementAnswer.cpp" />
     <ClCompile Include="PacketUpdateMovementRequest.cpp" />
+    <ClCompile Include="ResourcesHandler.cpp" />
+    <ClCompile Include="Skill.cpp" />
+    <ClCompile Include="SkillFactory.cpp" />
     <ClCompile Include="Socket.cpp" />
     <ClCompile Include="TcpListener.cpp" />
     <ClCompile Include="TcpSocket.cpp" />
+    <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="UdpSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -105,9 +109,13 @@
     <ClInclude Include="PacketUpdateHealth.h" />
     <ClInclude Include="PacketUpdateMovementAnswer.h" />
     <ClInclude Include="PacketUpdateMovementRequest.h" />
+    <ClInclude Include="ResourcesHandler.h" />
+    <ClInclude Include="Skill.h" />
+    <ClInclude Include="SkillFactory.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="TcpListener.h" />
     <ClInclude Include="TcpSocket.h" />
+    <ClInclude Include="tinyxml2.h" />
     <ClInclude Include="UdpSocket.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

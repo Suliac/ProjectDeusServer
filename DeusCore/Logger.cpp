@@ -30,6 +30,9 @@ namespace DeusCore
 			}
 			m_instanceLock.unlock();
 		}
+		
+		m_instanceLock.try_lock();
+		m_instanceLock.unlock();
 	}
 
 	void Logger::Log(std::string name, std::string message)

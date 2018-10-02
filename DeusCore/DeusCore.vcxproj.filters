@@ -79,6 +79,15 @@
     <Filter Include="Exceptions\Sources">
       <UniqueIdentifier>{89ca66ca-bb8b-4f70-850f-eed8be91469c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{180720ce-ff12-4b72-b06d-62d82858f9f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Skills">
+      <UniqueIdentifier>{e65cad38-8749-4965-bdbb-d09cbb9acc4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XML">
+      <UniqueIdentifier>{0c890a28-a9f8-426c-8175-c80d98f68287}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Socket.cpp">
@@ -201,8 +210,24 @@
     <ClCompile Include="PacketSendUDP.cpp">
       <Filter>Network\Packets\Sources\Base</Filter>
     </ClCompile>
-    <ClCompile Include="PacketSyncClockRequest.cpp" />
-    <ClCompile Include="PacketSyncClockAnswer.cpp" />
+    <ClCompile Include="PacketSyncClockRequest.cpp">
+      <Filter>Network\Packets\Sources\General</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketSyncClockAnswer.cpp">
+      <Filter>Network\Packets\Sources\General</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourcesHandler.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Skill.cpp">
+      <Filter>Resources\Skills</Filter>
+    </ClCompile>
+    <ClCompile Include="SkillFactory.cpp">
+      <Filter>Resources\Skills</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml2.cpp">
+      <Filter>XML</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -334,10 +359,26 @@
     <ClInclude Include="PacketSendUDP.h">
       <Filter>Network\Packets\Headers\Base</Filter>
     </ClInclude>
-    <ClInclude Include="PacketSyncClockRequest.h" />
-    <ClInclude Include="PacketSyncClockAnswer.h" />
     <ClInclude Include="Packets.h">
       <Filter>Network\Packets</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketSyncClockAnswer.h">
+      <Filter>Network\Packets\Headers\General</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketSyncClockRequest.h">
+      <Filter>Network\Packets\Headers\General</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourcesHandler.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Skill.h">
+      <Filter>Resources\Skills</Filter>
+    </ClInclude>
+    <ClInclude Include="SkillFactory.h">
+      <Filter>Resources\Skills</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml2.h">
+      <Filter>XML</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
