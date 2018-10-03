@@ -52,6 +52,8 @@ namespace DeusCore
 			UpdateMovementRequest	= 54,
 			UpdateMovementAnswer	= 55,
 			CellFirePacket			= 56,
+			UseSkillRequest			= 57,
+			UseSkillAnswer			= 58
 
 			// /!\ Game view  : 100-150 /!\ 
 		};
