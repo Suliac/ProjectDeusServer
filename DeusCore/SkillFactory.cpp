@@ -22,8 +22,8 @@ namespace DeusCore
 
 		if (doc.ErrorID() == tinyxml2::XMLError::XML_SUCCESS)
 		{
-			tinyxml2::XMLElement* p_root = doc.FirstChildElement("skill");
-			for (tinyxml2::XMLElement* p_element = p_root; p_element != nullptr; p_element = p_element->NextSiblingElement())
+			tinyxml2::XMLElement* p_root = doc.FirstChildElement("skills");
+			for (tinyxml2::XMLElement* p_element = p_root->FirstChildElement("skill"); p_element != nullptr; p_element = p_element->NextSiblingElement())
 			{
 				SkillPtr p_newSkill = CreateSkillFromXML(p_element);
 				Logger::Instance()->Log("SKILL FACTORY", "SKILL LOADED : " + p_newSkill->ToString());

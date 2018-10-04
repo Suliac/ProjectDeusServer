@@ -217,4 +217,7 @@
       <Filter>ClientCommunication\Headers</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Resources\skills.xml" />
+  </ItemGroup>
 </Project>

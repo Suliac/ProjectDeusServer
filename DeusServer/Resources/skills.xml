@@ -1,32 +1,34 @@
-<skill>
+<skills>
+  <skill>
     <id>1</id>
     <name>Meteore</name>
     <shape>circle</shape>
     <effects>
-        <effect>
-            <duration>0</duration>
-            <damages>25</damages>
-        </effect>
+      <effect>
+        <duration>0</duration>
+        <damages>25</damages>
+      </effect>
     </effects>
     <casttime>2</casttime>
     <scope>5</scope>
     <class>1</class>
     <level>1</level>
     <manacost>20</manacost>
-</skill>
-<skill>
+  </skill>
+  <skill>
     <id>2</id>
     <name>Lightning Bolt</name>
     <shape>circle</shape>
     <effects>
-        <effect>
-            <duration>0</duration>
-            <damages>5</damages>
-        </effect>
+      <effect>
+        <duration>0</duration>
+        <damages>5</damages>
+      </effect>
     </effects>
     <casttime>1</casttime>
     <scope>3</scope>
     <class>1</class>
     <level>1</level>
     <manacost>10</manacost>
-</skill>
+  </skill>
+</skills>

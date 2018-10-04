@@ -211,6 +211,9 @@
     <ClInclude Include="WorldNetworkServer.h" />
     <ClInclude Include="DeusTcpConnection.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="Resources\skills.xml" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
