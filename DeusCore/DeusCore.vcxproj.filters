@@ -228,8 +228,12 @@
     <ClCompile Include="tinyxml2.cpp">
       <Filter>XML</Filter>
     </ClCompile>
-    <ClCompile Include="PacketUseSkillRequest.cpp" />
-    <ClCompile Include="PacketUseSkillAnswer.cpp" />
+    <ClCompile Include="PacketUseSkillRequest.cpp">
+      <Filter>Network\Packets\Sources\Logic</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketUseSkillAnswer.cpp">
+      <Filter>Network\Packets\Sources\Logic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Socket.h">
@@ -382,7 +386,11 @@
     <ClInclude Include="tinyxml2.h">
       <Filter>XML</Filter>
     </ClInclude>
-    <ClInclude Include="PacketUseSkillRequest.h" />
-    <ClInclude Include="PacketUseSkillAnswer.h" />
+    <ClInclude Include="PacketUseSkillAnswer.h">
+      <Filter>Network\Packets\Headers\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketUseSkillRequest.h">
+      <Filter>Network\Packets\Headers\Logic</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
