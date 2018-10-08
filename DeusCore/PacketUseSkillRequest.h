@@ -1,5 +1,6 @@
 #pragma once
 #include "Packet.h"
+#include "DeusVector2.h"
 namespace DeusCore
 {
 	class PacketUseSkillRequest : public Packet
@@ -8,6 +9,9 @@ namespace DeusCore
 		PacketUseSkillRequest();
 		~PacketUseSkillRequest();
 
+		Id GetSkillId() const { return m_skillId; }
+		DeusVector2 GetSkillPosition() const { return m_skillLaunchPosition; }
+
 	protected:
 		virtual void OnDeserialize(Buffer512 & buffer) override;
 		virtual void OnSerialize(Buffer512 & buffer) const override;
@@ -15,6 +19,7 @@ namespace DeusCore
 
 	private:
 		Id m_skillId;
+		DeusVector2 m_skillLaunchPosition;
 	};
 }
 
