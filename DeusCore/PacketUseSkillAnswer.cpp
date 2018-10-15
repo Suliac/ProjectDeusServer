@@ -23,18 +23,18 @@ namespace DeusCore
 	{
 		DeserializeData(buffer, m_objectId);
 		DeserializeData(buffer, m_skillId);
-		DeserializeData(buffer, m_skillLaunchPosition);
+		DeserializeData<ISerializable>(buffer, m_skillLaunchPosition);
 	}
 
 	void PacketUseSkillAnswer::OnAnswerSerialize(Buffer512 & buffer) const
 	{
 		SerializeData(buffer, m_objectId);
 		SerializeData(buffer, m_skillId);
-		SerializeData(buffer, m_skillLaunchPosition);
+		SerializeData<ISerializable>(buffer, m_skillLaunchPosition);
 	}
 
 	uint16_t PacketUseSkillAnswer::EstimateAnswerCurrentSerializedSize() const
 	{
-		return uint16_t(sizeof(m_objectId) + sizeof(m_skillId) + sizeof(m_skillLaunchPosition);
+		return uint16_t(sizeof(m_objectId) + sizeof(m_skillId) + sizeof(m_skillLaunchPosition));
 	}
 }
