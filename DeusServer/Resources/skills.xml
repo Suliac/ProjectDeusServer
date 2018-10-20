@@ -11,6 +11,7 @@
     </effects>
     <casttime>2</casttime>
     <scope>5</scope>
+    <radius>5</radius>
     <class>1</class>
     <level>1</level>
     <manacost>20</manacost>
@@ -27,6 +28,7 @@
     </effects>
     <casttime>1</casttime>
     <scope>3</scope>
+    <radius>5</radius>
     <class>1</class>
     <level>1</level>
     <manacost>10</manacost>

@@ -47,6 +47,7 @@ namespace DeusCore
 		assert(p_element->FirstChildElement("shape") != nullptr);
 		assert(p_element->FirstChildElement("casttime") != nullptr);
 		assert(p_element->FirstChildElement("scope") != nullptr);
+		assert(p_element->FirstChildElement("radius") != nullptr);
 		assert(p_element->FirstChildElement("level") != nullptr);
 		assert(p_element->FirstChildElement("manacost") != nullptr);
 		assert(p_element->FirstChildElement("effects") != nullptr);
@@ -83,6 +84,14 @@ namespace DeusCore
 		sstream.str("");
 		sstream.clear();
 
+		// Get Radius
+		uint16_t radius = 0;
+		sstream << p_element->FirstChildElement("radius")->GetText();
+		sstream >> radius;
+
+		sstream.str("");
+		sstream.clear();
+
 		// Get Level
 		uint16_t lvl = 0;
 		sstream << p_element->FirstChildElement("level")->GetText();
@@ -109,7 +118,7 @@ namespace DeusCore
 		}
 
 		// Create Skill
-		return std::make_shared<Skill>(id, name, isCircle, castTime, scope, lvl, manaCost, effects);
+		return std::make_shared<Skill>(id, name, isCircle, castTime, scope, radius, lvl, manaCost, effects);
 	}
 
 	SkillEffectPtr SkillFactory::CreateSkillEffectFromXml(tinyxml2::XMLElement * p_effect) const

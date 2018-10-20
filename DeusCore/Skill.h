@@ -2,6 +2,8 @@
 #include <memory>
 #include <vector>
 #include <string>
+
+#include "DeusVector2.h"
 namespace DeusCore
 {
 	using Id = uint32_t;
@@ -27,7 +29,7 @@ namespace DeusCore
 	class Skill
 	{
 	public:
-		Skill(Id id, std::string name, bool isCircle, float castTime, uint16_t maxScope, uint16_t level, uint16_t manaCost, std::vector<SkillEffectPtr>& effects);
+		Skill(Id id, std::string name, bool isCircle, float castTime, uint16_t maxScope, uint16_t radius, uint16_t level, uint16_t manaCost, std::vector<SkillEffectPtr>& effects);
 		~Skill();
 
 		Id GetId() const { return m_id; }
@@ -36,7 +38,9 @@ namespace DeusCore
 		uint16_t GetMaxScope() const { return m_id; }
 		uint16_t GetLevel() const { return m_id; }
 		uint16_t GetManaCost() const { return m_id; }
+		uint16_t GetRadius() const { return m_radius; }
 		const std::vector<SkillEffectPtr> GetEffects() const { return m_effects; }
+
 
 		std::string ToString() const { return "ID : " + std::to_string(m_id) + " | Name : " + m_name + " | Shape : " + (m_isCircle ? "Circle" : "Not Circle"); }
 	private:
@@ -47,6 +51,7 @@ namespace DeusCore
 		std::vector<SkillEffectPtr> m_effects;
 		float m_castTime;
 		uint16_t m_maxScope;
+		uint16_t m_radius;
 		uint16_t m_level;
 		uint16_t m_manaCost;
 
@@ -54,4 +59,22 @@ namespace DeusCore
 	};
 
 	using SkillPtr = std::shared_ptr<Skill>;
+
+	class SkillInfos : public Skill
+	{
+	public:
+		enum ESkillState {
+			NotLaunched = 0,
+			Casting = 1,
+			Launched = 2,
+			Finished = 3
+		};
+		
+
+	private:
+		uint32_t m_launchTimeMs;
+		ESkillState m_skillState;
+		DeusVector2 m_launchPosition;
+	
+	};
 }
