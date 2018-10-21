@@ -88,6 +88,17 @@ namespace DeusServer
 		return nullptr;
 	}
 
+	std::shared_ptr<GameObjectComponent> GameObject::GetFirstComponent(GameObjectComponent::EComponentType componentType)
+	{
+		for (const auto& component : m_components)
+		{
+			if (component.second->GetType() == componentType)
+				return component.second;
+		}
+
+		return nullptr;
+	}
+
 	void GameObject::OnUpdate(double deltatimeMs)
 	{
 		for (const auto& component : m_components) {

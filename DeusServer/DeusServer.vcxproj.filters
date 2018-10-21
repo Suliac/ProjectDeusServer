@@ -133,6 +133,9 @@
     <ClCompile Include="DeusUdpListener.cpp">
       <Filter>ClientCommunication\Sources</Filter>
     </ClCompile>
+    <ClCompile Include="SkillTimeLineComponent.cpp">
+      <Filter>Logic\Sources\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeusClient.h">
@@ -215,6 +218,9 @@
     </ClInclude>
     <ClInclude Include="DeusListeningUdpConnection.h">
       <Filter>ClientCommunication\Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="SkillTimeLineComponent.h">
+      <Filter>Logic\Headers\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

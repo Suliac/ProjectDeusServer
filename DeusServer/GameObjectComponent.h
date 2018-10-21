@@ -17,6 +17,7 @@ namespace DeusServer
 			Error				= 0,
 			HealthComponent		= 1,
 			PositionComponent	= 2,
+			SkillComponent		= 3,
 		};
 
 		GameObjectComponent(EComponentType type);

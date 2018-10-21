@@ -49,6 +49,7 @@ namespace DeusServer
 		void StartNewGame(const std::vector<uint32_t>& playerIds);
 		void PlayerDisconnected(Id clientId);
 		void UpdatePlayerDirection(Id clientId, Id componentId, DeusCore::DeusVector2 newDir);
+		void PlayerUseSkill(Id clientId, std::shared_ptr<DeusCore::PacketUseSkillRequest> p_packet);
 	private:
 		const float SPEED_SEC = 5;
 		const float SPEED_MS = SPEED_SEC / 1000.f;
@@ -56,13 +57,16 @@ namespace DeusServer
 		Id GetCellIdOfGameObject(Id objectId);
 		void GetGameObjectOnChangeCells(Id playerId, Id cellLeavedId, Id cellEnteredId, std::vector<std::shared_ptr<const GameObject>>& objectInCellsLeft, std::vector<std::shared_ptr<const GameObject>>& objectInCellsEntered);
 		
+		std::shared_ptr<GameObjectComponent> GetObjectComponent(Id clientId, Id componentId, Id& cellId);
+		std::shared_ptr<GameObject> GetObject(Id clientId, Id& cellId);
+
 		ServerCells m_cellsGameObjects;
 		PlayerInfos m_playerWithGameObject;
 
 		std::string m_name;
 		Id m_gameId;
 
-		std::mutex m_cellLock;
+		std::recursive_mutex m_cellLock;
 		//std::mutex m_gameObjLocker[NUMBER_CELLS];
 		std::mutex m_playersLocker;
 	};

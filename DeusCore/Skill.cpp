@@ -14,9 +14,14 @@ namespace DeusCore
 		m_manaCost(manaCost),
 		m_effects(std::move(effects))
 	{
+		m_totalTimeMs = castTime; // /!\ cast time is in seconds
+
+		for (const auto& p_effect : m_effects)
+			m_totalTimeMs += p_effect->GetDuration();// /!\ duration is in seconds
+
+		m_totalTimeMs *= 1000; // convert in ms
 	}
-
-
+	
 	Skill::~Skill()
 	{
 	}
@@ -31,4 +36,11 @@ namespace DeusCore
 	{
 	}
 
+	SkillInfos::SkillInfos(const Skill& model, uint32_t launchTime, DeusVector2 position)
+		: Skill(model)
+	{
+		m_launchTimeMs = launchTime;
+		m_launchPosition = position;
+		m_skillState = ESkillState::NotLaunched;
+	}
 }

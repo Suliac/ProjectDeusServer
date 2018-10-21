@@ -19,6 +19,7 @@ namespace DeusServer
 
 		void GetSerializableComponents(std::vector<std::shared_ptr<ISerializableComponent>>& components) const;
 		std::shared_ptr<GameObjectComponent> GetComponent(uint32_t identifier);
+		std::shared_ptr<GameObjectComponent> GetFirstComponent(GameObjectComponent::EComponentType componentType);
 		EObjectType GetType() const { return m_type; }
 	protected:
 		virtual void OnUpdate(double deltatimeMs) override;

@@ -23,7 +23,7 @@ namespace DeusCore
 
 		// TODO : Add link for buff/debuff myabe a list of alterations ?
 	};
-	
+
 	using SkillEffectPtr = std::shared_ptr<SkillEffect>;
 
 	class Skill
@@ -35,14 +35,16 @@ namespace DeusCore
 		Id GetId() const { return m_id; }
 		std::string GetName() const { return m_name; }
 		bool IsCircle() const { return m_isCircle; }
-		uint16_t GetMaxScope() const { return m_id; }
-		uint16_t GetLevel() const { return m_id; }
-		uint16_t GetManaCost() const { return m_id; }
+		float GetCastTime() const { return m_castTime; }
+		uint16_t GetMaxScope() const { return m_maxScope; }
+		uint16_t GetLevel() const { return m_level; }
+		uint16_t GetManaCost() const { return m_manaCost; }
 		uint16_t GetRadius() const { return m_radius; }
 		const std::vector<SkillEffectPtr> GetEffects() const { return m_effects; }
 
+		uint32_t GetTotalTime() const { return m_totalTimeMs; } // calculated on load
 
-		std::string ToString() const { return "ID : " + std::to_string(m_id) + " | Name : " + m_name + " | Shape : " + (m_isCircle ? "Circle" : "Not Circle"); }
+		std::string ToString() const { return "ID : " + std::to_string(m_id) + " | Name : " + m_name + " | Shape : " + (m_isCircle ? "Circle" : "Not Circle") + " | Cast time : " + std::to_string(m_castTime) + " | Max scope : " + std::to_string(m_maxScope) + " | Radius : " + std::to_string(m_radius) + " | Level : " + std::to_string(m_level) + " | Mana cost : " + std::to_string(m_manaCost); }
 	private:
 		Id m_id;
 		std::string m_name;
@@ -54,6 +56,7 @@ namespace DeusCore
 		uint16_t m_radius;
 		uint16_t m_level;
 		uint16_t m_manaCost;
+		uint16_t m_totalTimeMs;
 
 		// Class : warrior/mage ...
 	};
@@ -69,12 +72,17 @@ namespace DeusCore
 			Launched = 2,
 			Finished = 3
 		};
-		
+
+		SkillInfos(const Skill& model, uint32_t launchTime, DeusVector2 position);
+			
+		uint32_t GetLaunchTime() const { return m_launchTimeMs; }
+		ESkillState GetState() const { return m_skillState; }
+		DeusVector2 GetLaunchPosition() const { return m_launchPosition; }
 
 	private:
 		uint32_t m_launchTimeMs;
 		ESkillState m_skillState;
 		DeusVector2 m_launchPosition;
-	
+
 	};
 }

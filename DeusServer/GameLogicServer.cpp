@@ -2,12 +2,15 @@
 #include "GameObjectFactory.h"
 #include "PacketObjectChangeCell.h"
 #include "PacketCellFirePacket.h"
+
 #include "PositionTimeLineComponent.h"
 #include "HealthTimeLineComponent.h"
+#include "SkillTimeLineComponent.h"
 
 #include "DeusCore/Logger.h"
 #include "DeusCore/Packets.h"
 #include "DeusCore/EventManagerHandler.h"
+#include "DeusCore/ResourcesHandler.h"
 
 namespace DeusServer
 {
@@ -140,6 +143,9 @@ namespace DeusServer
 		case DeusCore::Packet::EMessageType::UpdateMovementRequest:
 			UpdatePlayerDirection(p_packet->first, std::dynamic_pointer_cast<DeusCore::PacketUpdateMovementRequest>(p_packet->second)->GetComponentId(), std::dynamic_pointer_cast<DeusCore::PacketUpdateMovementRequest>(p_packet->second)->GetNewPosition());
 			break;
+		case DeusCore::Packet::EMessageType::UseSkillRequest:
+			PlayerUseSkill(p_packet->first, std::dynamic_pointer_cast<DeusCore::PacketUseSkillRequest>(p_packet->second));
+			break;
 		}
 	}
 
@@ -234,7 +240,7 @@ namespace DeusServer
 	void GameLogicServer::UpdatePlayerDirection(Id clientId, Id componentId, DeusCore::DeusVector2 destination)
 	{
 		//DeusCore::Logger::Instance()->Log(m_name, "|----------------------------------------------------------------- |");
-		
+
 		GameObjectId objectId = 0;
 
 		m_playersLocker.lock(); // <----------- LOCK
@@ -274,7 +280,7 @@ namespace DeusServer
 							// 2 - Extrapolate time to go to destination and insert futur data
 							float sqrtDist = DeusCore::DeusVector2::SqrtMagnitude(*p_posAtUpdate, destination);
 							uint32_t dtReachDestinationMs = sqrtDist / SPEED_MS; // t = d / s
-							
+
 							//DeusCore::Logger::Instance()->Log(m_name, "reach destination in : "+std::to_string(dtReachDestinationMs)+"ms at : "+std::to_string(currentMs + dtReachDestinationMs));
 
 							std::dynamic_pointer_cast<PositionTimeLineComponent>(compo)->InsertData(std::make_shared<const DeusCore::DeusVector2>(destination), currentMs + dtReachDestinationMs);
@@ -303,6 +309,59 @@ namespace DeusServer
 		}
 	}
 
+	void GameLogicServer::PlayerUseSkill(Id clientId, std::shared_ptr<DeusCore::PacketUseSkillRequest> p_packet)
+	{
+		m_cellLock.lock(); // <----------- LOCK
+		Id cellId = 0;
+		std::shared_ptr<GameObject> gameObj = GetObject(clientId, cellId);
+
+		std::shared_ptr<SkillTimeLineComponent> skillCompo = std::dynamic_pointer_cast<SkillTimeLineComponent>(gameObj->GetComponent(p_packet->GetComponentId()));
+		std::shared_ptr<PositionTimeLineComponent> posCompo = std::dynamic_pointer_cast<PositionTimeLineComponent>(gameObj->GetComponent(GameObjectComponent::EComponentType::PositionComponent));
+
+		if (skillCompo != nullptr && posCompo != nullptr)
+		{
+			uint32_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() + DELAY_MS;
+			std::shared_ptr<const DeusCore::SkillInfos> p_skillInfos = skillCompo->GetValue(currentMs);
+			std::shared_ptr<const DeusCore::DeusVector2> p_pos = posCompo->GetValue(currentMs);
+
+			// 1 - Check if the player can use the skill requested
+			//		That means : 
+			//		a) a skill isn't used at that time 
+			//		b) Skill used in right scope
+			//		c) [TODO] Player has enough mana
+			//		d) [TODO] Player has the minimum level requested and has unlocked the skill
+
+			bool canLaunch = true;
+
+			// a) Skill already launching ?
+			if (p_skillInfos != nullptr && p_skillInfos->GetTotalTime() >= currentMs) // a skill is already used !
+				canLaunch = false;
+
+			// b) Scope OK ?
+			if (DeusCore::DeusVector2::SqrtMagnitude(*p_pos, p_packet->GetSkillPosition()) > p_skillInfos->GetMaxScope()) // skill too far from player
+				canLaunch = false;
+
+			// c) TODO : Mana check
+
+			// d) TODO : Level check
+
+			// 2 - Insert datas 
+			if (canLaunch)
+			{
+				DeusCore::SkillPtr currentSkillModel = DeusCore::ResourcesHandler::Instance()->GetSkill(p_packet->GetSkillId());
+				std::shared_ptr<DeusCore::SkillInfos> p_newSkillInfos = std::make_shared<DeusCore::SkillInfos>(*(currentSkillModel), currentMs, p_packet->GetSkillPosition());
+				skillCompo->InsertData(p_newSkillInfos, currentMs);
+
+				// 3 - Send answer to clients 
+				std::unique_ptr<DeusCore::PacketUseSkillAnswer> skillFeedBack = std::make_unique<DeusCore::PacketUseSkillAnswer>(gameObj->GetId(), p_newSkillInfos->GetId(), p_newSkillInfos->GetLaunchPosition(), p_newSkillInfos->GetLaunchTime());
+				DeusCore::PacketSPtr p_cellFirePacket = std::shared_ptr<CellFirePacket>(new CellFirePacket(cellId, gameObj->GetId(), std::move(skillFeedBack)));
+				DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, 0, p_cellFirePacket);
+			}
+		}
+		m_cellLock.unlock(); // <----------- UNLOCK
+	}
+
+	//-------------------------------------------------------------------------------------------------------------
 	Id GameLogicServer::GetCellIdOfGameObject(Id objectId)
 	{
 		Id cellId = 0; // 0 = error, ids start at 1
@@ -316,7 +375,7 @@ namespace DeusServer
 			{
 				cellId = cellGameObjects.first;
 				//m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
-				m_cellLock.unlock(); 
+				m_cellLock.unlock();
 				return cellId;
 			}
 			//m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
@@ -337,7 +396,62 @@ namespace DeusServer
 			{
 				if (gameObj.second->GetId() != m_playerWithGameObject[playerId])
 					objectInCellsEntered.push_back(gameObj.second);
-			}m_cellLock.unlock();
+			}
+			m_cellLock.unlock();
 		}
+	}
+
+	std::shared_ptr<GameObjectComponent> GameLogicServer::GetObjectComponent(Id clientId, Id componentId, Id& cellId)
+	{
+		std::shared_ptr<GameObject> gameObj = GetObject(clientId, cellId);
+		if (gameObj != nullptr)
+		{
+			m_cellLock.lock(); // <----------- LOCK
+			std::shared_ptr<GameObjectComponent> result = gameObj->GetComponent(componentId);
+			m_cellLock.unlock(); // <----------- UNLOCK
+
+			return result;
+		}
+
+		return nullptr;
+	}
+
+	std::shared_ptr<GameObject> GameLogicServer::GetObject(Id clientId, Id& cellId)
+	{
+		GameObjectId objectId = 0;
+
+		m_playersLocker.lock(); // <----------- LOCK
+								// Find object
+		if (m_playerWithGameObject.find(clientId) != m_playerWithGameObject.end())
+		{
+			objectId = m_playerWithGameObject[clientId];
+		}
+		m_playersLocker.unlock(); // <----------- UNLOCK
+
+		if (objectId > 0)
+		{
+			try
+			{
+				m_cellLock.lock(); // <----------- LOCK
+				for (auto& cellGameObjects : m_cellsGameObjects)
+				{
+					// Search for object
+					const auto& gameObjIt = cellGameObjects.second.find(objectId);
+					if (gameObjIt != cellGameObjects.second.end())
+					{
+						cellId = cellGameObjects.first;
+						m_cellLock.unlock(); // <----------- UNLOCK
+						return gameObjIt->second;
+					}
+				}
+				m_cellLock.unlock(); // <----------- UNLOCK
+			}
+			catch (const std::system_error& e)
+			{
+				DeusCore::Logger::Instance()->Log(m_name, e.what());
+			}
+		}
+
+		return nullptr;
 	}
 }

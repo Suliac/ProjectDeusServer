@@ -9,6 +9,7 @@ namespace DeusCore
 		PacketUseSkillRequest();
 		~PacketUseSkillRequest();
 
+		Id GetComponentId() const { return m_componentId; }
 		Id GetSkillId() const { return m_skillId; }
 		DeusVector2 GetSkillPosition() const { return m_skillLaunchPosition; }
 
@@ -18,6 +19,7 @@ namespace DeusCore
 		virtual uint16_t EstimateCurrentSerializedSize() const override;
 
 	private:
+		Id m_componentId;
 		Id m_skillId;
 		DeusVector2 m_skillLaunchPosition;
 	};

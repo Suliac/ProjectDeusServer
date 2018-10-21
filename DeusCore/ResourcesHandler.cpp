@@ -34,6 +34,20 @@ namespace DeusCore
 		m_instanceResourceLock.unlock();
 	}
 
+	SkillPtr ResourcesHandler::GetSkill(Id skillId)
+	{
+		m_instanceResourceLock.lock();
+		for (const auto& p_skill : m_skills)
+		{
+			if (p_skill->GetId() == skillId)
+			{
+				m_instanceResourceLock.unlock();
+				return p_skill;
+			}
+		}
+		m_instanceResourceLock.unlock();
+	}
+
 	ResourcesHandler::ResourcesHandler()
 	{
 		SkillFactory factory;

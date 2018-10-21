@@ -12,6 +12,7 @@ namespace DeusCore
 		static ResourcesHandler* Instance();
 		static void Free();
 
+		SkillPtr GetSkill(Id skill);
 	private:
 		ResourcesHandler();
 		~ResourcesHandler();

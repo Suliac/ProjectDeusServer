@@ -27,5 +27,7 @@
 #include "PacketPingRequest.h"
 #include "PacketSyncClockRequest.h"
 #include "PacketSyncClockAnswer.h"
+#include "PacketUseSkillAnswer.h"
+#include "PacketUseSkillRequest.h"
 
 
