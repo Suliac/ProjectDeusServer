@@ -555,12 +555,14 @@ namespace DeusServer
 		//update id we follow
 		m_playersInfos[clientId].ObjectsIdsFollowed.push_back(gameObject->GetId());
 
-		// Send packet ObjectEnter in UDP
+		// Send packet ObjectEnter 
 		std::vector<std::shared_ptr<ISerializableComponent>> objectsComponents;
 		gameObject->GetSerializableComponents(objectsComponents);
 
-		DeusCore::PacketUPtr p_packetEnteredCell = std::unique_ptr<PacketObjectEnter>(new PacketObjectEnter(gameObject->GetId(), gameObject->GetType(), gameObject->GetId() == m_playersInfos[clientId].GameObjectId, objectsComponents, playerLinked));
-		SendPacket(std::move(p_packetEnteredCell), clientId, SEND_TCP);
+		DeusCore::PacketSPtr p_packetEnteredCell = std::shared_ptr<PacketObjectEnter>(new PacketObjectEnter(gameObject->GetId(), gameObject->GetType(), gameObject->GetId() == m_playersInfos[clientId].GameObjectId, objectsComponents, playerLinked));
+		SendPacket(p_packetEnteredCell, clientId, SEND_TCP);
+		
+		DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, m_gameId, p_packetEnteredCell);
 	}
 
 	void GameNetworkServer::ObjectLeft(Id objectId, Id clientId)
@@ -570,9 +572,11 @@ namespace DeusServer
 		if (objectFollowedIt != m_playersInfos[clientId].ObjectsIdsFollowed.end())
 			m_playersInfos[clientId].ObjectsIdsFollowed.erase(objectFollowedIt);
 
-		// Send packet ObjectLeave in UDP
-		DeusCore::PacketUPtr p_packetLeaveCell = std::unique_ptr<PacketObjectLeave>(new PacketObjectLeave(objectId));
+		// Send packet ObjectLeave 
+		DeusCore::PacketSPtr p_packetLeaveCell = std::shared_ptr<PacketObjectLeave>(new PacketObjectLeave(objectId));
 		SendPacket(std::move(p_packetLeaveCell), clientId, SEND_TCP);
+
+		DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, m_gameId, p_packetLeaveCell);
 	}
 
 }

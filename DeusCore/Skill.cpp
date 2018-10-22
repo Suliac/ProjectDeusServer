@@ -3,6 +3,10 @@
 
 namespace DeusCore
 {
+	Skill::Skill()
+	{
+	}
+
 	Skill::Skill(Id id, std::string name, bool isCircle, float castTime, uint16_t maxScope, uint16_t radius, uint16_t level, uint16_t manaCost, std::vector<SkillEffectPtr>& effects)
 		: m_id(id),
 		m_name(name),
@@ -36,11 +40,18 @@ namespace DeusCore
 	{
 	}
 
+	SkillInfos::SkillInfos()
+	{
+		m_launchTimeMs = 0;
+		m_launchPosition = DeusCore::DeusVector2::Zero();
+		//m_skillState = ESkillState::NotLaunched;
+	}
+
 	SkillInfos::SkillInfos(const Skill& model, uint32_t launchTime, DeusVector2 position)
 		: Skill(model)
 	{
 		m_launchTimeMs = launchTime;
 		m_launchPosition = position;
-		m_skillState = ESkillState::NotLaunched;
+		//m_skillState = ESkillState::NotLaunched;
 	}
 }

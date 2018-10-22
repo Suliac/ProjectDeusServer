@@ -29,6 +29,7 @@ namespace DeusCore
 	class Skill
 	{
 	public:
+		Skill();
 		Skill(Id id, std::string name, bool isCircle, float castTime, uint16_t maxScope, uint16_t radius, uint16_t level, uint16_t manaCost, std::vector<SkillEffectPtr>& effects);
 		~Skill();
 
@@ -63,25 +64,31 @@ namespace DeusCore
 
 	using SkillPtr = std::shared_ptr<Skill>;
 
+	enum ESkillState {
+		NotLaunched = 0,
+		Casting = 1,
+		Launched = 2,
+		Finished = 3
+	};
+
 	class SkillInfos : public Skill
 	{
 	public:
-		enum ESkillState {
-			NotLaunched = 0,
-			Casting = 1,
-			Launched = 2,
-			Finished = 3
-		};
 
+		SkillInfos();
 		SkillInfos(const Skill& model, uint32_t launchTime, DeusVector2 position);
-			
+
 		uint32_t GetLaunchTime() const { return m_launchTimeMs; }
-		ESkillState GetState() const { return m_skillState; }
+		//ESkillState GetState() const { return m_skillState; }
 		DeusVector2 GetLaunchPosition() const { return m_launchPosition; }
+
+		uint32_t SetLaunchTime(uint32_t value) { m_launchTimeMs = value; }
+		//ESkillState SetState(ESkillState value) { m_skillState = value; }
+		DeusVector2 SetLaunchPosition(const DeusVector2& value) { m_launchPosition = value; }
 
 	private:
 		uint32_t m_launchTimeMs;
-		ESkillState m_skillState;
+		//ESkillState m_skillState;
 		DeusVector2 m_launchPosition;
 
 	};

@@ -27,6 +27,7 @@ namespace DeusServer
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::LeaveGameRequest);
 
 		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::UpdateMovementRequest);
+		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::UseSkillRequest);
 	}
 
 	GameLogicServer::~GameLogicServer()
@@ -40,12 +41,8 @@ namespace DeusServer
 		m_cellLock.lock();
 		for (const auto& cellGameObjects : m_cellsGameObjects)
 		{
-			//m_gameObjLocker[cellGameObjects.first - 1].lock(); // <-----------LOCK
-			for (const auto& gameObj : cellGameObjects.second)
-			{
+			for (const auto& gameObj : cellGameObjects.second)			
 				gameObj.second->Update(deltatimeMs);
-			}
-			//m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
 		}
 		m_cellLock.unlock();
 	}
@@ -68,13 +65,14 @@ namespace DeusServer
 	void GameLogicServer::OnStop()
 	{
 		DeusCore::DeusEventDeleguate messageInterpretDeleguate = fastdelegate::MakeDelegate(this, &GameLogicServer::InterpretPacket);
+		
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::StartGame);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::Disconnect);
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::LeaveGameRequest);
 
 		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::UpdateMovementRequest);
-
-
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::UseSkillRequest);
+		
 		m_cellsGameObjects.clear();
 		m_playerWithGameObject.clear();
 
@@ -84,11 +82,8 @@ namespace DeusServer
 	bool GameLogicServer::AddObject(std::shared_ptr<GameObject> p_objectToAdd, Id cellId)
 	{
 		m_cellLock.lock();
-		//m_gameObjLocker[cellId - 1].lock(); // <-----------LOCK
 		if (m_cellsGameObjects[cellId].find(p_objectToAdd->GetId()) != m_cellsGameObjects[cellId].end())
 		{
-			//m_gameObjLocker[cellId - 1].unlock(); // <-----------UNLOCK
-
 			m_cellLock.unlock();
 			return false; // Already existing game object !
 		}
@@ -96,9 +91,7 @@ namespace DeusServer
 		p_objectToAdd->Start();
 		//DeusCore::Logger::Instance()->Log(m_name, "Create GameObject : " + std::to_string(p_objectToAdd->GetId()));
 		m_cellsGameObjects[cellId].insert(std::make_pair(p_objectToAdd->GetId(), p_objectToAdd));
-
-		//m_gameObjLocker[cellId - 1].unlock(); // <-----------UNLOCK
-
+		
 		m_cellLock.unlock();
 		return true;
 	}
@@ -108,19 +101,15 @@ namespace DeusServer
 		m_cellLock.lock();
 		for (auto& cellGameObjects : m_cellsGameObjects)
 		{
-			//m_gameObjLocker[cellGameObjects.first - 1].lock(); // <-----------LOCK
-
 			const auto& gameObjIt = cellGameObjects.second.find(objectToDeleteId);
 			if (gameObjIt != cellGameObjects.second.end())
 			{
 				gameObjIt->second->Stop();
 				cellGameObjects.second.erase(gameObjIt);
-				//m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
 
 				m_cellLock.unlock();
 				return true;
 			}
-			//m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
 		}
 
 		m_cellLock.unlock();
@@ -211,7 +200,6 @@ namespace DeusServer
 			m_cellLock.lock();
 			for (auto& cellGameObjects : m_cellsGameObjects)
 			{
-				//m_gameObjLocker[cellGameObjects.first - 1].lock(); // <-----------LOCK
 
 				const auto& gameObjIt = cellGameObjects.second.find(objectId);
 				if (gameObjIt != cellGameObjects.second.end())
@@ -228,10 +216,8 @@ namespace DeusServer
 					//GameObject found, delete it and send infos
 					cellGameObjects.second.erase(gameObjIt);
 					//////////////////////////////////////////////
-					//m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
 					break;
 				}
-				//m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
 			}
 			m_cellLock.unlock();
 		}
@@ -258,14 +244,10 @@ namespace DeusServer
 				m_cellLock.lock();
 				for (auto& cellGameObjects : m_cellsGameObjects)
 				{
-					//m_gameObjLocker[cellGameObjects.first - 1].lock(); // <-----------LOCK
-
 					// Search for object
 					const auto& gameObjIt = cellGameObjects.second.find(objectId);
 					if (gameObjIt != cellGameObjects.second.end())
 					{
-						//DeusCore::Logger::Instance()->Log(m_name, "Update client : " + std::to_string(clientId) + " with componentId : " + std::to_string(componentId));
-
 						// Search for PositionComponent
 						std::shared_ptr<GameObjectComponent> compo = gameObjIt->second->GetComponent(componentId);
 						if (compo != nullptr)
@@ -290,12 +272,10 @@ namespace DeusServer
 							DeusCore::PacketSPtr p_cellFirePacket = std::shared_ptr<CellFirePacket>(new CellFirePacket(cellGameObjects.first, objectId, std::move(movementFeedback)));
 							DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, 0, p_cellFirePacket);
 
-							//DeusCore::Logger::Instance()->Log(m_name, "UpdatePlayerDirection success");
 							break;
 						}
 					}
 
-					//m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
 				}
 				m_cellLock.unlock();
 			}
@@ -303,15 +283,14 @@ namespace DeusServer
 			{
 				DeusCore::Logger::Instance()->Log(m_name, e.what());
 			}
-
-			//DeusCore::Logger::Instance()->Log(m_name, "|----------------------------------------------------------------- |");
-
 		}
 	}
 
 	void GameLogicServer::PlayerUseSkill(Id clientId, std::shared_ptr<DeusCore::PacketUseSkillRequest> p_packet)
 	{
+		DeusCore::Logger::Instance()->Log(m_name, "Player " + std::to_string(clientId) + " request to use skill " + std::to_string(p_packet->GetSkillId()));
 		m_cellLock.lock(); // <----------- LOCK
+		
 		Id cellId = 0;
 		std::shared_ptr<GameObject> gameObj = GetObject(clientId, cellId);
 
@@ -330,7 +309,6 @@ namespace DeusServer
 			//		b) Skill used in right scope
 			//		c) [TODO] Player has enough mana
 			//		d) [TODO] Player has the minimum level requested and has unlocked the skill
-
 			bool canLaunch = true;
 
 			// a) Skill already launching ?
@@ -348,6 +326,8 @@ namespace DeusServer
 			// 2 - Insert datas 
 			if (canLaunch)
 			{
+				DeusCore::Logger::Instance()->Log(m_name, "Can launch");
+				
 				DeusCore::SkillPtr currentSkillModel = DeusCore::ResourcesHandler::Instance()->GetSkill(p_packet->GetSkillId());
 				std::shared_ptr<DeusCore::SkillInfos> p_newSkillInfos = std::make_shared<DeusCore::SkillInfos>(*(currentSkillModel), currentMs, p_packet->GetSkillPosition());
 				skillCompo->InsertData(p_newSkillInfos, currentMs);
@@ -358,32 +338,31 @@ namespace DeusServer
 				DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, 0, p_cellFirePacket);
 			}
 		}
+
 		m_cellLock.unlock(); // <----------- UNLOCK
+		DeusCore::Logger::Instance()->Log(m_name, "End skill request");
 	}
 
 	//-------------------------------------------------------------------------------------------------------------
 	Id GameLogicServer::GetCellIdOfGameObject(Id objectId)
 	{
 		Id cellId = 0; // 0 = error, ids start at 1
-		m_cellLock.lock();
+		m_cellLock.lock(); // <-----------LOCK
 		for (auto& cellGameObjects : m_cellsGameObjects)
 		{
-			//m_gameObjLocker[cellGameObjects.first - 1].lock(); // <-----------LOCK
-
 			const auto& gameObjIt = cellGameObjects.second.find(objectId);
 			if (gameObjIt != cellGameObjects.second.end())
 			{
 				cellId = cellGameObjects.first;
-				//m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
 				m_cellLock.unlock();
 				return cellId;
 			}
-			//m_gameObjLocker[cellGameObjects.first - 1].unlock(); // <-----------UNLOCK
 		}
-		m_cellLock.unlock();
+		m_cellLock.unlock(); // <-----------UNLOCK
 		return cellId;
 	}
 
+	//-------------------------------------------------------------------------------------------------------------
 	void GameLogicServer::GetGameObjectOnChangeCells(Id playerId, Id cellLeavedId, Id cellEnteredId, std::vector<std::shared_ptr<const GameObject>>& objectInCellsLeft, std::vector<std::shared_ptr<const GameObject>>& objectInCellsEntered)
 	{
 		// TODO : Interest management here !
