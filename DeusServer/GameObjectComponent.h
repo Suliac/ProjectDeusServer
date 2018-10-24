@@ -20,7 +20,7 @@ namespace DeusServer
 			SkillComponent		= 3,
 		};
 
-		GameObjectComponent(EComponentType type);
+		GameObjectComponent(EComponentType type, Id parentGameObjectId);
 		~GameObjectComponent();
 
 		EComponentType GetType() const { return m_type; }
@@ -29,6 +29,7 @@ namespace DeusServer
 		virtual void OnStart() override;
 		virtual void OnStop() override;
 		
+		Id m_parentObjectId;
 	private:
 		static Id NextId;
 		EComponentType m_type;

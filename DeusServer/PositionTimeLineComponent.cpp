@@ -4,8 +4,8 @@
 
 namespace DeusServer
 {
-	PositionTimeLineComponent::PositionTimeLineComponent()
-		: TimeLineComponent(EComponentType::PositionComponent)
+	PositionTimeLineComponent::PositionTimeLineComponent(Id parentObjectId)
+		: TimeLineComponent(EComponentType::PositionComponent, parentObjectId)
 	{
 		InsertData(std::make_shared<const DeusCore::DeusVector2>(DeusCore::DeusVector2::Zero()));
 	}

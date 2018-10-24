@@ -10,7 +10,7 @@ namespace DeusServer
 		switch (objectType)
 		{
 		case DeusServer::GameObject::Player:
-			GetPlayerComponents(components);
+			GetPlayerComponents(components, GameObject::GetNextId());
 			break;
 		default:
 			break;
@@ -20,10 +20,10 @@ namespace DeusServer
 		return gameObj;
 	}
 
-	void GameObjectFactory::GetPlayerComponents(std::vector<std::shared_ptr<GameObjectComponent>>& components)
+	void GameObjectFactory::GetPlayerComponents(std::vector<std::shared_ptr<GameObjectComponent>>& components, Id parentObjectId)
 	{
-		components.push_back(std::shared_ptr<HealthTimeLineComponent>(new HealthTimeLineComponent()));
-		components.push_back(std::shared_ptr<PositionTimeLineComponent>(new PositionTimeLineComponent()));
+		components.push_back(std::shared_ptr<HealthTimeLineComponent>(new HealthTimeLineComponent(parentObjectId)));
+		components.push_back(std::shared_ptr<PositionTimeLineComponent>(new PositionTimeLineComponent(parentObjectId)));
 
 	}
 

@@ -1,13 +1,16 @@
 #include "SkillTimeLineComponent.h"
+#include "HealthTimeLineComponent.h"
 
 #include "DeusCore/FastDelegate.h"
+#include "DeusCore/PacketUpdateHealth.h"
+#include "DeusCore/EventManagerHandler.h"
 
 namespace DeusServer
 {
-	SkillTimeLineComponent::SkillTimeLineComponent(DeusCore::Id gameId)
-		:	TimeLineComponent(EComponentType::SkillComponent),
-			m_gameId(gameId)
-	{		
+	SkillTimeLineComponent::SkillTimeLineComponent(DeusCore::Id gameId, Id parentObjectId)
+		: TimeLineComponent(EComponentType::SkillComponent, parentObjectId),
+		m_gameId(gameId)
+	{
 	}
 
 	SkillTimeLineComponent::~SkillTimeLineComponent()
@@ -17,9 +20,8 @@ namespace DeusServer
 	void SkillTimeLineComponent::OnStart()
 	{
 		DeusCore::DeusEventDeleguate messageInterpretDeleguate = fastdelegate::MakeDelegate(this, &SkillTimeLineComponent::InterpretPacket);
-		
-		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::ObjectEnter);
-		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::ObjectLeave);
+
+		DeusCore::EventManagerHandler::Instance()->AddListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::ObjectChangeCell);
 	}
 
 	void SkillTimeLineComponent::OnUpdate(double deltatimeMs)
@@ -62,27 +64,55 @@ namespace DeusServer
 						if ((p_currentSkill->GetLaunchTime() + p_currentSkill->GetCastTime() + p_currentSkill->GetEffects()[m_effectIndex]->GetDuration() + m_effectDurationDone) * 1000 < currentTime) // can apply effect
 						{
 							// Apply damage
-							// 1 - Check if there is someone in the area
+							for (int i = 0; i < m_objectsInPerimeters.size(); ++i)
+							{
+								std::shared_ptr<PositionTimeLineComponent> p_positionComponent = std::dynamic_pointer_cast<PositionTimeLineComponent>(m_objectsInPerimeters[i]->GetFirstComponent(GameObjectComponent::EComponentType::PositionComponent));
+								if (p_positionComponent)
+								{
+									// ******************** 1 - Check if there is someone in the range of the skill
+									std::shared_ptr<const DeusCore::DeusVector2> p_objPos = p_positionComponent->GetValue(currentTime);
+									std::shared_ptr<const DeusCore::DeusVector2> p_myPod = m_currentPosition->GetValue(currentTime);
 
-							// 2 - Deduce life
+									if (!p_objPos || !p_myPod)
+										break;
 
-							// 3 - Send packets to client concerned
+									// check range
+									if (DeusCore::DeusVector2::SqrtMagnitude(*p_objPos, *p_myPod) <= p_currentSkill->GetMaxScope() * p_currentSkill->GetMaxScope())
+									{
 
-							m_effectDurationDone += p_currentSkill->GetEffects()[m_effectIndex]->GetDuration();
-							m_effectIndex++;
+										// Check if target has life
+										std::shared_ptr<HealthTimeLineComponent> p_healthComponent = std::dynamic_pointer_cast<HealthTimeLineComponent>(m_objectsInPerimeters[i]->GetFirstComponent(GameObjectComponent::EComponentType::HealthComponent));
+										if (p_healthComponent)
+										{
+											// ******************** 2 - Deduce life
+											std::shared_ptr<const int> p_life = p_healthComponent->GetValue(currentTime);
+											int newHealth = *p_life - p_currentSkill->GetEffects()[m_effectIndex]->GetDamage();
+											p_healthComponent->InsertData(std::make_shared<int>(newHealth), currentTime);
+
+											// ******************** 3 - Send packets to client concerned
+											//DeusCore::PacketSPtr p_packetHealth = std::shared_ptr<DeusCore::PacketUpdateHealth>(new DeusCore::PacketUpdateHealth(m_objectsInPerimeters[i], p_healthComponent->GetId(), newHealth, currentTime));
+											//DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, 0, p_packetHealth);										}
+										}
+									}
+
+
+								}
+
+								m_effectDurationDone += p_currentSkill->GetEffects()[m_effectIndex]->GetDuration();
+								m_effectIndex++;
+							}
 						}
-					}
-					// else all effects are done
+						// else all effects are done
 
-					break;
+						break;
 				case DeusCore::Finished:
 					// Delete or réinit
 					break;
 				default:
 					break;
+					}
 				}
 			}
-
 		}
 	}
 
@@ -90,8 +120,7 @@ namespace DeusServer
 	{
 		DeusCore::DeusEventDeleguate messageInterpretDeleguate = fastdelegate::MakeDelegate(this, &SkillTimeLineComponent::InterpretPacket);
 
-		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::ObjectEnter);
-		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::ObjectLeave);
+		DeusCore::EventManagerHandler::Instance()->RemoveListener(m_gameId, messageInterpretDeleguate, DeusCore::Packet::EMessageType::ObjectChangeCell);
 	}
 
 	std::shared_ptr<DeusCore::SkillInfos> SkillTimeLineComponent::Interpolate(const DeusCore::SkillInfos & beforeValue, uint32_t beforeValueTimestamp, const DeusCore::SkillInfos & afterValue, uint32_t afterValueTimestamp, uint32_t currentMs) const
@@ -106,6 +135,31 @@ namespace DeusServer
 
 	void SkillTimeLineComponent::InterpretPacket(DeusCore::DeusEventSPtr p_packet)
 	{
-		// TODO : Update player GO list
+		if (p_packet->second->GetType() == DeusCore::Packet::EMessageType::ObjectChangeCell)
+		{
+			ManageChangeCellPacket(std::dynamic_pointer_cast<PacketObjectChangeCell>(p_packet->second));
+		}
+	}
+
+	void SkillTimeLineComponent::ManageChangeCellPacket(std::shared_ptr<PacketObjectChangeCell> p_packetChangeCell)
+	{
+		// Is this me ? then i need to update my info
+		if (p_packetChangeCell->GetGameObject()->GetId() == m_parentObjectId)
+		{
+			m_currentCellId = p_packetChangeCell->GetEnteredCellId();
+
+		}
+		else
+		{
+			if (p_packetChangeCell->GetEnteredCellId() == m_currentCellId) // new object entered our perimeter
+				m_objectsInPerimeters.insert(std::make_pair(p_packetChangeCell->GetGameObject()->GetId(), p_packetChangeCell->GetGameObject()));
+
+			if (p_packetChangeCell->GetLeftCellId() == m_currentCellId) // object just left perimeter
+			{
+				std::map<Id, std::shared_ptr<const GameObject>>::iterator  objIt = m_objectsInPerimeters.find(p_packetChangeCell->GetGameObject()->GetId());
+				if (objIt != m_objectsInPerimeters.end())
+					m_objectsInPerimeters.erase(objIt);
+			}
+		}
 	}
 }

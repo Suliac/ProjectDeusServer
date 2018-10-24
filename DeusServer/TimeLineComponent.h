@@ -14,7 +14,7 @@ namespace DeusServer
 #define WANT_DATA_AFTER_TIMESTAMP false
 
 	public:
-		TimeLineComponent(EComponentType type);
+		TimeLineComponent(EComponentType type, Id parentObjectId);
 
 		virtual std::shared_ptr<const T> GetValue(uint32_t timeWantedMs = 0) const;
 		void InsertData(std::shared_ptr<const T> data);
@@ -60,8 +60,8 @@ namespace DeusServer
 	}
 
 	template<typename T>
-	inline TimeLineComponent<T>::TimeLineComponent(EComponentType type)
-		: GameObjectComponent(type)
+	inline TimeLineComponent<T>::TimeLineComponent(EComponentType type, Id parentObjectId)
+		: GameObjectComponent(type, parentObjectId)
 	{
 	}
 

@@ -25,7 +25,7 @@ namespace DeusServer
 	class PositionTimeLineComponent : public TimeLineComponent<DeusCore::DeusVector2>
 	{
 	public:
-		PositionTimeLineComponent();
+		PositionTimeLineComponent(Id parentObjectId);
 		~PositionTimeLineComponent();
 	protected:
 		//virtual void OnStart() override;

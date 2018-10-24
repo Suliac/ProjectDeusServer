@@ -2,7 +2,7 @@
 
 namespace DeusServer
 {
-	HealthTimeLineComponent::HealthTimeLineComponent() : TimeLineComponent(EComponentType::HealthComponent)
+	HealthTimeLineComponent::HealthTimeLineComponent(Id parentObjectId) : TimeLineComponent(EComponentType::HealthComponent, parentObjectId)
 	{
 		InsertData(std::make_shared<int>(100));
 	}

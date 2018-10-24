@@ -10,6 +10,7 @@ namespace DeusServer
 	{
 	public:
 		enum EObjectType : uint8_t {
+			Anything = 0,
 			Player = 1,
 		};
 
@@ -18,9 +19,11 @@ namespace DeusServer
 		~GameObject();
 
 		void GetSerializableComponents(std::vector<std::shared_ptr<ISerializableComponent>>& components) const;
-		std::shared_ptr<GameObjectComponent> GetComponent(uint32_t identifier);
-		std::shared_ptr<GameObjectComponent> GetFirstComponent(GameObjectComponent::EComponentType componentType);
+		std::shared_ptr<GameObjectComponent> GetComponent(uint32_t identifier) const;
+		std::shared_ptr<GameObjectComponent> GetFirstComponent(GameObjectComponent::EComponentType componentType) const;
 		EObjectType GetType() const { return m_type; }
+
+		static Id GetNextId() { return NextId; }
 	protected:
 		virtual void OnUpdate(double deltatimeMs) override;
 		virtual void OnStart() override;

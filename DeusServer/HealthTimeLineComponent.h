@@ -5,7 +5,7 @@ namespace DeusServer
 	class HealthTimeLineComponent : public TimeLineComponent<int>
 	{
 	public:
-		HealthTimeLineComponent();
+		HealthTimeLineComponent(Id parentObjectId);
 		~HealthTimeLineComponent();
 
 

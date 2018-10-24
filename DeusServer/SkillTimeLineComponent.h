@@ -1,6 +1,8 @@
 #pragma once
 
 #include "TimeLineComponent.h"
+#include "PacketObjectChangeCell.h"
+#include "PositionTimeLineComponent.h"
 
 #include "DeusCore/Skill.h"
 #include "DeusCore/EventManagerHandler.h"
@@ -9,7 +11,7 @@ namespace DeusServer
 	class SkillTimeLineComponent : public TimeLineComponent<DeusCore::SkillInfos>
 	{
 	public:
-		SkillTimeLineComponent(DeusCore::Id gameId);
+		SkillTimeLineComponent(DeusCore::Id gameId, Id parentObjectId);
 		~SkillTimeLineComponent();
 
 	protected:
@@ -22,9 +24,15 @@ namespace DeusServer
 	
 	private:
 		void InterpretPacket(DeusCore::DeusEventSPtr p_packet);
-
+		void ManageChangeCellPacket(std::shared_ptr<PacketObjectChangeCell> p_packetChangeCell);
+		
 		DeusCore::Id m_gameId;
+		DeusCore::Id m_currentCellId;
+		std::shared_ptr<const PositionTimeLineComponent> m_currentPosition;
 
+		std::map<Id, std::shared_ptr<const GameObject>> m_objectsInPerimeters;
+
+		// Effects management
 		DeusCore::ESkillState m_lastState;
 		size_t m_effectIndex = 0;
 		uint32_t m_effectDurationDone = 0;

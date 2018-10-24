@@ -79,16 +79,18 @@ namespace DeusServer
 		}
 	}
 
-	std::shared_ptr<GameObjectComponent> GameObject::GetComponent(uint32_t identifier)
+	std::shared_ptr<GameObjectComponent> GameObject::GetComponent(uint32_t identifier) const
 	{
-		GameObjectComponents::iterator componentIt = m_components.find(identifier);
-		if (componentIt != m_components.end())
-			return componentIt->second;
+		for (const auto& component : m_components)
+		{
+			if (component.second->GetId() == identifier)
+				return component.second;
+		}
 
 		return nullptr;
 	}
 
-	std::shared_ptr<GameObjectComponent> GameObject::GetFirstComponent(GameObjectComponent::EComponentType componentType)
+	std::shared_ptr<GameObjectComponent> GameObject::GetFirstComponent(GameObjectComponent::EComponentType componentType) const
 	{
 		for (const auto& component : m_components)
 		{
