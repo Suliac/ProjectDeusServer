@@ -345,6 +345,8 @@ namespace DeusServer
 			SendPacket(p_packet, playerInfo.first, SEND_TCP);
 		}
 		m_playersLocker.unlock(); // <------------- UNLOCK
+		//DeusCore::Logger::Instance()->Log(m_name, "Game started sended");
+
 	}
 
 	//---------------------------------------------------------------------------------

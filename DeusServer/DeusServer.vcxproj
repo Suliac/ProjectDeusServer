@@ -173,6 +173,7 @@
     <ClCompile Include="PositionTimeLineComponent.cpp" />
     <ClCompile Include="SerializableHealthComponent.cpp" />
     <ClCompile Include="SerializablePositionComponent.cpp" />
+    <ClCompile Include="SerializableSkillComponent.cpp" />
     <ClCompile Include="SkillTimeLineComponent.cpp" />
     <ClCompile Include="WorldNetworkServer.cpp" />
     <ClCompile Include="DeusTcpConnection.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="PacketObjectEnter.h" />
     <ClInclude Include="PositionTimeLineComponent.h" />
     <ClInclude Include="SerializableHealthComponent.h" />
+    <ClInclude Include="SerializableSkillComponent.h" />
     <ClInclude Include="SerializableTimelineComponent.h" />
     <ClInclude Include="SerializablePositionComponent.h" />
     <ClInclude Include="SkillTimeLineComponent.h" />

@@ -64,9 +64,9 @@ namespace DeusServer
 						if ((p_currentSkill->GetLaunchTime() + p_currentSkill->GetCastTime() + p_currentSkill->GetEffects()[m_effectIndex]->GetDuration() + m_effectDurationDone) * 1000 < currentTime) // can apply effect
 						{
 							// Apply damage
-							for (int i = 0; i < m_objectsInPerimeters.size(); ++i)
+							for (const auto& objectInPerimeter : m_objectsInPerimeters)
 							{
-								std::shared_ptr<PositionTimeLineComponent> p_positionComponent = std::dynamic_pointer_cast<PositionTimeLineComponent>(m_objectsInPerimeters[i]->GetFirstComponent(GameObjectComponent::EComponentType::PositionComponent));
+								std::shared_ptr<PositionTimeLineComponent> p_positionComponent = std::dynamic_pointer_cast<PositionTimeLineComponent>(objectInPerimeter.second->GetFirstComponent(GameObjectComponent::EComponentType::PositionComponent));
 								if (p_positionComponent)
 								{
 									// ******************** 1 - Check if there is someone in the range of the skill
@@ -81,7 +81,7 @@ namespace DeusServer
 									{
 
 										// Check if target has life
-										std::shared_ptr<HealthTimeLineComponent> p_healthComponent = std::dynamic_pointer_cast<HealthTimeLineComponent>(m_objectsInPerimeters[i]->GetFirstComponent(GameObjectComponent::EComponentType::HealthComponent));
+										std::shared_ptr<HealthTimeLineComponent> p_healthComponent = std::dynamic_pointer_cast<HealthTimeLineComponent>(objectInPerimeter.second->GetFirstComponent(GameObjectComponent::EComponentType::HealthComponent));
 										if (p_healthComponent)
 										{
 											// ******************** 2 - Deduce life
@@ -90,12 +90,11 @@ namespace DeusServer
 											p_healthComponent->InsertData(std::make_shared<int>(newHealth), currentTime);
 
 											// ******************** 3 - Send packets to client concerned
-											//DeusCore::PacketSPtr p_packetHealth = std::shared_ptr<DeusCore::PacketUpdateHealth>(new DeusCore::PacketUpdateHealth(m_objectsInPerimeters[i], p_healthComponent->GetId(), newHealth, currentTime));
-											//DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, 0, p_packetHealth);										}
+											DeusCore::Logger::Instance()->Log("SKILL TL", "New health " + newHealth);
+											DeusCore::PacketSPtr p_packetHealth = std::shared_ptr<DeusCore::PacketUpdateHealth>(new DeusCore::PacketUpdateHealth(objectInPerimeter.first, p_healthComponent->GetId(), newHealth, currentTime));
+											DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, 0, p_packetHealth);										
 										}
 									}
-
-
 								}
 
 								m_effectDurationDone += p_currentSkill->GetEffects()[m_effectIndex]->GetDuration();

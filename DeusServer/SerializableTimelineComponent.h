@@ -28,11 +28,13 @@ namespace DeusServer
 		m_componentId = componentId;
 		m_componentType = componentType;
 
-		assert(p_originValue);
-		m_originValue = std::make_shared<T>(*p_originValue);
-		m_originMs = originMs;
+		if (p_originValue)
+		{
+			m_originValue = std::make_shared<T>(*p_originValue);
+			m_originMs = originMs;
+		}
 
-		if (p_destinationValue != nullptr)
+		if (p_destinationValue)
 		{
 			m_destinationValue = std::make_shared<T>(*p_destinationValue);
 			m_destinationMs = destinationMs;

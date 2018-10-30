@@ -26,7 +26,7 @@ namespace DeusCore
 
 	using SkillEffectPtr = std::shared_ptr<SkillEffect>;
 
-	class Skill
+	class Skill : public ISerializable
 	{
 	public:
 		Skill();
@@ -46,7 +46,14 @@ namespace DeusCore
 		uint32_t GetTotalTime() const { return m_totalTimeMs; } // calculated on load
 
 		std::string ToString() const { return "ID : " + std::to_string(m_id) + " | Name : " + m_name + " | Shape : " + (m_isCircle ? "Circle" : "Not Circle") + " | Cast time : " + std::to_string(m_castTime) + " | Max scope : " + std::to_string(m_maxScope) + " | Radius : " + std::to_string(m_radius) + " | Level : " + std::to_string(m_level) + " | Mana cost : " + std::to_string(m_manaCost); }
-	private:
+	
+		virtual void Deserialize(Buffer512 & buffer) override;
+		virtual void Serialize(Buffer512 & buffer) const override;
+		virtual uint16_t EstimateAnswerCurrentSerializedSize() const override;
+	
+	protected:
+		void LoadSkill(Id skillId);
+
 		Id m_id;
 		std::string m_name;
 		bool m_isCircle;
@@ -85,6 +92,10 @@ namespace DeusCore
 		uint32_t SetLaunchTime(uint32_t value) { m_launchTimeMs = value; }
 		//ESkillState SetState(ESkillState value) { m_skillState = value; }
 		DeusVector2 SetLaunchPosition(const DeusVector2& value) { m_launchPosition = value; }
+
+		virtual void Deserialize(Buffer512 & buffer) override;
+		virtual void Serialize(Buffer512 & buffer) const override;
+		virtual uint16_t EstimateAnswerCurrentSerializedSize() const override;
 
 	private:
 		uint32_t m_launchTimeMs;

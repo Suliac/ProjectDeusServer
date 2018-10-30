@@ -136,6 +136,9 @@
     <ClCompile Include="SkillTimeLineComponent.cpp">
       <Filter>Logic\Sources\Components</Filter>
     </ClCompile>
+    <ClCompile Include="SerializableSkillComponent.cpp">
+      <Filter>Serialization\Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DeusClient.h">
@@ -221,6 +224,9 @@
     </ClInclude>
     <ClInclude Include="SkillTimeLineComponent.h">
       <Filter>Logic\Headers\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="SerializableSkillComponent.h">
+      <Filter>Serialization\Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

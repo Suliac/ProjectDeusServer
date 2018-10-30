@@ -19,8 +19,13 @@ namespace DeusServer {
 		DeserializeData(buffer, componentType);
 		m_componentType = (GameObjectComponent::EComponentType)componentType;
 		
-		DeserializeData(buffer, *m_originValue);
-		DeserializeData(buffer, m_originMs);
+		bool isThereOrigin = false;
+		DeserializeData(buffer, isThereOrigin);
+		if (isThereOrigin)
+		{
+			DeserializeData(buffer, *m_originValue);
+			DeserializeData(buffer, m_originMs);
+		}
 
 		bool isThereDestination = false;
 		DeserializeData(buffer, isThereDestination);
@@ -38,12 +43,17 @@ namespace DeusServer {
 		uint8_t componentType = m_componentType;
 		SerializeData(buffer, componentType);
 
-		SerializeData(buffer, *m_originValue);
-		SerializeData(buffer, m_originMs);
+		bool isThereOrigin = m_originValue != nullptr;
+		SerializeData(buffer, isThereOrigin);
+		if (isThereOrigin)
+		{
+			SerializeData(buffer, *m_originValue);
+			SerializeData(buffer, m_originMs);
+		}
 		
-		bool isThereDestination = false;
+		bool isThereDestination = m_destinationValue != nullptr;
 		SerializeData(buffer, isThereDestination);
-		if (m_destinationValue != nullptr)
+		if (isThereDestination)
 		{
 			SerializeData(buffer, *m_destinationValue);
 			SerializeData(buffer, m_destinationMs);
@@ -56,6 +66,7 @@ namespace DeusServer {
 		uint16_t destinationDataSize = m_destinationValue != nullptr ? sizeof(*m_destinationValue) + sizeof(m_destinationMs) : 0;
 
 		return uint16_t(sizeof(m_componentId) + sizeof(m_componentType)
+			+ sizeof(bool) // bool isThereOrigin
 			+ originDataSize
 			+ sizeof(bool) // bool isThereDestination
 			+ destinationDataSize);

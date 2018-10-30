@@ -154,7 +154,7 @@ namespace DeusServer
 			if (m_playerWithGameObject.find(id) != m_playerWithGameObject.end())
 				continue;// already init this player
 
-			std::shared_ptr<GameObject> p_gameObj = GameObjectFactory::Create(GameObject::EObjectType::Player);
+			std::shared_ptr<GameObject> p_gameObj = GameObjectFactory::Create(GameObject::EObjectType::Player, m_gameId);
 			m_playerWithGameObject[id] = p_gameObj->GetId();
 			AddObject(p_gameObj, DEFAULT_CELL_ID); // give ownership
 
@@ -178,6 +178,8 @@ namespace DeusServer
 		// 4 - notify players
 		DeusCore::PacketSPtr p_packetGameStarted = std::shared_ptr<DeusCore::PacketGameStarted>(new DeusCore::PacketGameStarted());
 		DeusCore::EventManagerHandler::Instance()->QueueEvent(m_gameId, 0, p_packetGameStarted);
+		DeusCore::Logger::Instance()->Log(m_name, "End start new game");
+
 	}
 
 	void GameLogicServer::PlayerDisconnected(Id clientId)

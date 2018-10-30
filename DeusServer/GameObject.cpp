@@ -1,11 +1,14 @@
 #include "GameObject.h"
 #include "HealthTimeLineComponent.h"
 #include "PositionTimeLineComponent.h"
+#include "SkillTimeLineComponent.h"
 #include "SerializablePositionComponent.h"
 #include "SerializableHealthComponent.h"
+#include "SerializableSkillComponent.h"
 
 #include "DeusCore/DeusException.h"
 #include "DeusCore/DeusVector2.h"
+#include "DeusCore/Skill.h"
 namespace DeusServer
 {
 	Id GameObject::NextId = 1;
@@ -70,6 +73,18 @@ namespace DeusServer
 					component.second->GetType(),
 					originValue, originMs,
 					destValue, destMs);
+				break;
+			}
+			case GameObjectComponent::EComponentType::SkillComponent:
+			{
+				const std::shared_ptr<const DeusCore::SkillInfos> originValue = std::dynamic_pointer_cast<SkillTimeLineComponent>(component.second)->GetValueAtTime(currentMs, originMs, true);
+				const std::shared_ptr<const DeusCore::SkillInfos> destValue = std::dynamic_pointer_cast<SkillTimeLineComponent>(component.second)->GetValueAtTime(currentMs, destMs, false);
+
+				serializableCompo = std::make_shared<SerializableSkillComponent>(component.second->GetId(),
+					component.second->GetType(),
+					originValue, originMs,
+					destValue, destMs);
+
 				break;
 			}
 			default:
